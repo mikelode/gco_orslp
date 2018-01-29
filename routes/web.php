@@ -16,3 +16,4 @@ Route::get('/', function () {
 });
 
 Route::get('proyecto','Gco\ProyectoController@index');
+Route::get('presupuesto','Gco\PresupuestoController@index');

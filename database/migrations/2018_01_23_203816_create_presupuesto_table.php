@@ -21,14 +21,16 @@ class CreatePresupuestoTable extends Migration
                     ->on('gcoProyecto')
                     ->onDelete('cascade');
 
+            $table->integer('preLevel')->unsigned();
             $table->string('preItem',20);
+            $table->string('preDescription',1000);
             $table->string('preUnit',10);
             $table->decimal('preMetered',14,2)->default(0.00);
             $table->decimal('prePrice',14,2)->default(0.00);
             $table->decimal('prePartial',14,2);
-            $table->boolean('preItemDisable')->nullable();
-            $table->string('preItemDisableItem',100);
-            $table->datetime('preItemUpdateAt');
+            $table->boolean('preItemDisable')->default(0)->nullable();
+            $table->string('preItemDisableDetail',500)->nullable();
+            $table->datetime('preItemUpdateAt')->nullable();
             $table->string('preItemUpdateDetail')->nullable();
         });
     }

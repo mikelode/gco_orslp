@@ -1,0 +1,45 @@
+.tbl{
+
+}
+
+.tbl-header{
+
+}
+
+.tbl tbody td{
+	font-size: 10px;
+}
+
+.tbl .tbl-pres td{
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.lvl-1{
+	color: red;
+	font-weight: bold;
+}
+
+.lvl-2{
+	color: green;
+}
+
+.lvl-3{
+	color: blue;
+}
+
+.lvl-4{
+	color: pink;
+}
+
+.lvl-5{
+	color: orange;
+}
+
+.wdg-box{
+	margin-bottom: 4px;
+}
+
+.wdg-box .widget-header{
+	padding: 5px;
+}

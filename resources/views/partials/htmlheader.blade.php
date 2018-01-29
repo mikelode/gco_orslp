@@ -10,8 +10,12 @@
     <link href="{{ asset('/css/font-awesome.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/css/style.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/css/pages/dashboard.css') }}" rel="stylesheet" type="text/css">
+
+    <link href="{{ asset('/plugins/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('/css/symva.css') }}" rel="stylesheet" type="text/css">
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
           <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <script src="{{ asset('/js/jquery-1.7.2.min.js') }}" type="text/javascript"></script>
 </head>

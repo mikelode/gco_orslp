@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Gco;
 
 use App\Models\Proyecto;
-use App\Models\Equiprof;
-use App\Models\Uejecutora;
+use App\Models\Presupuesto;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class ProyectoController extends Controller
+class PresupuestoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,11 +16,9 @@ class ProyectoController extends Controller
      */
     public function index()
     {
-        $pys = Proyecto::with('ejecutor')->get();
-        $tms = Equiprof::with('individualData')->get();
-
-        $view = view('gestion.panel_proyectos', compact('pys','tms'));
-
+        $pys = Proyecto::all();
+        $pto = Presupuesto::where('preProject',1)->get();
+        $view = view('gestion.panel_presupuesto',compact('pys','pto'));
         return $view;
     }
 
@@ -49,10 +46,10 @@ class ProyectoController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Proyecto  $proyecto
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Proyecto $proyecto)
+    public function show($id)
     {
         //
     }
@@ -60,10 +57,10 @@ class ProyectoController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Proyecto  $proyecto
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Proyecto $proyecto)
+    public function edit($id)
     {
         //
     }
@@ -72,10 +69,10 @@ class ProyectoController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Proyecto  $proyecto
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Proyecto $proyecto)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -83,10 +80,10 @@ class ProyectoController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Proyecto  $proyecto
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Proyecto $proyecto)
+    public function destroy($id)
     {
         //
     }
