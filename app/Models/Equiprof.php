@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Equiprof extends Model
 {
-    protected $table = 'gcoEquiprof';
+    protected $table = 'gcoequiprof';
     protected $primaryKey = 'prfId';
     public $timestamps = false;
 

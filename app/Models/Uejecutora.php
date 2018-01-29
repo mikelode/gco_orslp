@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Uejecutora extends Model
 {
-    protected $table = 'gcoUejecutora';
+    protected $table = 'gcouejecutora';
     protected $primaryKey = 'ejeId';
     public $timestamps = false;
 

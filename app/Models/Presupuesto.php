@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Presupuesto extends Model
 {
-    protected $table = 'gcoPresupuesto';
+    protected $table = 'gcopresupuesto';
     protected $primaryKey = 'preId';
     public $timestamps = false;
 }
