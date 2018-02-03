@@ -1,13 +1,14 @@
 <!-- REQUIRED JS SCRIPTS -->
- 
 <script src="{{ asset('/js/excanvas.min.js') }}" type="text/javascript"></script> 
 <script src="{{ asset('/js/chart.min.js') }}" type="text/javascript"></script> 
-<script src="{{ asset('/js/bootstrap.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/bootstrap4/dist/js/bootstrap.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('plugins/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
 <script language="javascript" type="text/javascript" src="{{ asset('/js/full-calendar/fullcalendar.min.js') }}"></script>
 
 <script src="{{ asset('/js/base.js') }}" type="text/javascript"></script>
 
 <script src="{{ asset('/plugins/select2/select2.full.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/jqueryui-editable/js/jqueryui-editable.min.js') }}" type="text/javascript"></script>
 <script type="text/javascript" src="{{ asset('/js/symva.js') }}"></script>
 <script>     
 

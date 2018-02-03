@@ -1,20 +1,3 @@
-.tbl{
-
-}
-
-.tbl-header{
-
-}
-
-.tbl tbody td{
-	font-size: 10px;
-}
-
-.tbl .tbl-pres td{
-	padding-top: 1px;
-	padding-bottom: 1px;
-}
-
 .lvl-1{
 	color: red;
 	font-weight: bold;
@@ -42,4 +25,30 @@
 
 .wdg-box .widget-header{
 	padding: 5px;
+}
+
+.action-table{
+	
+}
+
+.action-table thead th{
+	text-align: center;
+	vertical-align: middle;
+}
+
+.action-table tbody td{
+	font-size: 10px;
+}
+
+.action-table .td-actions { 
+	width: 80px; 	
+	text-align: center; 
+}
+
+.action-table .td-actions .btn { 
+	margin-right: .1em;		
+}
+	
+.action-table .td-actions .btn:last-child { 
+	margin-rigth: 0; 		
 }

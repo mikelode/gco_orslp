@@ -12,6 +12,6 @@ class Equiprof extends Model
 
     public function individualData()
     {
-    	return $this->hasOne('App\Models\Persona','perId','prfPerson');	
+    	return $this->hasOne('App\Models\Persona','perId','prfPerson');
     }
 }

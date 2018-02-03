@@ -16,4 +16,15 @@ Route::get('/', function () {
 });
 
 Route::get('proyecto','Gco\ProyectoController@index');
+Route::get('nuevo/pry','Gco\ProyectoController@create');
+Route::post('nuevo/pry','Gco\ProyectoController@store');
+Route::get('editar/pry','Gco\ProyectoController@edit');
+Route::post('editar/pry','Gco\ProyectoController@update');
+
 Route::get('presupuesto','Gco\PresupuestoController@index');
+
+Route::post('nuevo/prs','Gco\PersonaController@store');
+Route::get('check/person','Gco\PersonaController@exist');
+
+Route::post('edit/statusteam','Gco\ProyectoController@postEditStatusTeam');
+Route::post('edit/jobteam','Gco\ProyectoController@postEditJobTeam');

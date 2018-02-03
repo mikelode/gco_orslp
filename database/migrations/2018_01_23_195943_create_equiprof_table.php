@@ -21,7 +21,7 @@ class CreateEquiprofTable extends Migration
                     ->on('gcoPersona')
                     ->onDelete('cascade');
 
-            $table->string('prfJob',20)->nullable();
+            $table->string('prfJob',30)->nullable();
             $table->boolean('prfDisable')->default(0);
             $table->string('prfDetailDisable', 200)->nullable();
             $table->integer('prfUejecutora')->unsigned();
