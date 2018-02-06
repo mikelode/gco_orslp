@@ -22,6 +22,8 @@ Route::get('editar/pry','Gco\ProyectoController@edit');
 Route::post('editar/pry','Gco\ProyectoController@update');
 
 Route::get('presupuesto','Gco\PresupuestoController@index');
+Route::get('list/presup','Gco\PresupuestoController@list');
+Route::post('importar/presup','Gco\PresupuestoController@importXls');
 
 Route::post('nuevo/prs','Gco\PersonaController@store');
 Route::get('check/person','Gco\PersonaController@exist');

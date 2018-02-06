@@ -99,7 +99,68 @@ function actualizar_proyecto(form, event)
 	});
 }
 
-function saludo()
+function cargar_presupuesto(id, callback)
 {
-	alert('HOLAAA');
+	$.ajax({
+		'url': 'list/presup',
+		'type': 'GET',
+		'data': {pyId: id},
+		'success': callback
+	});
+}
+
+function importar_presupuesto(form)
+{
+	var frmData = new FormData(form);
+
+	$.ajax({
+        type: 'post',
+        url: 'importar/presup',
+        data: frmData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response){
+            console.log(response);
+            alert(response.msg);
+        },
+        xhr: function(){
+            var myXhr = $.ajaxSettings.xhr();
+            if(myXhr.upload){
+                myXhr.upload.addEventListener('progress', function(ev){
+                    if(ev.lengthComputable){
+                        $('progress').attr({
+                            value: ev.loaded,
+                            max: ev.total,
+                        });
+                    }
+                }, false);
+            }
+            return myXhr;
+        },
+    });
+}
+
+function habilitar_edicion(btn, grid)
+{
+	alert(btn.text());
+	if(btn[0].value === 'enable'){
+		grid.setOptions({editable: false});
+		btn[0].value = 'disable'
+		btn.text('Editar');
+		btn.attr('class', 'btn btn-sm btn-info btn-block');
+	}
+	else if(btn[0].value === 'disable'){
+		grid.setOptions({editable: true});
+		btn[0].value = 'enable';
+		btn.text('Cancelar');
+		btn.attr('class', 'btn btn-sm btn-warning btn-block');
+	}
+	
+
+}
+
+function saludo(a)
+{
+	alert(a);
 }

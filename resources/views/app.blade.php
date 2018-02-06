@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="es">
 
 @include('partials.htmlheader')
 
@@ -18,6 +18,8 @@
 	@include('partials.extrafooter')
 	@include('partials.footer')
 	@include('partials.scripts')
+
+	@yield('custom-scripts')
 
 </body>
 </html>

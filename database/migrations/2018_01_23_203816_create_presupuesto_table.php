@@ -22,12 +22,12 @@ class CreatePresupuestoTable extends Migration
                     ->onDelete('cascade');
 
             $table->integer('preLevel')->unsigned();
-            $table->string('preItem',20);
-            $table->string('preDescription',1000);
-            $table->string('preUnit',10);
-            $table->decimal('preMetered',14,2)->default(0.00);
-            $table->decimal('prePrice',14,2)->default(0.00);
-            $table->decimal('prePartial',14,2);
+            $table->string('preItem',20)->nullable();
+            $table->string('preDescription',1000)->nullable();
+            $table->string('preUnit',10)->nullable();
+            $table->decimal('preMetered',14,2)->default(0.00)->nullable();
+            $table->decimal('prePrice',14,2)->default(0.00)->nullable();
+            $table->decimal('prePartial',14,2)->nullable();
             $table->boolean('preItemDisable')->default(0)->nullable();
             $table->string('preItemDisableDetail',500)->nullable();
             $table->datetime('preItemUpdateAt')->nullable();
