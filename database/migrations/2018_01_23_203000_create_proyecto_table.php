@@ -26,7 +26,7 @@ class CreateProyectoTable extends Migration
             $table->integer('pryExeUnit')->unsigned()->nullable();
             $table->foreign('pryExeUnit')
                     ->references('ejeId')
-                    ->on('gcoUejecutora')
+                    ->on('gcouejecutora')
                     ->onDelete('cascade');
 
             $table->boolean('pryInvalidate')->default(0);

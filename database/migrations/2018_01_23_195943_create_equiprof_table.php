@@ -18,7 +18,7 @@ class CreateEquiprofTable extends Migration
             $table->integer('prfPerson')->unsigned();
             $table->foreign('prfPerson')
                     ->references('perId')
-                    ->on('gcoPersona')
+                    ->on('gcopersona')
                     ->onDelete('cascade');
 
             $table->string('prfJob',30)->nullable();
@@ -27,7 +27,7 @@ class CreateEquiprofTable extends Migration
             $table->integer('prfUejecutora')->unsigned();
             $table->foreign('prfUejecutora')
                     ->references('ejeId')
-                    ->on('gcoUejecutora')
+                    ->on('gcouejecutora')
                     ->onDelete('cascade');
 
             $table->boolean('prfInvalidate')->default(0);

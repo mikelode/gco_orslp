@@ -18,7 +18,7 @@ class CreatePresupuestoTable extends Migration
             $table->integer('preProject')->unsigned();
             $table->foreign('preProject')
                     ->references('pryId')
-                    ->on('gcoProyecto')
+                    ->on('gcoproyecto')
                     ->onDelete('cascade');
 
             $table->integer('preLevel')->unsigned();

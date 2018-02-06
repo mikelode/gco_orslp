@@ -21,7 +21,7 @@ class CreateAvancepresTable extends Migration
             $table->integer('aprProject')->unsigned();
             $table->foreign('aprProject')
                     ->references('pryId')
-                    ->on('gcoProyecto')
+                    ->on('gcoproyecto')
                     ->onDelete('cascade');
 
             $table->string('aprPeriod',50);

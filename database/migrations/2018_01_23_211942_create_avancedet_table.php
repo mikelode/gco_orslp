@@ -27,7 +27,7 @@ class CreateAvancedetTable extends Migration
             $table->integer('avcBudgetProgress')->unsigned();
             $table->foreign('avcBudgetProgress')
                     ->references('aprId')
-                    ->on('gcoAvancepres')
+                    ->on('gcoavancepres')
                     ->onDelete('cascade');
         });
     }
