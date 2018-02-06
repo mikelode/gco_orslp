@@ -107,7 +107,7 @@ $(document).ready(function(){
 		autoEdit: true
 	};
 
-@if(!is_null($pto))
+@if(count($pto) > 0)
 
 	$(function(){
 
