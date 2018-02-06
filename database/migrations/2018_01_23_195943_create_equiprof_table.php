@@ -13,7 +13,7 @@ class CreateEquiprofTable extends Migration
      */
     public function up()
     {
-        Schema::create('gcoEquiprof', function (Blueprint $table) {
+        Schema::create('gcoequiprof', function (Blueprint $table) {
             $table->increments('prfId');
             $table->integer('prfPerson')->unsigned();
             $table->foreign('prfPerson')

@@ -13,7 +13,7 @@ class CreateAvancepresTable extends Migration
      */
     public function up()
     {
-        Schema::create('gcoAvancepres', function (Blueprint $table) {
+        Schema::create('gcoavancepres', function (Blueprint $table) {
             $table->increments('aprId');
             $table->integer('aprExecutor')->unsigned();
             $table->integer('aprResident')->unsigned();

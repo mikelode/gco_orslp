@@ -13,7 +13,7 @@ class CreatePersonaTable extends Migration
      */
     public function up()
     {
-        Schema::create('gcoPersona', function (Blueprint $table) {
+        Schema::create('gcopersona', function (Blueprint $table) {
             $table->increments('perId');
             $table->string('perDni',10)->nullable();
             $table->string('perFullName',300);

@@ -13,7 +13,7 @@ class CreateProyectoTable extends Migration
      */
     public function up()
     {
-        Schema::create('gcoProyecto', function (Blueprint $table) {
+        Schema::create('gcoproyecto', function (Blueprint $table) {
             $table->increments('pryId');
             $table->string('prySnip',10)->nullable();
             $table->string('pryUnifiedCode',10)->nullable();

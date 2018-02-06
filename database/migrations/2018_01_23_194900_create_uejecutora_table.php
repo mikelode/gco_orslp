@@ -13,7 +13,7 @@ class CreateUejecutoraTable extends Migration
      */
     public function up()
     {
-        Schema::create('gcoUejecutora', function (Blueprint $table) {
+        Schema::create('gcouejecutora', function (Blueprint $table) {
             $table->increments('ejeId');
             $table->string('ejePersonType',10); // natural o jurídica
             $table->string('ejeRegistType',10)->nullable(); // RUC o DNI u OTRO

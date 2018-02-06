@@ -13,7 +13,7 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('gcoUsuario', function (Blueprint $table) {
+        Schema::create('gcousuario', function (Blueprint $table) {
 
             $table->engine = 'InnoDB';
             $table->increments('tusId');

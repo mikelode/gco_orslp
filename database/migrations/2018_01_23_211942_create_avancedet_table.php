@@ -13,7 +13,7 @@ class CreateAvancedetTable extends Migration
      */
     public function up()
     {
-        Schema::create('gcoAvancedet', function (Blueprint $table) {
+        Schema::create('gcoavancedet', function (Blueprint $table) {
             $table->increments('avcId');
             $table->string('avcItem',20);
             $table->decimal('avcFisico',14,2)->default(0.00);

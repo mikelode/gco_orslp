@@ -13,7 +13,7 @@ class CreatePresupuestoTable extends Migration
      */
     public function up()
     {
-        Schema::create('gcoPresupuesto', function (Blueprint $table) {
+        Schema::create('gcopresupuesto', function (Blueprint $table) {
             $table->increments('preId');
             $table->integer('preProject')->unsigned();
             $table->foreign('preProject')
