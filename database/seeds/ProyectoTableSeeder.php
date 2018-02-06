@@ -12,7 +12,7 @@ class ProyectoTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('gcoProyecto')->insert([
+        DB::table('gcoproyecto')->insert([
     		'prySnip' => '133282',
     		'pryDenomination' => 'MEJORAMIENTO DE LA CARRETERA ARAPA - CHUPA (PU114) - DV HUANCANE (EMP PE 34H), PROVINCIA DE AZANGARO Y HUANCANE - PUNO',
     		'pryViabilityDateSD' => '2017-6-18',
