@@ -34,7 +34,7 @@ class ProyectoController extends Controller
      */
     public function create()
     {
-        $view = view('gestion.nuevo_proyecto');
+        $view = view('formularios.nuevo_proyecto');
         return $view;
     }
 
@@ -125,7 +125,7 @@ class ProyectoController extends Controller
         $ejecutor = Uejecutora::find($proyecto->pryExeUnit);
         $equipo = Equiprof::with('individualData')->where('prfUejecutora',$ejecutor->ejeId)->get();
 
-        $view = view('gestion.editar_proyecto', compact('proyecto','ejecutor','equipo'));
+        $view = view('formularios.editar_proyecto', compact('proyecto','ejecutor','equipo'));
 
         return $view;
     }

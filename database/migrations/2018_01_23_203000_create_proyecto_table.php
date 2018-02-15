@@ -29,6 +29,9 @@ class CreateProyectoTable extends Migration
                     ->on('gcouejecutora')
                     ->onDelete('cascade');
 
+            $table->decimal('pryGeneralExpensesPrcnt',14,2)->nullable();
+            $table->decimal('pryAvailPrcnt',14,2)->nullable();
+            $table->decimal('pryIgv',14,2)->default(0.18)->nullable();
             $table->boolean('pryInvalidate')->default(0);
             $table->string('pryInvalidateDetail',200)->nullable();
         });
@@ -41,6 +44,6 @@ class CreateProyectoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gcoProyecto');
+        Schema::dropIfExists('gcoproyecto');
     }
 }

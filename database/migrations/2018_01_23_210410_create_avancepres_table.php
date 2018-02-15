@@ -19,11 +19,7 @@ class CreateAvancepresTable extends Migration
             $table->integer('aprResident')->unsigned();
             $table->integer('aprSupervisor')->unsigned();
             $table->integer('aprProject')->unsigned();
-            $table->foreign('aprProject')
-                    ->references('pryId')
-                    ->on('gcoproyecto')
-                    ->onDelete('cascade');
-
+            $table->integer('aprNumber')->unsigned();
             $table->string('aprPeriod',50);
             $table->date('aprStartDate');
             $table->date('aprEndDate');
@@ -46,6 +42,6 @@ class CreateAvancepresTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gcoAvancepres');
+        Schema::dropIfExists('gcoavancepres');
     }
 }

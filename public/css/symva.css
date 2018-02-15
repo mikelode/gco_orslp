@@ -5,12 +5,32 @@
   font-size: 8pt;
 }*/
 
-#myGrid {
-font-family: arial;
+#myGrid, #footBudgetGrid {
+  font-family: arial;
   font-size: 8pt;
   background: white;
   outline: 0;
   border: 1px solid gray;
+}
+
+#footBudgetGrid .jexcel > tbody > tr > td{
+  /*text-align: left;*/
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+#myGrid .jexcel > tbody > tr > td{
+  /*text-align: left;*/
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+#footBudgetGrid .jexcel > tbody > tr > td.readonly{
+  color: #6A6F75;
+}
+
+#myGrid .jexcel > tbody > tr > td.readonly{
+  color: #6A6F75;
 }
 
 /* Individual cell styles */

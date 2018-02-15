@@ -22,8 +22,17 @@ Route::get('editar/pry','Gco\ProyectoController@edit');
 Route::post('editar/pry','Gco\ProyectoController@update');
 
 Route::get('presupuesto','Gco\PresupuestoController@index');
-Route::get('list/presup','Gco\PresupuestoController@list');
-Route::post('importar/presup','Gco\PresupuestoController@importXls');
+Route::post('importar/partidas','Gco\PartidaController@importXls');
+
+Route::get('list/partidas','Gco\PartidaController@list');
+
+Route::get('presupuesto/avance','Gco\AvanceController@index');
+Route::get('avance/nuevo','Gco\AvanceController@create');
+Route::post('avance/nuevo','Gco\AvanceController@store');
+Route::get('list/avance','Gco\AvanceController@list');
+
+Route::post('detallado/avance','Gco\AvanceController@edit');
+Route::post('almacenar/avance','Gco\AvanceController@update');
 
 Route::post('nuevo/prs','Gco\PersonaController@store');
 Route::get('check/person','Gco\PersonaController@exist');

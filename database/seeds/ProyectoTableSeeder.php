@@ -17,7 +17,7 @@ class ProyectoTableSeeder extends Seeder
     		'pryDenomination' => 'MEJORAMIENTO DE LA CARRETERA ARAPA - CHUPA (PU114) - DV HUANCANE (EMP PE 34H), PROVINCIA DE AZANGARO Y HUANCANE - PUNO',
     		'pryViabilityDateSD' => '2017-6-18',
     		'pryViabilityResolution' => 'RGR N° 236-2017-GGR-GR PUNO',
-    		'pryExeMode' => 'CONTRATA',
+    		'pryExeMode' => 'AI',
     		'pryExeUnit' => 1,
         ]);
     }

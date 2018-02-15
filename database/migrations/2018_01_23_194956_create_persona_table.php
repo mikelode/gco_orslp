@@ -38,6 +38,6 @@ class CreatePersonaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gcoPersona');
+        Schema::dropIfExists('gcopersona');
     }
 }

@@ -102,20 +102,34 @@ function actualizar_proyecto(form, event)
 function cargar_presupuesto(id, callback)
 {
 	$.ajax({
-		'url': 'list/presup',
+		'url': 'list/partidas',
 		'type': 'GET',
 		'data': {pyId: id},
 		'success': callback
 	});
 }
 
-function importar_presupuesto(form)
+function cargar_presupuesto1(id)
+{
+	var partidas = [];
+
+	$.get('list/partidas', {pyId: id}, function(data) {
+
+		$.each(data.pto, function(i, val) {
+			 partidas[i] = [val.preId,val.preLevel];
+		});
+	});
+
+	return partidas;
+}
+
+function importar_partidas(form)
 {
 	var frmData = new FormData(form);
 
 	$.ajax({
         type: 'post',
-        url: 'importar/presup',
+        url: 'importar/partidas',
         data: frmData,
         cache: false,
         contentType: false,
@@ -160,7 +174,124 @@ function habilitar_edicion(btn, grid)
 
 }
 
-function saludo(a)
+function registrar_avance(form)
 {
-	alert(a);
+	var data = form.serialize();
+	var url = form.prop('action');
+
+	$.post(url, data, function(response) {
+
+		alert(response.msg);
+		if(response.msgId == '200')
+			window.location = response.url;
+	});
+}
+
+function avance_partidas(slcProy, slcAvan, form, callback)
+{
+	var py = slcProy.val();
+	var av = slcAvan.val();
+	var url = form.prop('action');
+	var data = form.serialize();
+
+	if(py == 'NA' || av == null || av == 'NA'){
+		alert('Llene los campos anteriores');
+		return;
+	}
+	if(av == 'CP'){
+		alert('Seleccione el periodo de avance que desea desplegar');
+		return;
+	}
+
+	$.ajax({
+		'url': url,
+		'type': 'POST',
+		'data': data,
+		'success': callback
+	});
+}
+
+function CreateAddlHeaderRow(grid,columns) {
+    var $preHeaderPanel = $(grid.getPreHeaderPanel())
+        .empty()
+        .addClass("slick-header-columns")
+        .css('left','-1000px')
+        .width(grid.getHeadersWidth());
+    $preHeaderPanel.parent().addClass("slick-header");
+    var headerColumnWidthDiff = grid.getHeaderColumnWidthDiff();
+    var m, header, lastColumnGroup = '', widthTotal = 0;
+    
+    for (var i = 0; i < columns.length; i++) {
+     	m = columns[i];
+      	if (lastColumnGroup === m.columnGroup && i>0) {
+        	widthTotal += m.width;
+        	header.width(widthTotal - headerColumnWidthDiff)
+      	} else {
+          	widthTotal = m.width;
+          	header = $("<div class='ui-state-default slick-header-column' />")
+            .html("<span class='slick-column-name'>" + (m.columnGroup || '') + "</span>")
+            .width(m.width - headerColumnWidthDiff)
+            .appendTo($preHeaderPanel);
+      	}
+      	lastColumnGroup = m.columnGroup;
+    }
+}
+
+function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource, dataTarget)
+{
+	var columnId = gridSource.getColumns()[cellMount].field;
+	var total = 0;
+	var i = dataSource.length;
+
+	while(i--){
+		total += (parseFloat(dataSource[i][columnId]) || 0);
+	}
+
+	for(var i=0; i<=5; i++){
+		switch(i){
+			case 0:
+				dataTarget[rowDc]['avrMountCv'] = total;
+				break;
+			case 1:
+				dataTarget[rowDc + 1]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 1]['preItemGeneralPrcnt']) * total) * 100 ) / 100;
+				break;
+			case 2:
+				dataTarget[rowDc + 2]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 2]['preItemGeneralPrcnt']) * total) * 100 ) / 100;
+				break;
+			case 3:
+				dataTarget[rowDc + 3]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc]['avrMountCv']) + parseFloat(dataTarget[rowDc + 1]['avrMountCv']) + parseFloat(dataTarget[rowDc + 2]['avrMountCv']) ) * 100 ) / 100;
+				break;
+			case 4:
+				dataTarget[rowDc + 4]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 4]['preItemGeneralPrcnt']) * parseFloat(dataTarget[rowDc + 3]['avrMountCv'])) * 100 ) / 100;
+				break;
+			case 5:
+				dataTarget[rowDc + 5]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 3]['avrMountCv']) + parseFloat(dataTarget[rowDc + 4]['avrMountCv'])) * 100 ) / 100;
+				break;
+		}
+
+		dataTarget[rowDc + i]['avrPercentCv'] = Math.round((parseFloat(dataTarget[rowDc + i]['avrMountCv']) / parseFloat(dataTarget[rowDc + i]['preItemGeneralMount'])) * 10000) / 100;
+		dataTarget[rowDc + i]['avrMountCa'] = Math.round((parseFloat(dataTarget[rowDc + i]['avrMountCv']) + parseFloat(dataTarget[rowDc + i]['avrMountBa'])) * 100 ) / 100;
+		dataTarget[rowDc + i]['avrPercentCa'] = Math.round((parseFloat(dataTarget[rowDc + i]['avrMountCa']) / parseFloat(dataTarget[rowDc + i]['preItemGeneralMount'])) * 10000) / 100;
+		dataTarget[rowDc + i]['avrMountBv'] = Math.round((parseFloat(dataTarget[rowDc + i]['preItemGeneralMount']) - parseFloat(dataTarget[rowDc + i]['avrMountCa'])) * 100 ) / 100;
+		dataTarget[rowDc + i]['avrPercentBv'] = 100 - parseFloat(dataTarget[rowDc + i]['avrPercentCa']);
+
+		gridToUpdate.invalidateRow(rowDc + i);
+	}
+
+	gridToUpdate.render();
+}
+
+function guardar_avance(gridDetail, gridResume, form)
+{
+	var url = form.prop('action');
+	form.find("input[name='dataGridDetail']").val(JSON.stringify(gridDetail.getData()));
+	form.find("input[name='dataGridResume']").val(JSON.stringify(gridResume.getData()));
+	var data = form.serialize();
+
+
+	$.post(url, data, function(response) {
+		alert(response.msg);
+		if(response.msgId == '200')
+			window.location = response.url;
+	});
 }

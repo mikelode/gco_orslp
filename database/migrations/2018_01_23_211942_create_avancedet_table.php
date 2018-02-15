@@ -15,20 +15,29 @@ class CreateAvancedetTable extends Migration
     {
         Schema::create('gcoavancedet', function (Blueprint $table) {
             $table->increments('avcId');
-            $table->string('avcItem',20);
-            $table->decimal('avcFisico',14,2)->default(0.00);
-            $table->decimal('avcFinanciero',14,2)->default(0.00);
-            $table->decimal('avcFisicoAggregate',14,2)->default(0.00);
-            $table->decimal('avcFinancieroAggregate',14,2)->default(0.00);
-            $table->decimal('avcSaldoFisico',14,2);
-            $table->decimal('avcSaldoFinanciero',14,2);
-            $table->decimal('avcPercentFisico',14,2);
-            $table->decimal('avcPercentFinanciero',14,2);
             $table->integer('avcBudgetProgress')->unsigned();
             $table->foreign('avcBudgetProgress')
                     ->references('aprId')
-                    ->on('gcoavancepres')
-                    ->onDelete('cascade');
+                    ->on('gcoavancepres');
+
+            $table->integer('avcPartidaId')->unsigned();
+            $table->foreign('avcPartidaId')
+                    ->references('parId')
+                    ->on('gcopartidas');
+
+            $table->string('avcItem',20);
+            $table->decimal('avcMeteredBa',14,2)->default(0.00)->nullable();
+            $table->decimal('avcMountBa',14,2)->default(0.00)->nullable();
+            $table->decimal('avcPercentBa',14,2)->default(0.00)->nullable();
+            $table->decimal('avcMeteredCv',14,2)->default(0.00)->nullable();
+            $table->decimal('avcMountCv',14,2)->default(0.00)->nullable();
+            $table->decimal('avcPercentCv',14,2)->default(0.00)->nullable();
+            $table->decimal('avcMeteredCa',14,2)->default(0.00)->nullable();
+            $table->decimal('avcMountCa',14,2)->default(0.00)->nullable();
+            $table->decimal('avcPercentCa',14,2)->default(0.00)->nullable();
+            $table->decimal('avcMeteredBv',14,2)->default(0.00)->nullable();
+            $table->decimal('avcMountBv',14,2)->default(0.00)->nullable();
+            $table->decimal('avcPercentBv',14,2)->default(0.00)->nullable();
         });
     }
 
@@ -39,6 +48,6 @@ class CreateAvancedetTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gcoAvancedet');
+        Schema::dropIfExists('gcoavancedet');
     }
 }

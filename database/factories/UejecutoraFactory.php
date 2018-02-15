@@ -9,8 +9,8 @@ $factory->define(App\Models\Uejecutora::class, function (Faker $faker) {
 	$nombres = $faker->firstName;
 
 	return [
-                'ejePersonType' => $faker->randomElement(['natural','jurídica']),
-                'ejeRegistType' => $faker->randomElement(['dni','ruc']),
+                'ejePersonType' => $faker->randomElement(['PN','PJ']),
+                'ejeRegistType' => $faker->randomElement(['DNI','RUC']),
                 'ejeRegistNumber' => '10'.$faker->dni.$faker->randomDigitNotNull,
                 'ejeBusiName' => $faker->company,
                 'ejeAcronym' => $faker->companySuffix,

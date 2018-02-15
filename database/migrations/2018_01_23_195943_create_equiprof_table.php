@@ -41,6 +41,6 @@ class CreateEquiprofTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gcoEquiprof');
+        Schema::dropIfExists('gcoequiprof');
     }
 }

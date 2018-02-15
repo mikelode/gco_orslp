@@ -15,5 +15,6 @@ class DatabaseSeeder extends Seeder
         $this->call(UejecutoraTableSeeder::class);
         $this->call(EquiprofTableSeeder::class);
         $this->call(ProyectoTableSeeder::class);
+        $this->call(PresupuestoTableSeeder::class);
     }
 }

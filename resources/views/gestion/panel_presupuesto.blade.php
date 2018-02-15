@@ -29,10 +29,34 @@
 			</div>
 		</div>
 		<div class="col-md-11 pl-1">
+			<div class="card">
+				<div class="card-body">
+					<table class="table table-sm action-table">
+						<thead class="thead-dark">
+							<tr>
+								<th>Descripción</th>
+								<th>Proporción</th>
+								<th>Prespuesto</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach($pto as $item)
+							<tr>
+								<td class="py-0">{{ $item->preItemGeneral }}</td>
+								<td class="py-0">{{ ($item->preItemGeneralPrcnt * 100) . ' %' }}</td>
+								<td class="py-0">{{ $item->preItemGeneralMount }}</td>
+							</tr>
+							@endforeach
+						</tbody>
+					</table>
+				</div>
+			</div>
 			<div id="myGrid" style="height:500px; font-family: arial; font-size: 8pt; box-sizing: content-box;"></div>
+			<!--<div id="myGrid"></div>-->
 		</div>
 	</div>
 </div>
+
 <div class="modal fade" id="mdlImportFile" tabindex="-1" role="dialog" aria-labelledby="importarModal" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -58,7 +82,7 @@
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" onclick="importar_presupuesto($('#frmImportBudget')[0])">Cargar archivo</button>
+				<button type="button" class="btn btn-primary" onclick="importar_partidas($('#frmImportBudget')[0])">Cargar archivo</button>
         		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
 			</div>
 		</div>
@@ -89,14 +113,16 @@ $(document).ready(function(){
 
 @section('custom-scripts')
 <script>
+
+
 	var grid;
 	var columns = [
-		{id: "item", name: "Item", field: "preItem"},
-		{id: "descripcion", name: "Descripción", field: "preDescription", width: 500, editor: Slick.Editors.LongText},
-		{id: "unidad", name: "Unidad", field: "preUnit", editor: Slick.Editors.Text},
-		{id: "metrado", name: "Metrado", field: "preMetered", editor: Slick.Editors.Text},
-		{id: "precio", name: "Precio", field: "prePrice", editor: Slick.Editors.Text},
-		{id: "parcial", name: "Parcial", field: "prePartial", editor: Slick.Editors.Text}
+		{id: "item", name: "Item", field: "parItem"},
+		{id: "descripcion", name: "Descripción", field: "parDescription", width: 500, editor: Slick.Editors.LongText},
+		{id: "metrado", name: "Metrado", field: "parMetered", editor: Slick.Editors.Text},
+		{id: "unidad", name: "Und", field: "parUnit", editor: Slick.Editors.Text},
+		{id: "precio", name: "P.Unit.", field: "parPrice", editor: Slick.Editors.Text},
+		{id: "parcial", name: "Presupuesto", field: "parPartial", editor: Slick.Editors.Text}
 	];
 
 	var options = {
@@ -107,25 +133,17 @@ $(document).ready(function(){
 		autoEdit: true
 	};
 
-@if(count($pto) > 0)
+	@if(count($pto) > 0)
 
-	$(function(){
+		$(function(){
 
-		cargar_presupuesto({{ $pto[0]->preProject }}, function(data){
-		grid = new Slick.Grid("#myGrid", data.pto, columns, options);
+			cargar_presupuesto({{ $pto[0]->preProject }}, function(data){
+				console.log(data);
+				grid = new Slick.Grid("#myGrid", data.ptd, columns, options);
+			});
 
-		grid.setSelectionModel(new Slick.CellSelectionModel());
-
-			grid.onAddNewRow.subscribe(function (e, args) {
-		      var item = args.item;
-		      grid.invalidateRow(data.length);
-		      data.push(item);
-		      grid.updateRowCount();
-		      grid.render();
-		    });
 		});
+	@endif
 
-	});
-@endif
 </script>
 @endsection
