@@ -184,6 +184,13 @@ input.editor-checkbox {
      box-sizing: content-box;
 }
 
+/* Slick copy and paste from excel */
+.slick-cell.copied {
+  background: blue;
+  background: rgba(0, 0, 255, 0.2);
+  -webkit-transition: 0.5s background;
+}
+
 .lvl-1{
 	color: red;
 	font-weight: bold;
@@ -224,11 +231,24 @@ input.editor-checkbox {
 
 .action-table tbody td{
 	font-size: 10px;
+  padding-top: 0;
+  padding-bottom: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.action-table tbody td.amount{
+  text-align: right;
+  vertical-align: middle;
+}
+
+.action-table tbody input{
+  
 }
 
 .action-table .td-actions { 
 	width: 80px; 	
-	text-align: center; 
+	text-align: center;
 }
 
 .action-table .td-actions .btn { 
@@ -237,4 +257,26 @@ input.editor-checkbox {
 	
 .action-table .td-actions .btn:last-child { 
 	margin-rigth: 0; 		
+}
+
+.title-graph{
+  text-align: center;
+  font-weight: bold;
+}
+
+.caption{
+  text-align: center;
+  font-style: oblique;
+  color: gray;
+}
+
+.textarea-cell{
+  height: 3em;
+  resize: none;
+  transition: all 0.5s ease;
+}
+
+.textarea-cell:focus{
+  height: 6em;
+  width: 14em;
 }

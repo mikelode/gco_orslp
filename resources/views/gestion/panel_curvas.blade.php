@@ -5,18 +5,14 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="card border-info mb-2">
+			<div class="card">
 				<div class="card-header">
-					<h5 class="float-left"><i class="icon-th-list mr-2"></i>Presupuesto por Partidas</h5>
-				</div>
-				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-11">
 							<div class="form-group row mb-0">
-								<label class="col-sm-2 col-form-label font-weight-bold pt-1">ELEGIR PROYECTO</label>
-								<div class="col-sm-10">
+								<label class="col-sm-1 col-form-label">Proyecto</label>
+								<div class="col-sm-11">
 									<select id="pyName" name="npyName">
-										<option value="NA">-- Seleccione un proyecto --</option>
 										@foreach($pys as $py)
 											<option value="{{ $py->pryId }}">{{ $py->pryDenomination }}</option>
 										@endforeach
@@ -25,15 +21,17 @@
 							</div>
 						</div>
 						<div class="col-sm-1">
-							<button class="btn btn-outline-success btn-sm" id="btnVerPresupuesto" onclick="mostrar_presupuesto($('#pyName').val(),'{{ url('ver/presupuesto') }}')">Mostrar</button>
+							<button class="btn btn-outline-success btn-sm" id="btnDesplegarCurva">Mostrar</button>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="row" id="form-content">
-		
+	<div class="row">
+		<div class="col-md-12" id="scheduleInfo">
+			
+		</div>
 	</div>
 </div>
 
@@ -43,8 +41,26 @@ $(document).ready(function(){
 
 	$('#pyName').select2({
 		width: '100%'
-	})
+	});
+
+	$('#btnDesplegarCurva').click(function(evt) {
+		evt.preventDefault();
+
+		$.get('{{ url('curvas/desplegar/1') }}', { pyId : $('#pyName').val() } , function(data) {
+
+			$('#scheduleInfo').html(data);
+
+		});
+	});
+
 });
 </script>
 
+@endsection
+
+@section('custom-scripts')
+<script>
+
+
+</script>
 @endsection

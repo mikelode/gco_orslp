@@ -15,10 +15,15 @@ class ProyectoTableSeeder extends Seeder
         DB::table('gcoproyecto')->insert([
     		'prySnip' => '133282',
     		'pryDenomination' => 'MEJORAMIENTO DE LA CARRETERA ARAPA - CHUPA (PU114) - DV HUANCANE (EMP PE 34H), PROVINCIA DE AZANGARO Y HUANCANE - PUNO',
-    		'pryViabilityDateSD' => '2017-6-18',
     		'pryViabilityResolution' => 'RGR N° 236-2017-GGR-GR PUNO',
+            'pryDateResolution' => '2017-6-18',
     		'pryExeMode' => 'AI',
     		'pryExeUnit' => 1,
+            'pryDateAgree' => '2013-12-23',
+            'pryMonthTerm' => 18,
+            'pryDaysTerm' => 540,
+            'pryStartDateExe' => '2017-12-28',
+            'pryEndDateExe' => '2019-6-20',
         ]);
     }
 }

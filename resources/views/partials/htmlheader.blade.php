@@ -10,15 +10,15 @@
     <link href="{{ asset('/css/fontgoogle.css') }}"  rel="stylesheet" type="text/css">
     <link href="{{ asset('/css/font-awesome.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/css/style.css') }}" rel="stylesheet" type="text/css">
-
-    <link href="{{ asset('/plugins/jexcel/dist/css/jquery.jexcel.css') }}" rel="stylesheet" type="text/css">
     
     <link href="{{ asset('/plugins/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/plugins/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/plugins/jqueryui-editable/css/jqueryui-editable.css') }}" rel="stylesheet" type="text/css">
     
-    <link href="{{ asset('/plugins/SlickGrid2/slick.grid.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('/plugins/SlickGrid2/css/smoothness/jquery-ui-1.11.3.custom.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('/plugins/SlickGrid/slick.grid.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('/plugins/SlickGrid/css/smoothness/jquery-ui-1.11.3.custom.css') }}" rel="stylesheet" type="text/css">
+
+    <link href="{{ asset('/plugins/morris/morris.css') }}" rel="stylesheet" type="text/css">
 
     <link href="{{ asset('/css/symva.css') }}" rel="stylesheet" type="text/css">
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->

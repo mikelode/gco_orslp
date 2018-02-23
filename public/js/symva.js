@@ -19,6 +19,19 @@ function editar_proyecto(id)
 	});
 }
 
+function eliminar_proyecto(form)
+{
+	var url = form.prop('action');
+	var data = form.serialize();
+
+	$.post(url, data, function(response) {
+		alert(response.msg);
+		if(response.msgId == '200'){
+			window.location = response.url;
+		}
+	});
+}
+
 function check_persona(element, event)
 {
 	if(event.which == 13)
@@ -99,6 +112,65 @@ function actualizar_proyecto(form, event)
 	});
 }
 
+function registrar_presupuesto(form)
+{
+	var url = form.prop('action');
+	var data = form.serialize();
+
+	$.post(url, data, function(response) {
+		alert(response.msg);
+		if(response.msgId == '200')
+			mostrar_presupuesto(response.pyId, response.url);
+	});
+}
+
+function mostrar_presupuesto(py,url)
+{
+	var pyId = py;
+
+	if(pyId == 'NA'){
+		alert('Debe seleccionar el proyecto para ver su presupuesto');
+		return;
+	}
+
+	$.get(url, { pyId: pyId}, function(data) {
+		$('#form-content').html(data);
+	});
+}
+
+function editar_presupuesto(btn, form)
+{
+	var action = btn[0].value;
+
+	if(action == 'editar'){
+		$('.preEdit').prop('readonly', false);
+		btn[0].value = 'cancelar';
+		btn.text('Cancelar Edición');
+		btn.attr('class', 'btn btn-sm btn-warning btn-block');
+		$('#btnUpdateBudget').show();
+	}
+	else if(action == 'cancelar'){
+		$('.preEdit').prop('readonly', true);
+		btn[0].value = 'editar';
+		btn.text('Editar Presupuesto');
+		btn.attr('class', 'btn btn-sm btn-primary btn-block');
+		$('#btnUpdateBudget').hide();
+	}
+}
+
+function actualizar_presupuesto(form)
+{
+	var url = form.prop('action');
+	var data = form.serialize();
+
+	$.post(url, data, function(response) {
+		alert(response.msg)
+
+		if(response.msgId == '200')
+			mostrar_presupuesto(response.pyId, response.url);
+	});
+}
+
 function cargar_presupuesto(id, callback)
 {
 	$.ajax({
@@ -135,8 +207,11 @@ function importar_partidas(form)
         contentType: false,
         processData: false,
         success: function(response){
-            console.log(response);
             alert(response.msg);
+            $('#mdlImportFile').modal('hide');
+            if(response.msgId == 200){
+            	mostrar_presupuesto(response.pyId, response.url);
+            }
         },
         xhr: function(){
             var myXhr = $.ajaxSettings.xhr();
@@ -161,7 +236,7 @@ function habilitar_edicion(btn, grid)
 	if(btn[0].value === 'enable'){
 		grid.setOptions({editable: false});
 		btn[0].value = 'disable'
-		btn.text('Editar');
+		btn.text('Editar Partidas');
 		btn.attr('class', 'btn btn-sm btn-info btn-block');
 	}
 	else if(btn[0].value === 'disable'){
@@ -170,8 +245,22 @@ function habilitar_edicion(btn, grid)
 		btn.text('Cancelar');
 		btn.attr('class', 'btn btn-sm btn-warning btn-block');
 	}
-	
+}
 
+function mostrar_avance(pyId, avId, url)
+{
+	if(pyId == 'NA' || avId == null || avId == 'NA'){
+		alert('Llene los campos anteriores');
+		return;
+	}
+	if(avId == 'CP'){
+		alert('Seleccione el periodo de avance que desea desplegar');
+		return;
+	}
+
+	$.get(url,{pyId: pyId, avId: avId}, function(data) {
+		$('#content-progress').html(data);
+	});
 }
 
 function registrar_avance(form)
@@ -184,30 +273,6 @@ function registrar_avance(form)
 		alert(response.msg);
 		if(response.msgId == '200')
 			window.location = response.url;
-	});
-}
-
-function avance_partidas(slcProy, slcAvan, form, callback)
-{
-	var py = slcProy.val();
-	var av = slcAvan.val();
-	var url = form.prop('action');
-	var data = form.serialize();
-
-	if(py == 'NA' || av == null || av == 'NA'){
-		alert('Llene los campos anteriores');
-		return;
-	}
-	if(av == 'CP'){
-		alert('Seleccione el periodo de avance que desea desplegar');
-		return;
-	}
-
-	$.ajax({
-		'url': url,
-		'type': 'POST',
-		'data': data,
-		'success': callback
 	});
 }
 
@@ -246,7 +311,6 @@ function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource
 	while(i--){
 		total += (parseFloat(dataSource[i][columnId]) || 0);
 	}
-
 	for(var i=0; i<=5; i++){
 		switch(i){
 			case 0:
@@ -281,17 +345,136 @@ function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource
 	gridToUpdate.render();
 }
 
-function guardar_avance(gridDetail, gridResume, form)
+function guardar_avance(gridDetail, gridResume, form, close)
 {
-	var url = form.prop('action');
+	if(close == 1){
+		var ok = confirm("Una vez dado por finalizado el registro ya no podrá editarlo. \n ¿Está seguro seguro de continuar con esta operación?");
+		if(!ok){
+			return;
+		}
+	}
+
+	var url = form.prop('action') + '/' + close;
 	form.find("input[name='dataGridDetail']").val(JSON.stringify(gridDetail.getData()));
 	form.find("input[name='dataGridResume']").val(JSON.stringify(gridResume.getData()));
 	var data = form.serialize();
-
 
 	$.post(url, data, function(response) {
 		alert(response.msg);
 		if(response.msgId == '200')
 			window.location = response.url;
+	});
+}
+
+function check_cien(celda){
+	
+	var sum = 0;
+	celda.each(function() {
+		valor = numeral(this.value).value();
+	 	if(!isNaN(valor) && this.value.length != 0){
+	 		sum += parseFloat(this.value);
+	 	}
+	});
+
+	total = numeral(sum).format('0,0.00');
+	sum = numeral(total).value();
+	
+	return sum;
+}
+
+function mostrar_cronograma(py,url)
+{
+	var pyId = py;
+
+	if(pyId == 'NA'){
+		alert('Debe seleccionar el proyecto para ver su presupuesto');
+		return;
+	}
+
+	$.get(url, { pyId: pyId}, function(data) {
+		$('#content-programacion').html(data);
+	});
+}
+
+function registrar_cronograma(form)
+{
+	var url = form.prop('action');
+	var data = form.serialize();
+
+	$.post(url, data, function(response) {
+		alert(response.msg);
+		if(response.msgId == '200')
+			window.location = response.url;
+	});
+}
+
+function editar_cronograma(btn, form)
+{
+	var action = btn[0].value;
+
+	if(action == 'editar'){
+		$('.cronoedit').prop('readonly', false);
+		btn[0].value = 'cancelar';
+		btn.text('Cancelar Edición');
+		btn.attr('class', 'btn btn-sm btn-warning btn-block');
+		$('#btnEditSchedule').show();
+		$('#btnAddPeriod').show();
+	}
+	else if(action == 'cancelar'){
+		mostrar_cronograma(form.find('#pyId').val(),'../ver/programacion/0');
+		/*$('.cronoedit').prop('readonly', true);
+		btn[0].value = 'editar';
+		btn.text('Editar Cronograma');
+		btn.attr('class', 'btn btn-sm btn-info btn-block');
+		$('#btnEditSchedule').hide();
+		$('#btnAddPeriod').hide();*/
+	}
+}
+
+function agregar_periodo(table)
+{
+	var lastRow = table.find('tbody tr:last').attr('id');
+	var lastNumber = lastRow.split('-')[1];
+	var newNumber = parseInt(lastNumber) + 1;
+
+	var rowHtml = '<tr id="val-' + newNumber + '">';
+	rowHtml += '<td><input type="hidden" name="hnvalId[]" value="0"><input type="number" name="nvalNumber[]" class="form-control-plaintext" readonly value="' + newNumber + '"></td>';
+	rowHtml += '<td><input type="date" name="nvalPeriod[]" class="form-control-plaintext cronoedit"></td>';
+	rowHtml += '<td><input type="text" name="nvalMount[]" class="form-control-plaintext valMount cronoedit"></td>';
+	rowHtml += '<td><input type="text" name="nvalPrcnt[]" class="form-control-plaintext valPrcnt cronoedit"></td>';
+	rowHtml += '<td><input type="text" name="nvalAggrt[]" class="form-control-plaintext valAggrt cronoedit"></td>';
+	rowHtml += '<td><textarea class="textarea-cell" name="nvalNote[]" rows="1" cols="10"></textarea></td>';
+	rowHtml += '<td><a href="javascript:void(0)" onclick="eliminar_fila(this)" class="text-danger">(-) Quitar</a></td>';
+	rowHtml += '</tr>';
+
+	table.find('tbody tr:last').after(rowHtml);
+}
+
+function eliminar_fila(btn)
+{
+	var erow = $(btn).closest('tr');
+	var erowId = $(btn).closest('tr').attr('id');
+	var table = $(btn).closest('table');
+	var lrowId =  $(table).find('tbody tr:last').attr('id')
+
+	if(erowId == lrowId){
+		erow.remove();
+	}
+	else{
+		alert('La eliminación debe empezar de la última fila');
+	}
+}
+
+function actualizar_cronograma(form)
+{
+	var url = form.prop('action');
+	var data = form.serialize();
+
+	$.post(url, data, function(response) {
+		alert(response.msg)
+		if(response.msgId == '200'){
+			mostrar_cronograma(response.pyId, response.url);
+		}
+
 	});
 }

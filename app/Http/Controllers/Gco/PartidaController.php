@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Gco;
 use App\Models\Proyecto;
 use App\Models\Presupuesto;
 use App\Models\Partida;
+use App\Models\Avance;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -74,9 +75,32 @@ class PartidaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try{
+
+            $exception = DB::transaction(function() use($request){
+
+                $partida = Partida::find($request->parId);
+                $partida->parUnit = $request->parUnit;
+                $partida->parMetered = $request->parMetered;
+                $partida->parPrice = $request->parPrice;
+                $partida->parPartial = $request->parPartial;
+                $partida->save();
+
+            });
+
+            if(is_null($exception)){
+                $msg = 'Partida actualizada correctamente';
+                $msgId = 200;
+            }
+
+        }catch(Exception $e){
+            $msg = "Error: " . $e->getMessage();
+            $msgId = 500;
+        }
+
+        return response()->json(compact('msg','msgId'));
     }
 
     /**
@@ -101,6 +125,16 @@ class PartidaController extends Controller
         try{
 
             $pyId = $request->hnimpPry;
+            $url = url('ver/presupuesto');
+
+            if($request->hnimpAction == 'clear'){
+                $avance = Avance::where('aprProject',$pyId)->get();
+                
+                if(!$avance->isEmpty())
+                    throw new Exception("Las partidas presupuestarias presentan registros de avance o valorizaciones por lo que no es posible realizar esta acción");
+                
+                $limpiarPartidas = Partida::where('parProject',$pyId)->delete();
+            }
 
             if($request->hasFile('nimpFile')){
                 $file = $request->file('nimpFile');
@@ -163,6 +197,6 @@ class PartidaController extends Controller
             $msgId = 500;
         }
         
-        return response()->json(compact('msgId','msg'));
+        return response()->json(compact('msgId','msg','pyId','url'));
     }
 }

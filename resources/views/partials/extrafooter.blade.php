@@ -2,7 +2,7 @@
   <div class="extra-inner">
     <div class="container">
       <div class="row">
-                    <div class="span3">
+                    <div class="col-md-3">
                         <h4>
                             Sobre SIGCO</h4>
                         <ul>
@@ -12,8 +12,8 @@
                             <li><a href="javascript:;">Free Resources and Scripts</a></li>
                         </ul>
                     </div>
-                    <!-- /span3 -->
-                    <div class="span3">
+                    <!-- /col-md-3 -->
+                    <div class="col-md-3">
                         <h4>
                             Soporte</h4>
                         <ul>
@@ -23,8 +23,8 @@
                             <li><a href="javascript:;">Datos administrador sistema</a></li>
                         </ul>
                     </div>
-                    <!-- /span3 -->
-                    <div class="span3">
+                    <!-- /col-md-3 -->
+                    <div class="col-md-3">
                         <h4>
                             Directivas</h4>
                         <ul>
@@ -33,8 +33,8 @@
                             <li><a href="javascript:;">Privacy Policy</a></li>
                         </ul>
                     </div>
-                    <!-- /span3 -->
-                    <div class="span3">
+                    <!-- /col-md-3 -->
+                    <div class="col-md-3">
                         <h4>
                             Sitios relacionados</h4>
                         <ul>
@@ -44,7 +44,7 @@
                             <li><a href="">OSCE</a></li>
                         </ul>
                     </div>
-                    <!-- /span3 -->
+                    <!-- /col-md-3 -->
                 </div>
       <!-- /row --> 
     </div>

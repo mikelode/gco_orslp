@@ -8,6 +8,7 @@ use App\Models\Uejecutora;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Exception;
 
 class ProyectoController extends Controller
@@ -19,7 +20,7 @@ class ProyectoController extends Controller
      */
     public function index()
     {
-        $pys = Proyecto::with('ejecutor')->get();
+        $pys = Proyecto::with('ejecutor')->where('pryInvalidate',false)->get();
         $tms = Equiprof::with('individualData')->get();
 
         $view = view('gestion.panel_proyectos', compact('pys','tms'));
@@ -75,11 +76,15 @@ class ProyectoController extends Controller
                 $proyecto->pryUnifiedCode = $request->npyCu;
                 $proyecto->pryDenomination = $request->npyDenom;
                 $proyecto->pryShortDenomination = $request->npyShortdenom;
-                $proyecto->pryViabilityDatePip = $request->npyDateviab;
-                $proyecto->pryViabilityDateSD = $request->npyDateresol;
                 $proyecto->pryViabilityResolution = $request->npyResol;
+                $proyecto->pryDateResolution = $request->npyDateresol;
                 $proyecto->pryExeMode = $request->npyMod;
                 $proyecto->pryExeUnit = $ejecutor->ejeId;
+                $proyecto->pryDateAgree = $request->npyDateAgree;
+                $proyecto->pryMonthTerm = $request->npyMonthTerm;
+                $proyecto->pryDaysTerm = $request->npyDaysTerm;
+                $proyecto->pryStartDateExe = $request->npyStartDate;
+                $proyecto->pryEndDateExe = $request->npyEndDate;
                 $proyecto->save();
 
             });
@@ -168,13 +173,16 @@ class ProyectoController extends Controller
                 $proyecto->pryUnifiedCode = $request->npyCu;
                 $proyecto->pryDenomination = $request->npyDenom;
                 $proyecto->pryShortDenomination = $request->npyShortdenom;
-                $proyecto->pryViabilityDatePip = $request->npyDateviab;
-                $proyecto->pryViabilityDateSD = $request->npyDateresol;
                 $proyecto->pryViabilityResolution = $request->npyResol;
+                $proyecto->pryDateResolution = $request->npyDateresol;
                 $proyecto->pryExeMode = $request->npyMod;
                 $proyecto->pryExeUnit = $ejecutor->ejeId;
+                $proyecto->pryDateAgree = $request->npyDateAgree;
+                $proyecto->pryMonthTerm = $request->npyMonthTerm;
+                $proyecto->pryDaysTerm = $request->npyDaysTerm;
+                $proyecto->pryStartDateExe = $request->npyStartDate;
+                $proyecto->pryEndDateExe = $request->npyEndDate;
                 $proyecto->save();
-
             });
 
             if(is_null($exception)){
@@ -201,9 +209,35 @@ class ProyectoController extends Controller
      * @param  \App\Models\Proyecto  $proyecto
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Proyecto $proyecto)
+    public function destroy(Request $request)
     {
-        //
+        try{
+            $exception = DB::transaction(function() use($request){
+                $pyId = $request->npyIdentify;
+
+                $proyecto = Proyecto::find($pyId);
+                $proyecto->pryInvalidate = true;
+                $proyecto->pryInvalidateDetail = $request->pyDetailRemove . ' -- Eliminado por el Usuario: AAA con fecha: ' . Carbon::now()->toDateTimeString() . '.';
+                $proyecto->save();
+            });
+
+            if(is_null($exception)){
+                $msg = 'Proyecto eliminado correctamente';
+                $msgId = 200;
+                $url = url('proyecto');
+            }
+            else{
+                throw new Exception($exception);
+            }
+
+        }catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' -- ' . $e->getFile() . ' - ' . $e->getLine() . " \n";
+            $msgId = 500;
+            $url = '';
+        }
+
+        return response()->json(compact('msg','msgId','url'));
+        
     }
 
     public function postEditStatusTeam(Request $request)

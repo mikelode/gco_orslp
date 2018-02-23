@@ -9,6 +9,7 @@ use App\Models\Presupuesto;
 use App\Models\Equiprof;
 use App\Models\Uejecutora;
 use App\Models\Partida;
+use App\Models\Progfisica;
 use App\Models\Resumenavc;
 use App\Models\Vpiepresupuesto;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class AvanceController extends Controller
      */
     public function index()
     {
-        $pys = Proyecto::all();
+        $pys = Proyecto::where('pryInvalidate',false)->get();
         $avn = Avance::all();
 
         $view = view('gestion.panel_avance',compact('pys','avn'));
@@ -44,15 +45,17 @@ class AvanceController extends Controller
         $pry = Proyecto::find($request->pyId);
 
         if(!is_null($pry->pryExeUnit)){
-            $exe = Uejecutora::find($pry->pryId);
+            $exe = Uejecutora::find($pry->pryExeUnit);
             $prf = Equiprof::with('individualData')->get();
+            $crn = Progfisica::where('prgProject',$pry->pryId)->where('prgClosed',false)->get();
         }
         else{
             $exe = collect(['sin ejecutor']);
             $prf = collect(['sin equipo']);
+            $crn = collect(['sin cronograma']);
         }
 
-        $view = view('formularios.nuevo_avance',compact('pry','exe','prf'));
+        $view = view('formularios.nuevo_avance',compact('pry','exe','prf','crn'));
         return $view;
     }
 
@@ -68,6 +71,24 @@ class AvanceController extends Controller
 
             $exception = DB::transaction(function() use($request){
 
+                $valId = $request->navNumber; // navnumber contiene el id de la programacion
+                $pyId = $request->hnpyId;                
+
+                $val = Progfisica::find($valId);
+                $valNumber = $val->prgNumberVal;
+
+                $prevVal = Progfisica::where('prgProject',$pyId)->where('prgNumberVal',$valNumber - 1)->get();
+                $prevAvance = 0;
+
+                if(!is_null($val->prgBudgetProgress))
+                    throw new Exception("EL número de valorización elegido ya presenta avance de metrados registrado \nPara registrar el avance de metrados para una nueva valorización primero debe finalizar el registro de la valorización número: {$valNumber}");
+
+                if(!$prevVal->isEmpty())
+                    if($prevVal[0]->prgClosed == false)
+                        throw new Exception("No es posible registrar un nuevo avance, porque no se ha finalizado el registro del anterior avance");
+                    else
+                        $prevAvance = $prevVal[0]->prgBudgetProgress;
+                
                 $cant_avncs = Avance::where('aprProject',$request->hnpyId)->count();
 
                 $avance = new Avance();
@@ -75,73 +96,133 @@ class AvanceController extends Controller
                 $avance->aprResident = $request->hnpyResidente;
                 $avance->aprSupervisor = $request->hnpySupervisor;
                 $avance->aprProject = $request->hnpyId;
-                $avance->aprNumber = $request->navNumber;
+                $avance->aprProgFisica = $request->navNumber;
                 $avance->aprPeriod = $request->navPeriod;
                 $avance->aprStartDate = $request->navStartDate;
                 $avance->aprEndDate = $request->navEndDate;
                 $avance->save();
 
-                $partidas = Partida::where('parProject',$request->hnpyId)->get();
+                $val->prgBudgetProgress = $avance->aprId;
+                $val->save();
 
-                foreach ($partidas as $i => $part) {
+                if($prevAvance == 0){
+                    $partidas = Partida::where('parProject',$request->hnpyId)->get();
 
-                    $avpart = new Avdetail();
-                    $avpart->avcPartidaId = $part->parId;
-                    $avpart->avcItem = $part->parItem;
-                    $avpart->avcBudgetProgress = $avance->aprId;
+                    foreach ($partidas as $i => $part) {
 
-                    if($part->parMetered == null && $part->parUnit == null){
-                        $avpart->avcMeteredBa = null;
-                        $avpart->avcMountBa = null;
-                        $avpart->avcPercentBa = null;
-                        $avpart->avcMeteredCv = null;
-                        $avpart->avcMountCv = null;
-                        $avpart->avcPercentCv = null;
-                        $avpart->avcMeteredCa = null;
-                        $avpart->avcMountCa = null;
-                        $avpart->avcPercentCa = null;
-                        $avpart->avcMeteredBv = null;
-                        $avpart->avcMountBv = null;
-                        $avpart->avcPercentBv = null;
+                        $avpart = new Avdetail();
+                        $avpart->avcPartidaId = $part->parId;
+                        $avpart->avcItem = $part->parItem;
+                        $avpart->avcBudgetProgress = $avance->aprId;
+
+                        if($part->parMetered == null && $part->parUnit == null){
+                            $avpart->avcMeteredBa = null;
+                            $avpart->avcMountBa = null;
+                            $avpart->avcPercentBa = null;
+                            $avpart->avcMeteredCv = null;
+                            $avpart->avcMountCv = null;
+                            $avpart->avcPercentCv = null;
+                            $avpart->avcMeteredCa = null;
+                            $avpart->avcMountCa = null;
+                            $avpart->avcPercentCa = null;
+                            $avpart->avcMeteredBv = null;
+                            $avpart->avcMountBv = null;
+                            $avpart->avcPercentBv = null;
+                        }
+                        else{
+
+                            if($cant_avncs == 0){
+                                $avpart->avcMeteredBv = $part->parMetered;
+                                $avpart->avcMountBv = $part->parPartial;
+                                $avpart->avcPercentBv = 100.00;
+                            }
+                            else{
+
+                            }
+
+                        }
+
+                        $avpart->save();
+
                     }
-                    else{
+
+                    $itemsresumen = Presupuesto::where('preProject',$request->hnpyId)->get();
+
+                    foreach ($itemsresumen as $i => $item) {
+                        
+                        $resumen = new Resumenavc();
+                        $resumen->avrBudgetProgress = $avance->aprId;
+                        $resumen->avrCodeItem = $item->preCodeItem;
 
                         if($cant_avncs == 0){
-                            $avpart->avcMeteredBv = $part->parMetered;
-                            $avpart->avcMountBv = $part->parPartial;
-                            $avpart->avcPercentBv = 100.00;
+                            $resumen->avrMountBv = $item->preItemGeneralMount;
+                            $resumen->avrPercentBv = 100.00;
                         }
                         else{
 
                         }
 
+                        $resumen->save();
                     }
-
-                    $avpart->save();
 
                 }
+                else{
+                    $partidas = Avdetail::where('avcBudgetProgress',$prevAvance)->get();
 
-                $itemsresumen = Presupuesto::where('preProject',$request->hnpyId)->get();
+                    foreach ($partidas as $i => $part) {
 
-                foreach ($itemsresumen as $i => $item) {
-                    
-                    $resumen = new Resumenavc();
-                    $resumen->avrBudgetProgress = $avance->aprId;
-                    $resumen->avrCodeItem = $item->preCodeItem;
+                        $avpart = new Avdetail();
+                        $avpart->avcPartidaId = $part->avcPartidaId;
+                        $avpart->avcItem = $part->avcItem;
+                        $avpart->avcBudgetProgress = $avance->aprId;
 
-                    if($cant_avncs == 0){
-                        $resumen->avrMountBv = $item->preItemGeneralMount;
-                        $resumen->avrPercentBv = 100.00;
+                        if($part->avcMeteredBa == null && $part->avcMountBa == null){
+                            $avpart->avcMeteredBa = null;
+                            $avpart->avcMountBa = null;
+                            $avpart->avcPercentBa = null;
+                            $avpart->avcMeteredCv = null;
+                            $avpart->avcMountCv = null;
+                            $avpart->avcPercentCv = null;
+                            $avpart->avcMeteredCa = null;
+                            $avpart->avcMountCa = null;
+                            $avpart->avcPercentCa = null;
+                            $avpart->avcMeteredBv = null;
+                            $avpart->avcMountBv = null;
+                            $avpart->avcPercentBv = null;
+                        }
+                        else{
+                            $avpart->avcMeteredBa = $part->avcMeteredCa;
+                            $avpart->avcMountBa = $part->avcMountCa;
+                            $avpart->avcPercentBa = $part->avcPercentCa;
+                            /*$avpart->avcMeteredCv = null;
+                            $avpart->avcMountCv = null;
+                            $avpart->avcPercentCv = null;
+                            $avpart->avcMeteredCa = null;
+                            $avpart->avcMountCa = null;
+                            $avpart->avcPercentCa = null;*/
+                            $avpart->avcMeteredBv = $part->avcMeteredBv;
+                            $avpart->avcMountBv = $part->avcMountBv;
+                            $avpart->avcPercentBv = $part->avcPercentBv;
+                        }
+
+                        $avpart->save();
+
                     }
-                    else{
 
+                    $itemsresumen = Resumenavc::where('avrBudgetProgress',$prevAvance)->get();
+
+                    foreach ($itemsresumen as $i => $item) {
+                        
+                        $resumen = new Resumenavc();
+                        $resumen->avrBudgetProgress = $avance->aprId;
+                        $resumen->avrCodeItem = $item->avrCodeItem;
+                        $resumen->avrMountBa = $item->avrMountCa;
+                        $resumen->avrPercentBa = $item->avrPercentCa;
+                        $resumen->avrMountBv = $item->avrMountBv;
+                        $resumen->avrPercentBv = $item->avrPercentBv;
+                        $resumen->save();
                     }
-
-                    $resumen->save();
                 }
-
-                
-
             });
 
             if(is_null($exception)){
@@ -168,9 +249,26 @@ class AvanceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-        //
+        $pyId = $request->pyId;
+        $avId = $request->avId;
+
+        //$pry = Proyecto::find($pyId);
+        //$apr = Avance::find($avId);
+
+        $avd = Avdetail::select('*')
+                ->join('gcopartidas','parId','=','avcPartidaId')
+                ->where('avcBudgetProgress',$avId)
+                ->get();
+        //$pto = Presupuesto::where('preProject',$pyId)->get();
+        $rsmn = Vpiepresupuesto::where('aprId',$avId)->get();
+        $valorizacion = Progfisica::where('prgProject',$pyId)->where('prgBudgetProgress',$avId)->first();
+
+        //$view = view('formularios.editar_avance',compact('pry','apr','avd','pto','rsmn'));
+        $view = view('formularios.editar_avance',compact('avd','rsmn','valorizacion'));
+
+        return $view;
     }
 
     /**
@@ -182,19 +280,6 @@ class AvanceController extends Controller
     public function edit(Request $request)
     {
 
-        $pyId = $request->npyName;
-        $avId = $request->navSelect;
-
-        $avd = Avdetail::select('*')
-                ->join('gcopartidas','parId','=','avcPartidaId')
-                ->where('avcBudgetProgress',$avId)
-                ->get();
-
-        $pto = Presupuesto::where('preProject',$pyId)->get();
-
-        $rsmn = Vpiepresupuesto::where('aprId',$avId)->get();
-
-        return response()->json(compact('avd','pto','rsmn'));
     }
 
     /**
@@ -204,11 +289,11 @@ class AvanceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, $close)
     {
         try{
 
-            $exception = DB::transaction(function() use($request){
+            $exception = DB::transaction(function() use($request, $close){
 
                 $pyId = $request->npyId;
                 $apId = $request->nbpId;
@@ -233,6 +318,11 @@ class AvanceController extends Controller
                     $partida->save();
                 }
 
+                $proyecto = Proyecto::find($pyId);
+                $presupuesto = Presupuesto::find($proyecto->pryBaseBudget);
+                $presupuestoCode = $presupuesto->preCodeItem;
+
+
                 foreach ($gridResumen as $item) {
                     $resumen = Resumenavc::find($item->avrId);
                     $resumen->avrMountBa = $item->avrMountBa;
@@ -244,7 +334,24 @@ class AvanceController extends Controller
                     $resumen->avrMountBv = $item->avrMountBv;
                     $resumen->avrPercentBv = $item->avrPercentBv;
                     $resumen->save();
+
+                    if($resumen->avrCodeItem == $presupuestoCode){
+                        $montoEjecutado = $resumen->avrMountCv;
+                        $porceEjecutado = $resumen->avrPercentCv;
+                        $acumuEjecutado = $resumen->avrPercentCa;
+                    }
+
                 }
+
+                $avancePresupuesto = Avance::find($apId);
+
+                $cronograma = Progfisica::find($avancePresupuesto->aprProgFisica);
+                $cronograma->prgBudgetProgress = $avancePresupuesto->aprId;
+                $cronograma->prgMountExec = $montoEjecutado;
+                $cronograma->prgPercentExec = $porceEjecutado / 100;
+                $cronograma->prgAggregateExec = $acumuEjecutado / 100;
+                $cronograma->prgClosed = $close;
+                $cronograma->save();
 
             });
 

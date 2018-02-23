@@ -19,19 +19,20 @@ class CreateProyectoTable extends Migration
             $table->string('pryUnifiedCode',10)->nullable();
             $table->string('pryDenomination',500)->nullable();
             $table->string('pryShortDenomination',200)->nullable();
-            $table->date('pryViabilityDatePip')->nullable();
-            $table->date('pryViabilityDateSD')->nullable();
             $table->string('pryViabilityResolution',100)->nullable();
+            $table->date('pryDateResolution')->nullable();
             $table->string('pryExeMode',50);
             $table->integer('pryExeUnit')->unsigned()->nullable();
             $table->foreign('pryExeUnit')
                     ->references('ejeId')
                     ->on('gcouejecutora')
                     ->onDelete('cascade');
-
-            $table->decimal('pryGeneralExpensesPrcnt',14,2)->nullable();
-            $table->decimal('pryAvailPrcnt',14,2)->nullable();
-            $table->decimal('pryIgv',14,2)->default(0.18)->nullable();
+            $table->date('pryDateAgree')->nullable();
+            $table->integer('pryMonthTerm')->unsigned()->nullable();
+            $table->integer('pryDaysTerm')->unsigned()->nullable();
+            $table->date('pryStartDateExe')->nullable();
+            $table->date('pryEndDateExe')->nullable();
+            $table->integer('pryBaseBudget')->unsigned()->nullable();
             $table->boolean('pryInvalidate')->default(0);
             $table->string('pryInvalidateDetail',200)->nullable();
         });

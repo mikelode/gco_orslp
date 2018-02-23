@@ -36,7 +36,11 @@
 			<div class="form-group row">
 				<label class="col-md-4">Valorización Nro:</label>
 				<div class="col-md-6">
-					<input type="number" class="form-control form-control-sm" name="navNumber">
+					<select class="form-control form-control-sm" name="navNumber">
+						@foreach($crn as $c)
+						<option value="{{ $c->prgId }}">{{ $c->prgNumberVal.' - '.$c->prgPeriodo }}</option>
+						@endforeach
+					</select>
 				</div>
 			</div>
 			<div class="form-group row">
