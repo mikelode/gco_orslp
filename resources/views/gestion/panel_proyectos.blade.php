@@ -8,9 +8,11 @@
 			<div class="card border-success mb-3">
 				<div class="card-header">
 					<h5 class="float-left"><i class="icon-th-list mr-2"></i>Proyectos</h5>
+					@if(Auth::user()->hasPermission(2))
 					<div class="float-right">
 						<button class="btn btn-success btn-sm" onclick="nuevo_proyecto()">Nuevo Proyecto</button>
 					</div>
+					@endif
 				</div>
 				<div class="card-body">
 					<div class="card">
@@ -40,12 +42,16 @@
 										@endforeach
 									</td>
 									<td class="td-actions">
+										@if(Auth::user()->hasPermission(3))
 										<a href="javascript:editar_proyecto('{{ $py->pryId }}');" class="btn btn-sm btn-outline-primary">
 											<i class="icon-pencil"></i>
 										</a>
+										@endif
+										@if(Auth::user()->hasPermission(4))
 										<button type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#mdlRemoveProject" data-proyid='{{ $py->pryId }}' data-proyname='{{ $py->pryDenomination }}'>
 											<i class="icon-minus"></i>
 										</button>
+										@endif
 									</td>
 								</tr>
 								@endforeach

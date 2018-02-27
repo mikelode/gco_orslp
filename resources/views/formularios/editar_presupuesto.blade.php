@@ -48,19 +48,23 @@
 						@endforeach
 					</tbody>
 				</table>
+				@if(Auth::user()->hasPermission(7))
 				<button type="button" class="btn btn-sm btn-success float-right" style="display: none;" id="btnUpdateBudget" onclick="actualizar_presupuesto($('#frmUpdateBudget'))">Guardar Cambios</button>
+				@endif
 			</form>
 		</div>
 		<div class="card-header">
 			<b>Partidas Presupuestarias</b>
-			@if($ptd->isEmpty())
-			<div class="float-right">
-				<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-action="new" data-target="#mdlImportFile">Importar</button>
-			</div>
-			@else
-			<div class="float-right">
-				<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-action="clear" data-target="#mdlImportFile">Limpiar e Importar</button>
-			</div>
+			@if(Auth::user()->hasPermission(7))
+				@if($ptd->isEmpty())
+				<div class="float-right">
+					<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-action="new" data-target="#mdlImportFile">Importar</button>
+				</div>
+				@else
+				<div class="float-right">
+					<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-action="clear" data-target="#mdlImportFile">Limpiar e Importar</button>
+				</div>
+				@endif
 			@endif
 		</div>
 		<div class="card-body">
@@ -73,9 +77,13 @@
 	<div class="card">
 		<div class="card-header py-1"><b>Operaciones</b></div>
 		<div class="card-body px-2">
+			@if(Auth::user()->hasPermission(7))
 			<button type="button" class="btn btn-sm btn-primary btn-block" onclick="editar_presupuesto($(this),$('#frmUpdateBudget'))" value="editar">Editar Presupuesto</button>
 			<button type="button" class="btn btn-sm btn-info btn-block" onclick="habilitar_edicion($(this),grid)" value="disable">Editar Partidas</button>
+			@endif
+			@if(Auth::user()->hasPermission(8))
 			<button type="button" class="btn btn-sm btn-danger btn-block">Eliminar</button>
+			@endif
 		</div>
 	</div>
 </div>

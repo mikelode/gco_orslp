@@ -17,8 +17,8 @@
         "PercentCompleteBar": PercentCompleteBarFormatter,
         "YesNo": YesNoFormatter,
         "Checkmark": CheckmarkFormatter,
-        "Checkbox": CheckboxFormatter
-
+        "Checkbox": CheckboxFormatter,
+        "Miles" : ThousandsFormatter
       }
     }
   });
@@ -61,5 +61,15 @@
 
   function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
     return value ? "<img src='../images/tick.png'>" : "";
+  }
+
+  /* SYMVA custom functions */
+  function ThousandsFormatter(row, cell, value, columnDef, dataContext){
+
+    if (value == null || value === "") {
+      return "";
+    }
+
+    return numeral(value).format('0,0.00');
   }
 })(jQuery);

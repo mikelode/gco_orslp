@@ -119,7 +119,9 @@
 	<div class="card border-success">
 		<div class="card-header py-1"><b>Operaciones</b></div>
 		<div class="card-body px-2">
+			@if(Auth::user()->hasPermission(10))
 			<button type="button" class="btn btn-sm btn-success btn-block" onclick="registrar_cronograma($('#frmNewSchedule'))">Registrar</button>
+			@endif
 		</div>
 	</div>
 </div>

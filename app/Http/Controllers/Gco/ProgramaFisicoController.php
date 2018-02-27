@@ -150,7 +150,62 @@ class ProgramaFisicoController extends Controller
         $cronograma = Progfisica::where('prgProject',$pyId)->orderBy('prgNumberVal','asc')->get();
 
         if($curva == '1'){
+            $chartData = '';
+            $labels = $cronograma->pluck('prgPeriodo');
+
+            $programado = $cronograma->map(function($item,$key){
+                return $item->prgAggregate * 100;
+            });
+
+            $ejecutado = $cronograma->map(function($item,$key){
+                return $item->prgAggregateExec * 100;
+            });
+
+            $chartData .= "{ 
+                labels: $labels, 
+                datasets: [{
+                    label: 'Cantidad Programada',
+                    fill: false,
+                    backgroundColor: 'rgba(255,99,132,0.5)',
+                    borderColor: 'rgb(255,99,132)',
+                    data:$programado
+                },{
+                    label: 'Cantidad Ejecutada',
+                    fill: false,
+                    backgroundColor: 'rgba(54, 162, 235,0.5)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    spanGaps: true,
+                    data:$ejecutado
+                }]
+            }";
+
+            $view = view('presentacion.slide_curvas', compact('cronograma','chartData'));
+        }
+        else{
+
+            if($cronograma->isEmpty()){
+                $view = $this->create($request);
+            }
+            else{
+                $pry = Proyecto::find($pyId);
+                $resumen = Presupuesto::where('preProject',$pyId)->get();
+
+                $view = view('formularios.editar_programacion', compact('cronograma','pry','resumen'));
+
+            }
+        }
+
+        return $view;
+    }
+
+    public function show_con_morris(Request $request, $curva)
+    {
+        $pyId = $request->pyId;
+        $cronograma = Progfisica::where('prgProject',$pyId)->orderBy('prgNumberVal','asc')->get();
+
+        if($curva == '1'){
             $data = '';
+
             foreach ($cronograma as $i => $crono) {
 
                 $programado = $crono->prgAggregate * 100;
@@ -163,6 +218,8 @@ class ProgramaFisicoController extends Controller
                 }
 
                 $data .= "{ periodo: '" . $crono->prgPeriodo . "', programado: " . $programado . ", ejecutado: " . $ejecutado . "}, ";
+
+
             }
             $data = substr($data, 0, -2);
 

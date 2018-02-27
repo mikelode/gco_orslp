@@ -18,12 +18,13 @@ class CreateUsersTable extends Migration
             $table->engine = 'InnoDB';
             $table->increments('tusId');
             $table->string('tusNickName', 20);
-            $table->string('tusPassword', 60);
+            $table->string('password', 60);
             $table->string('tusDni', 10)->nullable();
             $table->string('tusFullName', 300);
             $table->string('tusNames',100);
             $table->string('tusPaterno',100);
             $table->string('tusMaterno',100);
+            $table->string('tusRole',50);
             $table->string('tusRegisterBy',50)->nullable();
             $table->dateTime('tusRegisterAt')->nullable();
             $table->boolean('tusState')->nullable();

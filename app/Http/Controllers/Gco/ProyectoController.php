@@ -12,7 +12,7 @@ use Carbon\Carbon;
 use Exception;
 
 class ProyectoController extends Controller
-{
+{   
     /**
      * Display a listing of the resource.
      *

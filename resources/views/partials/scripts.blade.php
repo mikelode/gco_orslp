@@ -1,11 +1,10 @@
 <!-- REQUIRED JS SCRIPTS -->
 <script src="{{ asset('/plugins/jsnumeral/min/numeral.min.js') }}" type="text/javascript"></script>
 
-<script src="{{ asset('/js/excanvas.min.js') }}" type="text/javascript"></script> 
-<script src="{{ asset('/js/chart.min.js') }}" type="text/javascript"></script> 
+<script src="{{ asset('/plugins/chartjs/Chart.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/js/popper.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/bootstrap4/dist/js/bootstrap.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('plugins/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/jquerymask/jquery.mask.min.js') }}" type="text/javascript"></script>
 <script language="javascript" type="text/javascript" src="{{ asset('/js/full-calendar/fullcalendar.min.js') }}"></script>
 
@@ -30,3 +29,20 @@
 <script src="{{  asset('/plugins/morris/morris.min.js') }}" type="text/javascript"></script>
 
 <script type="text/javascript" src="{{ asset('/js/symva.js') }}"></script>
+
+<script type="text/javascript">
+	
+	var screen = $('#loading-screen');
+	configureLoadingScreen(screen);
+
+	function configureLoadingScreen(screen){
+		$(document)
+			.ajaxStart(function() {
+				screen.fadeIn();
+			})
+			.ajaxStop(function() {
+				screen.fadeOut();
+			});
+	}
+
+</script>

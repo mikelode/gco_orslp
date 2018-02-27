@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="es">
+<html lang="{{ app()->getLocale() }}">
 
 @include('partials.htmlheader')
 

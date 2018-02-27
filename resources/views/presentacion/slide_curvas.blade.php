@@ -4,21 +4,8 @@
 			<div class="card-body">
 				<div class="row">
 					<div class="col-md-12">
-						<div class="title-graph">
-							AVANCE PORCENTUAL ACUMULADO <br> PROGRAMADO VS EJECUTADO
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<div id="curve-s" style="position: relative; height: 400px;"></div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="caption">
-							PERIODOS DE VALORIZACIÓN
-						</div>
+						<!--<div id="curve-s" style="position: relative; height: 400px;"></div>-->
+						<canvas id="curve-s" width="400" height="200"></canvas>
 					</div>
 				</div>
 			</div>
@@ -67,10 +54,53 @@
 </div>
 
 <script type="text/javascript">
-	
-	var line_chart = Morris.Line({
+	var ctx = $('#curve-s');
+	var myChart = new Chart(ctx, {
+	    type: 'line',
+	    data: {!! $chartData !!},
+	    options: {
+	    	responsive: true,
+	    	title: {
+	            display: true,
+	            text: "AVANCE PORCENTUAL ACUMULADO PROGRAMADO VS EJECUTADO"
+	        },
+	        tooltips:{
+	        	mode: 'index',
+	        	intersect: false,
+	        },
+	        hover:{
+	        	mode: 'nearest',
+	        	intersect: true,
+	        },
+	        scales: {
+	        	xAxes: [{
+	        		display: true,
+	        		scaleLabel: {
+	        			display: true,
+	        			labelString: 'Periodo',
+	        		}
+	        	}],
+	            yAxes: [{
+	            	display: true,
+	            	scaleLabel: {
+	            		display: true,
+	            		labelString: 'Porcentaje de Ejecución',
+	            	}
+	            }]
+	        },
+	        legend: {
+	            display: true,
+	            labels: {
+	                fontColor: 'rgb(255, 99, 132)'
+	            }
+	        }
+	    }
+	});
+
+	Chart.defaults.line.spanGaps = true;
+	/*var line_chart = Morris.Line({
 		element: 'curve-s',
-		data: [<?php echo $data ?>],
+		data: [<php echo $data ?>],
 		xkey: 'periodo',
 		xLabelAngle: 45,
 		ykeys: ['programado','ejecutado'],
@@ -80,6 +110,6 @@
 		lineWidth: [1.5,1.5],
 		fillOpacity: 0.5,
 		hideHover: 'auto'
-	});
+	});*/
 
 </script>

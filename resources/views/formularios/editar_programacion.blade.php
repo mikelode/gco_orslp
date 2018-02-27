@@ -150,8 +150,12 @@
 	<div class="card border-success">
 		<div class="card-header py-1"><b>Operaciones</b></div>
 		<div class="card-body px-2">
+			@if(Auth::user()->hasPermission(11))
 			<button type="button" id="btnActionEdit" class="btn btn-sm btn-info btn-block" onclick="editar_cronograma($(this),$('#frmUpdateSchedule'))" value="editar">Editar Cronograma</button>
+			@endif
+			@if(Auth::user()->hasPermission(12))
 			<button type="button" id="btnActionDelete" class="btn btn-sm btn-danger btn-block">Eliminar</button>
+			@endif
 		</div>
 	</div>
 </div>

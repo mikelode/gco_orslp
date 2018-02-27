@@ -15,6 +15,7 @@ use App\Models\Vpiepresupuesto;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 use Excel;
 use File;
@@ -254,7 +255,7 @@ class AvanceController extends Controller
         $pyId = $request->pyId;
         $avId = $request->avId;
 
-        //$pry = Proyecto::find($pyId);
+        $pry = Proyecto::find($pyId);
         //$apr = Avance::find($avId);
 
         $avd = Avdetail::select('*')
@@ -266,7 +267,7 @@ class AvanceController extends Controller
         $valorizacion = Progfisica::where('prgProject',$pyId)->where('prgBudgetProgress',$avId)->first();
 
         //$view = view('formularios.editar_avance',compact('pry','apr','avd','pto','rsmn'));
-        $view = view('formularios.editar_avance',compact('avd','rsmn','valorizacion'));
+        $view = view('formularios.editar_avance',compact('avd','rsmn','valorizacion','pry'));
 
         return $view;
     }
@@ -391,7 +392,9 @@ class AvanceController extends Controller
         $avancesPy = Avance::where('aprProject',$pyId)->get();
 
         $optionHtml = '<optgroup label="Opciones"><option value="NA"> Elija o agregue un avance </option>';
-        $optionHtml .= '<option value="CP"> Registrar Nuevo Avance </option></optgroup>';
+        if(Auth::user()->hasPermission(14)){
+            $optionHtml .= '<option value="CP"> Registrar Nuevo Avance </option></optgroup>';
+        }
         $optionHtml .= '<optgroup label="Avances registrados">';
 
         foreach($avancesPy as $av){

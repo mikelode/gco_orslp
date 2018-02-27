@@ -1,9 +1,12 @@
 <head>
-    
     <meta charset="utf-8">
-    <title>Dashboard - Bootstrap Admin Template</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <title>{{ config('app.name', 'Symva') }}</title>
+
+    <!-- Styles -->
 
     <link href="{{ asset('/plugins/bootstrap4/dist/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="{{ asset('/plugins/open-iconic/font/css/open-iconic-bootstrap.css') }}" rel="stylesheet" type="text/css">

@@ -26,10 +26,10 @@
                     <!-- /col-md-3 -->
                     <div class="col-md-3">
                         <h4>
-                            Directivas</h4>
+                            Documentos</h4>
                         <ul>
                             <li><a href="javascript:;">Manual de Usuario</a></li>
-                            <li><a href="javascript:;">Decreto Regional</a></li>
+                            <li><a href="javascript:;">Directivas Regionales</a></li>
                             <li><a href="javascript:;">Privacy Policy</a></li>
                         </ul>
                     </div>

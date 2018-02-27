@@ -1,3 +1,13 @@
+function configureLoadingScreen(screen){
+	$(document)
+		.ajaxStart(function() {
+			screen.fadeIn();
+		})
+		.ajaxStop(function() {
+			screen.fadeOut();
+		});
+}
+
 function goto_menu(path)
 {
 	$.get(path, function(data) {
@@ -477,4 +487,11 @@ function actualizar_cronograma(form)
 		}
 
 	});
+}
+
+function change_to_submenu(path)
+{
+    $.get(path, function(data){
+        $('#sub-content').html(data);
+    });
 }

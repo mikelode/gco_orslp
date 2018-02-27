@@ -147,9 +147,11 @@
 	<div class="card">
 		<div class="card-header py-1"><b>Operaciones</b></div>
 		<div class="card-body px-2">
+			@if(Auth::user()->hasPermission(6))
 			<button type="button" class="btn btn-sm btn-success btn-block" onclick="registrar_presupuesto($('#frmRegisterBudget'))">
 				<i class="icon-save mr-3"></i>Registrar
 			</button>
+			@endif
 		</div>
 	</div>
 </div>
