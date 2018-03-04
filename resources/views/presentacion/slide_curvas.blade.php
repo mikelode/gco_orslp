@@ -4,6 +4,11 @@
 			<div class="card-body">
 				<div class="row">
 					<div class="col-md-12">
+						<a href="{{ url('export/sheet') . '?pyId=' . $cronograma[0]->prgProject }}" target="_blank" class="btn btn-success" id="btnMakeTemplate">Exportar Resultado a Excel</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
 						<!--<div id="curve-s" style="position: relative; height: 400px;"></div>-->
 						<canvas id="curve-s" width="400" height="200"></canvas>
 					</div>
@@ -16,7 +21,8 @@
 	<div class="col-md-12">
 		<div class="card">
 			<div class="card-body">
-				<table class="table table-bordered table-sm action-table">
+				<!--<table id="dataCronograma" class="table table-bordered table-sm action-table">-->
+				<table id="dataCronograma" class="display" cellspacing="0" width="100%">
 					<thead>
 						<tr>
 							<th rowspan="2">N° Valorización</th>
@@ -54,6 +60,41 @@
 </div>
 
 <script type="text/javascript">
+
+	$('#dataCronograma').DataTable({
+		'paging': false,
+		'ordering': false,
+		'info': false,
+		'searching': false,
+		dom: 'Bfrtip',
+        buttons: [
+            {
+                extend:    'copyHtml5',
+                text:      '<i class="fa fa-files-o"></i> Copiar',
+                titleAttr: 'Copy'
+            },
+            {
+                extend:    'excelHtml5',
+                text:      '<i class="fa fa-file-excel-o"></i> Excel',
+                titleAttr: 'Excel'
+            },
+            {
+                extend:    'csvHtml5',
+                text:      '<i class="fa fa-file-text-o"></i> Csv',
+                titleAttr: 'CSV'
+            },
+            {
+                extend:    'pdfHtml5',
+                text:      '<i class="fa fa-file-pdf-o"></i> Pdf',
+                titleAttr: 'PDF'
+            },{
+            	extend:    'print',
+            	text:      '<i class="fa fa-print"></i> Imprimir',
+                titleAttr: 'Print'
+            }
+        ]
+	});
+
 	var ctx = $('#curve-s');
 	var myChart = new Chart(ctx, {
 	    type: 'line',
@@ -111,5 +152,15 @@
 		fillOpacity: 0.5,
 		hideHover: 'auto'
 	});*/
+
+	$('#btnMake').click(function(evt) {
+		evt.preventDefault();
+
+		$.get('{{ url('export/sheet') }}', { pyId : $('#pyName').val() } , function(data) {
+
+			
+
+		});
+	});
 
 </script>

@@ -9,9 +9,13 @@ use App\Models\Avance;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 use Excel;
 use File;
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PartidaController extends Controller
 {
@@ -274,6 +278,91 @@ class PartidaController extends Controller
 
         }catch(Exception $e){
             $msg = 'Error: ' . $e->getMessage() . ' -- ' . $e->getFile() . ' - ' . $e->getLine() . " \n";
+            $msgId = 500;
+        }
+        
+        return response()->json(compact('msgId','msg','pyId','url'));
+    }
+
+    public function importExcel(Request $request)
+    {
+        try{
+
+            $pyId = $request->hnimpPry;
+            $url = url('ver/presupuesto');
+
+            if($request->hnimpAction == 'clear'){
+                $avance = Avance::where('aprProject',$pyId)->get();
+                
+                if(!$avance->isEmpty())
+                    throw new Exception("Las partidas presupuestarias presentan registros de avance o valorizaciones por lo que no es posible realizar esta acción");
+                
+                $limpiarPartidas = Partida::where('parProject',$pyId)->delete();
+            }
+
+            if($request->hasFile('nimpFile')){
+                $file = $request->file('nimpFile');
+                $extension = File::extension($file->getClientOriginalName());
+
+                if($extension == 'xlsx' || $extension == 'xls' || $extension == 'csv'){
+                    $path = $file->getRealPath();
+                    $partidas = IOFactory::load($path, function($reader){}, 'ISO-8859-1');
+                    $partidas = $partidas->getActiveSheet()->toArray(null, true, true, true);
+                    $headerXls = array_shift($partidas);
+                    $headerPar = array('A' => 'item', 'B' => 'descripcion', 'C' => 'unidad', 'D' => 'metrado', 'E' => 'precio', 'F' => 'parcial');
+
+                    if($headerXls != $headerPar){
+                        throw new Exception("Revise que la primera fila de su archivo excel tenga el siguiente orden de las columnas:\n| item | descripcion | unidad | metrado | precio | parcial |");
+                    }
+
+                    if(!empty($partidas) && count($partidas)){
+                        foreach ($partidas as $key => $value) {
+                            $div = explode('.', $value['A']);
+                            $nivel = count($div);
+
+                            $insert[] = [
+                                'parProject' => $pyId,
+                                'parLevel' => $nivel,
+                                'parItem' => trim($value['A']),
+                                'parDescription' => $value['B'],
+                                'parUnit' => trim($value['C']),
+                                'parMetered' => $value['D'],
+                                'parPrice' => $value['E'],
+                                'parPartial' => $value['F'],
+                            ];
+                        }
+
+                        if(!empty($insert)){
+                            
+                            $insertBudget = DB::table('gcopartidas')->insert($insert);
+                            
+                            if($insertBudget){
+                                $msg = 'Presupuesto importado correctamente';
+                                $msgId = 200;
+                            }
+                            else{
+                                throw new Exception("Error al intentar insetar los datos a la BD");
+                            }
+                                
+                        }
+                        else{
+                            throw new Exception("No se pudo relacionar los campos de la base de datos con los campos de la hoja excel");
+                        }
+                    }
+                    else{
+                        throw new Exception("No se pudo leer los datos del archivo excel seleccionado");
+                    }
+                }
+                else{
+                    throw new Exception("El archivo seleccionado debe tener la extension .xls | .xlsx o .csv");
+                }
+            }
+            else{
+                throw new Exception("No se ha seleccionado ningún archivo para su procesamiento");   
+            }
+
+        }catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' \n-- ' . $e->getFile() . ' - ' . $e->getLine() . " \n";
             $msgId = 500;
         }
         

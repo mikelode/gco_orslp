@@ -25,6 +25,17 @@
 <script src="{{ asset('/plugins/SlickGrid/slick.editors.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/SlickGrid/slick.grid.js') }}" type="text/javascript"></script>
 
+<!-- DataTables -->
+<!--<script src="{ asset('/plugins/DataTables/datatables.min.js') }}" type="text/javascript"></script>-->
+<script src="{{ asset('/plugins/DataTables/jquery.dataTables.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/DataTables/dataTables.buttons.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/DataTables/buttons.flash.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/DataTables/jszip.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/DataTables/pdfmake.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/DataTables/vfs_fonts.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/DataTables/buttons.html5.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/DataTables/buttons.print.min.js') }}" type="text/javascript"></script>
+
 <script src="{{  asset('/plugins/morris/raphael.min.js') }}" type="text/javascript"></script>
 <script src="{{  asset('/plugins/morris/morris.min.js') }}" type="text/javascript"></script>
 

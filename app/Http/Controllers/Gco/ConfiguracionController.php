@@ -97,7 +97,8 @@ class ConfiguracionController extends Controller
 
     public function getRegisterUser(Request $request)
     {
-        $view = view('setting.register_user');
+        $pys = Proyecto::with('ejecutor')->where('pryInvalidate',false)->get();
+        $view = view('setting.register_user',compact('pys'));
 
         if($request->ajax())
         {
@@ -121,6 +122,10 @@ class ConfiguracionController extends Controller
             $user->tusNames = strtoupper($request->name_user);
             $user->tusPaterno = strtoupper($request->patern_user);
             $user->tusMaterno = strtoupper($request->matern_user);
+            $user->tusProject = $request->npyName;
+            $user->tusJob = strtoupper(trim($request->job_user));
+            $user->tusEmail = strtoupper(trim($request->email_user));
+            $user->tusPhone = strtoupper(trim($request->phone_user));
             $user->tusRegisterBy = Auth::user()->tusId;
             $user->tusRegisterAt = Carbon::now();//->format('d/m/Y h:i:s A');
             $user->tusState = true;

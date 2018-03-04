@@ -8,6 +8,7 @@ use App\Models\Uejecutora;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Exception;
 
@@ -20,7 +21,22 @@ class ProyectoController extends Controller
      */
     public function index()
     {
-        $pys = Proyecto::with('ejecutor')->where('pryInvalidate',false)->get();
+        $pyAccess = Auth::user()->tusProject;
+
+        if($pyAccess == 0){
+            $pys = Proyecto::with('ejecutor')
+                    ->where('pryInvalidate',false)
+                    ->get();
+        }
+        else{
+            $pys = Proyecto::with('ejecutor')
+                    ->where('pryInvalidate',false)
+                    ->where('pryId',$pyAccess)
+                    ->get();
+        }
+
+        
+
         $tms = Equiprof::with('individualData')->get();
 
         $view = view('gestion.panel_proyectos', compact('pys','tms'));

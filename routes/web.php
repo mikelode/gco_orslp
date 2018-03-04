@@ -28,7 +28,7 @@ Route::get('ver/presupuesto','Gco\PresupuestoController@show');
 Route::post('nuevo/presupuesto','Gco\PresupuestoController@store');
 Route::post('actualizar/presupuesto','Gco\PresupuestoController@update');
 
-Route::post('importar/partidas','Gco\PartidaController@importCsv');
+Route::post('importar/partidas','Gco\PartidaController@importExcel');
 Route::get('list/partidas','Gco\PartidaController@list');
 Route::get('actualizar/partida','Gco\PartidaController@update');
 
@@ -40,6 +40,7 @@ Route::get('ver/programacion/{curva}','Gco\ProgramaFisicoController@show');
 Route::post('actualizar/programacion','Gco\ProgramaFisicoController@update');
 Route::get('curvas','Gco\ProgramaFisicoController@indexCurva')->middleware('auth');
 Route::get('curvas/desplegar/{curva}','Gco\ProgramaFisicoController@show');
+Route::get('export/sheet','Gco\ProgramaFisicoController@generateSheet');
 
 Route::get('presupuesto/avance','Gco\AvanceController@index')->middleware('auth');
 Route::get('avance/nuevo','Gco\AvanceController@create');

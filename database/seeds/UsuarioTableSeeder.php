@@ -17,10 +17,11 @@ class UsuarioTableSeeder extends Seeder
             'password' => \Hash::make('obras'),
             'tusDni' => '00000000',
             'tusFullName' => 'Usuario Administrador del Sistema',
-            'tusNames' => 'Usuario',
+            'tusNames' => 'ADMINISTRADOR',
             'tusPaterno' => 'Administrador',
             'tusMaterno' => 'Sistema',
-            'tusRole' => 'admin'
+            'tusRole' => 'admin',
+            'tusProject' => 0,
             'tusRegisterBy'=> 'admin',
             'tusState'=> true,
         ));

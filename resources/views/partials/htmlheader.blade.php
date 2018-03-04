@@ -11,7 +11,8 @@
     <link href="{{ asset('/plugins/bootstrap4/dist/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="{{ asset('/plugins/open-iconic/font/css/open-iconic-bootstrap.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/css/fontgoogle.css') }}"  rel="stylesheet" type="text/css">
-    <link href="{{ asset('/css/font-awesome.css') }}" rel="stylesheet" type="text/css">
+    <!-- Font Awesome Icons -->
+    <link href="{{ asset('/plugins/fontawesome-5.0.7/css/fontawesome-all.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/css/style.css') }}" rel="stylesheet" type="text/css">
     
     <link href="{{ asset('/plugins/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet" type="text/css">
@@ -20,6 +21,11 @@
     
     <link href="{{ asset('/plugins/SlickGrid/slick.grid.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/plugins/SlickGrid/css/smoothness/jquery-ui-1.11.3.custom.css') }}" rel="stylesheet" type="text/css">
+
+    <!-- datatables -->
+    <!--<link href="{ asset('/plugins/DataTables/datatables.min.css') }}" rel="stylesheet" type="text/css">-->
+    <link href="{{ asset('/plugins/DataTables/jquery.dataTables.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('/plugins/DataTables/buttons.dataTables.min.css') }}" rel="stylesheet" type="text/css">
 
     <link href="{{ asset('/plugins/morris/morris.css') }}" rel="stylesheet" type="text/css">
 

@@ -24,7 +24,11 @@ class CreateUsersTable extends Migration
             $table->string('tusNames',100);
             $table->string('tusPaterno',100);
             $table->string('tusMaterno',100);
-            $table->string('tusRole',50);
+            $table->string('tusRole',50)->nullable();
+            $table->integer('tusProject')->unsigned();
+            $table->string('tusJob',100)->nullable();
+            $table->string('tusEmail',250)->nullable();
+            $table->string('tusPhone',100)->nullable();
             $table->string('tusRegisterBy',50)->nullable();
             $table->dateTime('tusRegisterAt')->nullable();
             $table->boolean('tusState')->nullable();

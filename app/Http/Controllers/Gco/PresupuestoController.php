@@ -8,6 +8,7 @@ use App\Models\Partida;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 use Excel;
 use File;
@@ -21,7 +22,18 @@ class PresupuestoController extends Controller
      */
     public function index()
     {
-        $pys = Proyecto::where('pryInvalidate',false)->get();
+        $pyAccess = Auth::user()->tusProject;
+
+        if($pyAccess == 0){
+            $pys = Proyecto::where('pryInvalidate',false)->get();
+        }
+        else{
+            $pys = Proyecto::where('pryInvalidate',false)
+                    ->where('pryId',$pyAccess)
+                    ->get();
+        }
+
+        
         /*$pto = Presupuesto::select('*')
                 ->join('gcoproyecto','pryId','=','preProject')
                 ->where('pryInvalidate',false)

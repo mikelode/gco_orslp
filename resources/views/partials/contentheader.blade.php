@@ -3,10 +3,7 @@
 </div>
 <nav class="navbar navbar-expand navbar-dark" style="background-color: #00ba8b;">
   <div class="container">
-    <a class="navbar-brand mb-0 h3" href="{{ url('/') }}">SISTEMA DE GESTIÓN Y CONTROL DE AVANCE DE OBRAS</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <a class="navbar-brand h3" href="{{ url('/') }}">SISTEMA DE GESTIÓN Y CONTROL DE AVANCE DE OBRAS</a>
     <ul class="navbar-nav my-2 my-lg-0">
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
@@ -24,7 +21,7 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: white;">
           <i class="oi oi-person"></i>
-          Usuario
+          {{ Auth::user()->tusNames }}
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="#">Perfil</a>

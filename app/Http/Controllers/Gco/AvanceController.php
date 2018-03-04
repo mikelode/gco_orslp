@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use Exception;
 use Excel;
 use File;
@@ -29,7 +30,17 @@ class AvanceController extends Controller
      */
     public function index()
     {
-        $pys = Proyecto::where('pryInvalidate',false)->get();
+        $pyAccess = Auth::user()->tusProject;
+
+        if($pyAccess == 0){
+            $pys = Proyecto::where('pryInvalidate',false)->get();
+        }
+        else{
+            $pys = Proyecto::where('pryInvalidate',false)
+                    ->where('pryId',$pyAccess)
+                    ->get();
+        }
+
         $avn = Avance::all();
 
         $view = view('gestion.panel_avance',compact('pys','avn'));
@@ -101,6 +112,8 @@ class AvanceController extends Controller
                 $avance->aprPeriod = $request->navPeriod;
                 $avance->aprStartDate = $request->navStartDate;
                 $avance->aprEndDate = $request->navEndDate;
+                $avance->aprRegisterAt = Carbon::now();
+                $avance->aprRegisterBy = Auth::user()->tusId . ' - ' . Auth::user()->tusDni;
                 $avance->save();
 
                 $val->prgBudgetProgress = $avance->aprId;
