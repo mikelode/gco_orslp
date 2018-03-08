@@ -314,42 +314,57 @@ function CreateAddlHeaderRow(grid,columns) {
 
 function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource, dataTarget)
 {
-	var columnId = gridSource.getColumns()[cellMount].field;
+	var columnId = gridSource.getColumns()[cellMount].field; // get the mount field name
 	var total = 0;
 	var i = dataSource.length;
+	var itemCode;
+	var cd = gg = ggf = ggv = u = st = igv = 0;
 
 	while(i--){
 		total += (parseFloat(dataSource[i][columnId]) || 0);
 	}
-	for(var i=0; i<=5; i++){
-		switch(i){
-			case 0:
-				dataTarget[rowDc]['avrMountCv'] = total;
+	console.log(dataTarget);
+	for(var i=0; i<dataTarget.length; i++){
+
+		var itemCode = dataTarget[i].avrCodeItem;
+
+		switch(itemCode){
+			case 'CD':
+				dataTarget[i].avrMountCv = cd = total;
 				break;
-			case 1:
-				dataTarget[rowDc + 1]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 1]['preItemGeneralPrcnt']) * total) * 100 ) / 100;
+			case 'GG':
+				dataTarget[i]['avrMountCv'] = gg = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
 				break;
-			case 2:
-				dataTarget[rowDc + 2]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 2]['preItemGeneralPrcnt']) * total) * 100 ) / 100;
+			case 'GGF':
+				dataTarget[i]['avrMountCv'] = ggf = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
 				break;
-			case 3:
-				dataTarget[rowDc + 3]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc]['avrMountCv']) + parseFloat(dataTarget[rowDc + 1]['avrMountCv']) + parseFloat(dataTarget[rowDc + 2]['avrMountCv']) ) * 100 ) / 100;
+			case 'GGV':
+				dataTarget[i]['avrMountCv'] = ggv = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
 				break;
-			case 4:
-				dataTarget[rowDc + 4]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 4]['preItemGeneralPrcnt']) * parseFloat(dataTarget[rowDc + 3]['avrMountCv'])) * 100 ) / 100;
+			case 'U':
+				dataTarget[i]['avrMountCv'] = u = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
 				break;
-			case 5:
-				dataTarget[rowDc + 5]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 3]['avrMountCv']) + parseFloat(dataTarget[rowDc + 4]['avrMountCv'])) * 100 ) / 100;
+			case 'ST':
+				//dataTarget[i]['avrMountCv'] = st = Math.round((parseFloat(dataTarget[rowDc]['avrMountCv']) + parseFloat(dataTarget[rowDc + 1]['avrMountCv']) + parseFloat(dataTarget[rowDc + 2]['avrMountCv']) ) * 100 ) / 100;
+				dataTarget[i]['avrMountCv'] = st = Math.round((cd + gg + ggf + ggv + u) * 100 ) / 100;
+				break;
+			case 'IGV':
+				//dataTarget[i]['avrMountCv'] = igv = Math.round((parseFloat(dataTarget[rowDc + 4]['preItemGeneralPrcnt']) * parseFloat(dataTarget[rowDc + 3]['avrMountCv'])) * 100 ) / 100;
+				dataTarget[i]['avrMountCv'] = igv = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * st) * 100 ) / 100;
+				break;
+			case 'PT':
+				//dataTarget[i]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 3]['avrMountCv']) + parseFloat(dataTarget[rowDc + 4]['avrMountCv'])) * 100 ) / 100;
+				dataTarget[i]['avrMountCv'] = Math.round((st + igv) * 100 ) / 100;
 				break;
 		}
 
-		dataTarget[rowDc + i]['avrPercentCv'] = Math.round((parseFloat(dataTarget[rowDc + i]['avrMountCv']) / parseFloat(dataTarget[rowDc + i]['preItemGeneralMount'])) * 10000) / 100;
-		dataTarget[rowDc + i]['avrMountCa'] = Math.round((parseFloat(dataTarget[rowDc + i]['avrMountCv']) + parseFloat(dataTarget[rowDc + i]['avrMountBa'])) * 100 ) / 100;
-		dataTarget[rowDc + i]['avrPercentCa'] = Math.round((parseFloat(dataTarget[rowDc + i]['avrMountCa']) / parseFloat(dataTarget[rowDc + i]['preItemGeneralMount'])) * 10000) / 100;
-		dataTarget[rowDc + i]['avrMountBv'] = Math.round((parseFloat(dataTarget[rowDc + i]['preItemGeneralMount']) - parseFloat(dataTarget[rowDc + i]['avrMountCa'])) * 100 ) / 100;
-		dataTarget[rowDc + i]['avrPercentBv'] = 100 - parseFloat(dataTarget[rowDc + i]['avrPercentCa']);
+		dataTarget[i]['avrPercentCv'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) / parseFloat(dataTarget[i]['preItemGeneralMount'])) * 10000) / 100;
+		dataTarget[i]['avrMountCa'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) + parseFloat(dataTarget[i]['avrMountBa'])) * 100 ) / 100;
+		dataTarget[i]['avrPercentCa'] = Math.round((parseFloat(dataTarget[i]['avrMountCa']) / parseFloat(dataTarget[i]['preItemGeneralMount'])) * 10000) / 100;
+		dataTarget[i]['avrMountBv'] = Math.round((parseFloat(dataTarget[i]['preItemGeneralMount']) - parseFloat(dataTarget[i]['avrMountCa'])) * 100 ) / 100;
+		dataTarget[i]['avrPercentBv'] = 100 - parseFloat(dataTarget[i]['avrPercentCa']);
 
-		gridToUpdate.invalidateRow(rowDc + i);
+		gridToUpdate.invalidateRow(i);
 	}
 
 	gridToUpdate.render();
@@ -458,6 +473,14 @@ function agregar_periodo(table)
 	rowHtml += '</tr>';
 
 	table.find('tbody tr:last').after(rowHtml);
+}
+
+function agregar_itempres(table)
+{
+	var firstRow = table.find('tbody tr:first');
+	var newRow = firstRow.clone(true,true);
+	var lastRow = table.find('tbody tr:last');
+	lastRow.after(newRow.show());
 }
 
 function eliminar_fila(btn)

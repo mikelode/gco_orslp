@@ -326,9 +326,9 @@ class PartidaController extends Controller
                                 'parItem' => trim($value['A']),
                                 'parDescription' => $value['B'],
                                 'parUnit' => trim($value['C']),
-                                'parMetered' => $value['D'],
-                                'parPrice' => $value['E'],
-                                'parPartial' => $value['F'],
+                                'parMetered' => floatval(str_replace(',', '', $value['D'])),
+                                'parPrice' => floatval(str_replace(',', '', $value['E'])),
+                                'parPartial' => floatval(str_replace(',', '', $value['F'])),
                             ];
                         }
 

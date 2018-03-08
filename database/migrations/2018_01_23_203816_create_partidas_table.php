@@ -24,9 +24,9 @@ class CreatePartidasTable extends Migration
             $table->string('parItem',20)->nullable();
             $table->string('parDescription',1000)->nullable();
             $table->string('parUnit',10)->nullable();
-            $table->decimal('parMetered',14,2)->default(0.00)->nullable();
-            $table->decimal('parPrice',14,2)->default(0.00)->nullable();
-            $table->decimal('parPartial',14,2)->nullable();
+            $table->decimal('parMetered',14,5)->default(0.00)->nullable();
+            $table->decimal('parPrice',14,5)->default(0.00)->nullable();
+            $table->decimal('parPartial',14,5)->nullable();
             $table->boolean('parItemDisable')->default(0)->nullable();
             $table->string('parItemDisableDetail',500)->nullable();
             $table->datetime('parItemUpdateAt')->nullable();

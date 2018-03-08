@@ -307,3 +307,7 @@ input.editor-checkbox {
 .basecolbudget{
   background-color: rgba(255, 243, 205, 1); !important;
 }
+
+.percentage, .amount{
+  text-align: right;
+}

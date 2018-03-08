@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Gco;
 
 use App\Models\Proyecto;
 use App\Models\Presupuesto;
+use App\Models\Listpresupuesto;
 use App\Models\Partida;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -66,16 +67,22 @@ class PresupuestoController extends Controller
         try{
             $exception = DB::transaction(function() use($request){
 
-                foreach ($request->nptoOrder as $i => $item) {
-                    $presupuesto = new Presupuesto();
-                    $presupuesto->preProject = $request->hnpyId;
-                    $presupuesto->preOrder = $item;
-                    $presupuesto->preCodeItem = $request->nptoCodeItem[$i];
-                    $presupuesto->preItemGeneral = $request->nptoItemGral[$i];
-                    $presupuesto->preItemGeneralPrcnt = $request->nptoItemPercent[$i] / 100;
-                    $presupuesto->preItemGeneralMount = floatval(str_replace(',', '', $request->nptoItemMount[$i]));
-                    $presupuesto->save();
-                    unset($presupuesto);
+                foreach ($request->nptoItemGral as $i => $item) {
+                    if($i != 0){
+
+                        $itemPres = Listpresupuesto::find($item);
+
+                        $presupuesto = new Presupuesto();
+                        $presupuesto->preProject = $request->hnpyId;
+                        $presupuesto->preOrder = $itemPres->lprOrderItem;
+                        $presupuesto->preCodeItem = $itemPres->lprCodeItem;
+                        $presupuesto->preItemGeneral = $itemPres->lprDescriptionItem;
+                        if($itemPres->lprIsProportion)
+                            $presupuesto->preItemGeneralPrcnt = $request->nptoItemPercent[$i];// / 100;
+                        $presupuesto->preItemGeneralMount = floatval(str_replace(',', '', $request->nptoItemMount[$i]));
+                        $presupuesto->save();
+                        unset($presupuesto);
+                    }
                 }
 
             });
@@ -110,15 +117,16 @@ class PresupuestoController extends Controller
 
         $pry = Proyecto::find($pyId);
         $pto = Presupuesto::where('preProject',$pyId)->get();
+        $listPto = Listpresupuesto::all();
 
         $sinPto = $pto->isEmpty();
 
         if($sinPto){
-            $view = view('formularios.nuevo_presupuesto',compact('pry'));
+            $view = view('formularios.nuevo_presupuesto',compact('pry','listPto'));
         }
         else{
             $ptd = Partida::where('parProject',$pyId)->get();
-            $view = view('formularios.editar_presupuesto',compact('pry','pto','ptd'));
+            $view = view('formularios.editar_presupuesto',compact('pry','pto','ptd','listPto'));
         }
 
         return $view;

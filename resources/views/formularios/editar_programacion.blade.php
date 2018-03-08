@@ -43,7 +43,7 @@
 											<div class="form-group row">
 												<label class="col-sm-5 col-form-label">Monto Base</label>
 												<div class="col-sm-7">
-													<select class="mt-2" id="pyResumenPto">
+													<select class="form-control form-control-sm mt-2" id="pyResumenPto">
 														<option value="NA">-- Seleccionar --</option>
 														<?php $rsmMount = 0; ?>
 														@foreach($resumen as $pto)
@@ -183,23 +183,38 @@
 
 		var val_mount = numeral(this.value).value();
 
-		if(val_mount == '' || val_mount == null || isNaN(val_mount))
-			return;
+		if(val_mount == '' || val_mount == null || isNaN(val_mount)){
+			val_mount = 0;
+		}
 
 		var pto_base = numeral($('#ptoResumenMonto').val()).value();
 		var pto_total = numeral($('#valTotal').val()).value();
 		var val_prcnt = val_mount / pto_base;
 		var new_total = pto_total - val_prevmount + val_mount;
 
-		console.log('Pto_toal: ' + pto_total + ' prevmount: ' + val_prevmount + ' mount:' + val_mount + ' new_Total:' + new_total);
+		//console.log('Pto_total: ' + pto_total + ' prevmount: ' + val_prevmount + ' mount:' + val_mount + ' new_Total:' + new_total);
 
 		if(new_total > pto_base){
 			alert('Se ha superado el monto total base, revise los montos ingresados para cada periodo');
 			return;
 		}
+		$(row).find('.valPrcnt').val(numeral(val_prcnt).format('0.00%'));
+
+		new_total = 0;
+		$('input.valMount').each(function(index, el) {
+			valor = ($(el).val()).replace(/[^\d\.]/g,'');
+			console.log(valor);
+			if(valor == '' || valor == null || isNaN(valor)){
+				valor = 0;
+			}
+
+			new_total = new_total + parseFloat(valor);
+		});
+
+		console.log('TEST:' + new_total);
 
 		$('#valTotal').val(numeral(new_total).format('0,0.00'));
-		$(row).find('.valPrcnt').val(numeral(val_prcnt).format('0.00%'));
+		
 
 		if(prevrow.length == 0){
 			val_prevAggrt = 0;
@@ -207,7 +222,7 @@
 		else{
 			val_prevAggrt = numeral(prevrow.find('input.valAggrt').val()).value();
 		}
-		console.log('prevaggrt:' + val_prevAggrt + ' prcnt:' + val_prcnt);
+		//console.log('prevaggrt:' + val_prevAggrt + ' prcnt:' + val_prcnt);
 		val_aggrt = val_prevAggrt + val_prcnt;
 
 		$(row).find('.valAggrt').val(numeral(val_aggrt).format('0.00%'));
@@ -220,7 +235,7 @@
 			if(val_nextAggr == '')
 				return;
 			else{
-				console.log('refrescando fila: ' + nextrow.prop('id'));
+				//console.log('refrescando fila: ' + nextrow.prop('id'));
 				$(nextrow).find('input.valMount').trigger('focus');
 				$(nextrow).find('input.valMount').trigger('change');
 			}

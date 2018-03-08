@@ -21,14 +21,14 @@ class CreateAvanceresumenTable extends Migration
                     ->on('gcoavancepres');
 
             $table->string('avrCodeItem',20)->nullable();
-            $table->decimal('avrMountBa',14,2)->default(0.00)->nullable();
-            $table->decimal('avrPercentBa',14,2)->nullable();
-            $table->decimal('avrMountCv',14,2)->default(0.00)->nullable();
-            $table->decimal('avrPercentCv',14,2)->nullable();
-            $table->decimal('avrMountCa',14,2)->default(0.00)->nullable();
-            $table->decimal('avrPercentCa',14,2)->nullable();
-            $table->decimal('avrMountBv',14,2)->default(0.00)->nullable();
-            $table->decimal('avrPercentBv',14,2)->nullable();
+            $table->decimal('avrMountBa',14,5)->default(0.00)->nullable();
+            $table->decimal('avrPercentBa',14,5)->nullable();
+            $table->decimal('avrMountCv',14,5)->default(0.00)->nullable();
+            $table->decimal('avrPercentCv',14,5)->nullable();
+            $table->decimal('avrMountCa',14,5)->default(0.00)->nullable();
+            $table->decimal('avrPercentCa',14,5)->nullable();
+            $table->decimal('avrMountBv',14,5)->default(0.00)->nullable();
+            $table->decimal('avrPercentBv',14,5)->nullable();
         });
     }
 

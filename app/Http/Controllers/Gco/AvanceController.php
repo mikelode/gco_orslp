@@ -58,7 +58,7 @@ class AvanceController extends Controller
 
         if(!is_null($pry->pryExeUnit)){
             $exe = Uejecutora::find($pry->pryExeUnit);
-            $prf = Equiprof::with('individualData')->get();
+            $prf = Equiprof::with('individualData')->where('prfUejecutora',$exe->ejeId)->get();
             $crn = Progfisica::where('prgProject',$pry->pryId)->where('prgClosed',false)->get();
         }
         else{

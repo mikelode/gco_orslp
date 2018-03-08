@@ -25,7 +25,7 @@ class CreatePresupuestoTable extends Migration
             $table->string('preCodeItem',20)->nullable();
             $table->string('preItemGeneral',100)->nullable();
             $table->decimal('preItemGeneralPrcnt',14,5)->nullable();
-            $table->decimal('preItemGeneralMount',14,2)->nullable();
+            $table->decimal('preItemGeneralMount',14,5)->nullable();
             $table->boolean('preItemDisable')->default(0)->nullable();
             $table->string('preItemDisableDetail',500)->nullable();
             $table->datetime('preItemUpdateAt')->nullable();

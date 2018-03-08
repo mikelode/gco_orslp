@@ -8,9 +8,9 @@ trait BusquedaTablas{
     {
         $persona = Persona::where('perDni',$dni)->first();
 
-        if($persona->count() == 0)
+        if(count($persona) == 0)
         {
-            $msg = 'El DNI ingreso no está registrado';
+            $msg = 'El DNI ingresado no está registrado';
             $msgId = 0;
         }
         else

@@ -11,39 +11,39 @@
 								</div>
 								<div class="card-body py-0">
 									<div class="row">
-										<div class="col-sm-4">
+										<div class="col-md-4">
 											<div class="form-group row mb-0">
-												<label class="col-sm-5 col-form-label">Meses</label>
-												<div class="col-sm-7">
+												<label class="col-md-5 col-form-label">Meses</label>
+												<div class="col-md-7">
 													<input type="text" class="form-control-plaintext" id="pyMesesPlazo" name="npyMesesPlazo" value="{{ $pry->pryMonthTerm }} meses" readonly>
 												</div>
 											</div>
 											<div class="form-group row mb-0">
-												<label class="col-sm-5 col-form-label">Días</label>
-												<div class="col-sm-7">
+												<label class="col-md-5 col-form-label">Días</label>
+												<div class="col-md-7">
 													<input type="text" class="form-control-plaintext" id="pyDiasPlazo" name="npyDiasPlazo" value="{{ $pry->pryDaysTerm }} días" readonly>
 												</div>
 											</div>
 										</div>
-										<div class="col-sm-4">
+										<div class="col-md-4">
 											<div class="form-group row mb-0">
-												<label class="col-sm-5 col-form-label">Inicio de Obra</label>
-												<div class="col-sm-7">
+												<label class="col-md-5 col-form-label">Inicio de Obra</label>
+												<div class="col-md-7">
 													<input type="date" class="form-control-plaintext" id="pyFechaInicio" name="npyFechaInicio" value="{{ Carbon\Carbon::parse($pry->pryStartDateExe)->format('Y-m-d') }}" readonly>
 												</div>
 											</div>
 											<div class="form-group row mb-0">
-												<label class="col-sm-5 col-form-label">Término de Obra</label>
-												<div class="col-sm-7">
+												<label class="col-md-5 col-form-label">Término de Obra</label>
+												<div class="col-md-7">
 													<input type="date" class="form-control-plaintext" id="pyFechaFinal" name="npyFechaFinal" value="{{ Carbon\Carbon::parse($pry->pryEndDateExe)->format('Y-m-d') }}" readonly>
 												</div>
 											</div>
 										</div>
-										<div class="col-sm-4">
+										<div class="col-md-4">
 											<div class="form-group row">
-												<label class="col-sm-5 col-form-label">Monto Base</label>
-												<div class="col-sm-7">
-													<select class="mt-2" id="pyResumenPto">
+												<label class="col-md-5 col-form-label">Monto Base</label>
+												<div class="col-md-7">
+													<select class="form-control form-control-sm mt-2" id="pyResumenPto">
 														<option value="NA">-- Seleccionar --</option>
 														@foreach($resumen as $pto)
 														<option value="{{ $pto->preId.'-'.$pto->preCodeItem }}">{{ $pto->preItemGeneral }}</option>
@@ -52,8 +52,8 @@
 												</div>
 											</div>
 											<div class="form-group row">
-												<label class="col-sm-5 col-form-label">Soles</label>
-												<div class="col-sm-7">
+												<label class="col-md-5 col-form-label">Soles</label>
+												<div class="col-md-7">
 													<input type="text" readonly id="ptoResumenMonto" class="form-control-plaintext">
 												</div>
 											</div>
@@ -167,8 +167,19 @@
 			return;
 		}
 
-		$('#valTotal').val(numeral(new_total).format('0,0.00'));
 		$(row).find('.valPrcnt').val(numeral(val_prcnt).format('0.00%'));
+
+		new_total = 0;
+		$('input.valMount').each(function(index, el) {
+			valor = ($(el).val()).replace(/[^\d\.]/g,'');
+			if(valor == '' || valor == null || isNaN(valor)){
+				valor = 0;
+			}
+
+			new_total = new_total + parseFloat(valor);
+		});
+
+		$('#valTotal').val(numeral(new_total).format('0,0.00'));
 
 		if(prevrow.length == 0){
 			val_prevAggrt = 0;

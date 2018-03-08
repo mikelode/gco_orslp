@@ -93,6 +93,10 @@ class ProgramaFisicoController extends Controller
         $fechaValorizacion = $fecIni;
         $i = 0;
 
+        if($plazoMeses == null){
+            $plazoMeses = round($plazoDias / 30);
+        }
+
         while($plazoMeses > 0){
 
             $i++;

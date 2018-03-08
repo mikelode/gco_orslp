@@ -29,7 +29,7 @@
 							@else
 							<td>
 								<div class="input-group input-group-sm">
-									<input type="text" class="form-control percentage preEdit" name="nptoItemPercent[]" value="{{ $item->preItemGeneralPrcnt * 100 }}" readonly>
+									<input type="text" class="form-control percentage preEdit" name="nptoItemPercent[]" value="{{ $item->preItemGeneralPrcnt }}" readonly>
 									<div class="input-group-append">
 										<span class="input-group-text">%</span>
 									</div>
@@ -139,10 +139,10 @@
 	var columns = [
 		{id: "item", name: "Item", field: "parItem"},
 		{id: "descripcion", name: "Descripción", field: "parDescription", width: 500, editor: Slick.Editors.LongText},
-		{id: "metrado", name: "Metrado", field: "parMetered", editor: Slick.Editors.Text},
+		{id: "metrado", name: "Metrado", field: "parMetered", editor: Slick.Editors.Text, formatter: Slick.Formatters.Miles},
 		{id: "unidad", name: "Und", field: "parUnit", editor: Slick.Editors.Text},
-		{id: "precio", name: "P.Unit.", field: "parPrice", editor: Slick.Editors.Text},
-		{id: "parcial", name: "Presupuesto", field: "parPartial", editor: Slick.Editors.Text}
+		{id: "precio", name: "P.Unit.", field: "parPrice", editor: Slick.Editors.Text, formatter: Slick.Formatters.Miles},
+		{id: "parcial", name: "Presupuesto", field: "parPartial", editor: Slick.Editors.Text, formatter: Slick.Formatters.Miles}
 	];
 
 	var options = {

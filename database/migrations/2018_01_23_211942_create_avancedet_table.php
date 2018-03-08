@@ -26,18 +26,18 @@ class CreateAvancedetTable extends Migration
                     ->on('gcopartidas');
 
             $table->string('avcItem',20);
-            $table->decimal('avcMeteredBa',14,2)->default(0.00)->nullable();
-            $table->decimal('avcMountBa',14,2)->default(0.00)->nullable();
-            $table->decimal('avcPercentBa',14,2)->default(0.00)->nullable();
-            $table->decimal('avcMeteredCv',14,2)->default(0.00)->nullable();
-            $table->decimal('avcMountCv',14,2)->default(0.00)->nullable();
-            $table->decimal('avcPercentCv',14,2)->default(0.00)->nullable();
-            $table->decimal('avcMeteredCa',14,2)->default(0.00)->nullable();
-            $table->decimal('avcMountCa',14,2)->default(0.00)->nullable();
-            $table->decimal('avcPercentCa',14,2)->default(0.00)->nullable();
-            $table->decimal('avcMeteredBv',14,2)->default(0.00)->nullable();
-            $table->decimal('avcMountBv',14,2)->default(0.00)->nullable();
-            $table->decimal('avcPercentBv',14,2)->default(0.00)->nullable();
+            $table->decimal('avcMeteredBa',14,5)->default(0.00)->nullable();
+            $table->decimal('avcMountBa',14,5)->default(0.00)->nullable();
+            $table->decimal('avcPercentBa',14,5)->default(0.00)->nullable();
+            $table->decimal('avcMeteredCv',14,5)->default(0.00)->nullable();
+            $table->decimal('avcMountCv',14,5)->default(0.00)->nullable();
+            $table->decimal('avcPercentCv',14,5)->default(0.00)->nullable();
+            $table->decimal('avcMeteredCa',14,5)->default(0.00)->nullable();
+            $table->decimal('avcMountCa',14,5)->default(0.00)->nullable();
+            $table->decimal('avcPercentCa',14,5)->default(0.00)->nullable();
+            $table->decimal('avcMeteredBv',14,5)->default(0.00)->nullable();
+            $table->decimal('avcMountBv',14,5)->default(0.00)->nullable();
+            $table->decimal('avcPercentBv',14,5)->default(0.00)->nullable();
         });
     }
 

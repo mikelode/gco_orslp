@@ -49,9 +49,9 @@ class PersonaController extends Controller
                 $msgId = '200';
             }
             else{
-                $exception = DB::transaction(function() use($request){
+                $persona = new Persona();
 
-                    $persona = new Persona();
+                $exception = DB::transaction(function() use($request, &$persona){
 
                     $persona->perDni = $request->nprsDni;
                     $persona->perFullName = $request->nprsOcup.' '.$request->nprsNames.' '.$request->nprsPaterno.' '.$request->nprsMaterno;

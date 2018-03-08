@@ -160,6 +160,15 @@
 
 		grid.render();
 
+		/*
+			params1 => DC row
+			params2 => column mount cv
+			params3 => instance of grid with summary budget
+			params4 => instance of grid with detail budget
+			params5 => data of grid with detail budget
+			params6 => data of grid with summary budget
+		*/
+		
 		updateDirectCost(0, args.cell + 1, footGrid, grid, grid.getData(), footGrid.getData());
 	});
 

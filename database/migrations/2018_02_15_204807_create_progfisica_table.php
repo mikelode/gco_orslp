@@ -21,13 +21,13 @@ class CreateProgfisicaTable extends Migration
                     ->on('gcoproyecto');
             $table->integer('prgNumberVal')->unsigned()->nullable();
             $table->string('prgPeriodo',100)->nullable();
-            $table->decimal('prgMount',14,3)->nullable();
-            $table->decimal('prgPercent',14,4)->nullable();
-            $table->decimal('prgAggregate',14,4)->nullable();
+            $table->decimal('prgMount',14,5)->nullable();
+            $table->decimal('prgPercent',14,5)->nullable();
+            $table->decimal('prgAggregate',14,5)->nullable();
             $table->integer('prgBudgetProgress')->unsigned()->nullable();
-            $table->decimal('prgMountExec',14,3)->nullable();
-            $table->decimal('prgPercentExec',14,4)->nullable();
-            $table->decimal('prgAggregateExec',14,4)->nullable();
+            $table->decimal('prgMountExec',14,5)->nullable();
+            $table->decimal('prgPercentExec',14,5)->nullable();
+            $table->decimal('prgAggregateExec',14,5)->nullable();
             $table->string('prgEditNote',1000)->nullable();
             $table->boolean('prgClosed')->default(false)->nullable();
 

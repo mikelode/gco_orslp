@@ -44,12 +44,12 @@
 									<td class="td-actions">
 										@if(Auth::user()->hasPermission(3))
 										<a href="javascript:editar_proyecto('{{ $py->pryId }}');" class="btn btn-sm btn-outline-primary">
-											<i class="icon-pencil"></i>
+											<i class="fas fa-pencil-alt"></i>
 										</a>
 										@endif
 										@if(Auth::user()->hasPermission(4))
 										<button type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#mdlRemoveProject" data-proyid='{{ $py->pryId }}' data-proyname='{{ $py->pryDenomination }}'>
-											<i class="icon-minus"></i>
+											<i class="fas fa-minus"></i>
 										</button>
 										@endif
 									</td>
