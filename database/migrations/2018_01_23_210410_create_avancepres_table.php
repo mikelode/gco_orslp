@@ -19,6 +19,7 @@ class CreateAvancepresTable extends Migration
             $table->integer('aprResident')->unsigned();
             $table->integer('aprSupervisor')->unsigned();
             $table->integer('aprProject')->unsigned();
+            $table->integer('aprBudget')->unsigned();
             $table->integer('aprProgFisica')->unsigned();
             $table->string('aprPeriod',50);
             $table->date('aprStartDate');

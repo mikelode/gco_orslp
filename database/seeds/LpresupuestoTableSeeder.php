@@ -15,42 +15,47 @@ class LpresupuestoTableSeeder extends Seeder
         	[
 	        	'lprCodeItem' => 'CD',
 	        	'lprOrderItem' => 1,
-	        	'lprDescriptionItem' => 'COSTO DIRECTO',
+	        	'lprDescriptionItem' => 'Costo Directo',
 	        	'lprIsProportion' => 0
 	        ],[
 	        	'lprCodeItem' => 'GG',
 	        	'lprOrderItem' => 2,
-	        	'lprDescriptionItem' => 'GASTOS GENERALES',
+	        	'lprDescriptionItem' => 'Gastos Generales',
 	        	'lprIsProportion' => 1
 	        ],[
 	        	'lprCodeItem' => 'GGF',
 	        	'lprOrderItem' => 3,
-	        	'lprDescriptionItem' => 'GASTOS GENERALES FIJOS',
+	        	'lprDescriptionItem' => 'G.G. Fijos',
 	        	'lprIsProportion' => 1
 	        ],[
 	        	'lprCodeItem' => 'GGV',
 	        	'lprOrderItem' => 4,
-	        	'lprDescriptionItem' => 'GASTOS GENERALES VARIABLES',
+	        	'lprDescriptionItem' => 'G.G. Variables',
 	        	'lprIsProportion' => 1
 	        ],[
 	        	'lprCodeItem' => 'U',
 	        	'lprOrderItem' => 5,
-	        	'lprDescriptionItem' => 'UTILIDAD',
+	        	'lprDescriptionItem' => 'Utilidad',
 	        	'lprIsProportion' => 1
 	        ],[
 	        	'lprCodeItem' => 'ST',
 	        	'lprOrderItem' => 6,
-	        	'lprDescriptionItem' => 'SUB TOTAL',
+	        	'lprDescriptionItem' => 'Presup. sin IGV',
 	        	'lprIsProportion' => 0
 	        ],[
-	        	'lprCodeItem' => 'IGV',
+	        	'lprCodeItem' => 'STFR',
 	        	'lprOrderItem' => 7,
+	        	'lprDescriptionItem' => 'Pto con F.R.',
+	        	'lprIsProportion' => 1
+	        ],[
+	        	'lprCodeItem' => 'IGV',
+	        	'lprOrderItem' => 8,
 	        	'lprDescriptionItem' => 'IGV',
 	        	'lprIsProportion' => 1
 	        ],[
 	        	'lprCodeItem' => 'PT',
-	        	'lprOrderItem' => 8,
-	        	'lprDescriptionItem' => 'PRESUPUESTO TOTAL',
+	        	'lprOrderItem' => 9,
+	        	'lprDescriptionItem' => 'Presupuesto Total',
 	        	'lprIsProportion' => 0
 	        ]
     	]);

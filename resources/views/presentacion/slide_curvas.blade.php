@@ -4,7 +4,7 @@
 			<div class="card-body">
 				<div class="row">
 					<div class="col-md-12">
-						<a href="{{ url('export/sheet') . '?pyId=' . $cronograma[0]->prgProject }}" target="_blank" class="btn btn-success" id="btnMakeTemplate">Exportar Resultado a Excel</a>
+						<a href="{{ url('export/sheet') . '?pyId=' . $cronograma[0]->prgProject . '&prId=' . $cronograma[0]->prgBudget }}" target="_blank" class="btn btn-success" id="btnMakeTemplate">Exportar Resultado a Excel</a>
 					</div>
 				</div>
 				<div class="row">

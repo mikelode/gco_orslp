@@ -95,6 +95,10 @@ class ProyectoController extends Controller
                 $proyecto->pryViabilityResolution = $request->npyResol;
                 $proyecto->pryDateResolution = $request->npyDateresol;
                 $proyecto->pryExeMode = $request->npyMod;
+                $proyecto->prySisContract = $request->npyContract;
+                $proyecto->pryMountContract = $request->npyMountContract;
+                $proyecto->pryMountRefValue = $request->npyMountRefValue;
+                $proyecto->pryRelationFactor = $request->npyRelFactor;
                 $proyecto->pryExeUnit = $ejecutor->ejeId;
                 $proyecto->pryDateAgree = $request->npyDateAgree;
                 $proyecto->pryMonthTerm = $request->npyMonthTerm;
@@ -192,6 +196,10 @@ class ProyectoController extends Controller
                 $proyecto->pryViabilityResolution = $request->npyResol;
                 $proyecto->pryDateResolution = $request->npyDateresol;
                 $proyecto->pryExeMode = $request->npyMod;
+                $proyecto->prySisContract = $request->npyContract;
+                $proyecto->pryMountContract = $request->npyMountContract;
+                $proyecto->pryMountRefValue = $request->npyMountRefValue;
+                $proyecto->pryRelationFactor = $request->npyRelFactor;
                 $proyecto->pryExeUnit = $ejecutor->ejeId;
                 $proyecto->pryDateAgree = $request->npyDateAgree;
                 $proyecto->pryMonthTerm = $request->npyMonthTerm;

@@ -47,11 +47,11 @@
 														<option value="NA">-- Seleccionar --</option>
 														<?php $rsmMount = 0; ?>
 														@foreach($resumen as $pto)
-															@if($pto->preId == $pry->pryBaseBudget)
-															<option value="{{ $pto->preId.'-'.$pto->preCodeItem }}" selected>{{ $pto->preItemGeneral }}</option>
-															<?php $rsmMount = $pto->preItemGeneralMount; ?>
+															@if($pto->iprId == $pry->pryBaseBudget)
+															<option value="{{ $pto->iprId.'-'.$pto->iprCodeItem }}" selected>{{ $pto->iprItemGeneral }}</option>
+															<?php $rsmMount = $pto->iprItemGeneralMount; ?>
 															@else
-															<option value="{{ $pto->preId.'-'.$pto->preCodeItem }}">{{ $pto->preItemGeneral }}</option>
+															<option value="{{ $pto->iprId.'-'.$pto->iprCodeItem }}">{{ $pto->iprItemGeneral }}</option>
 															@endif
 														@endforeach()
 													</select>
@@ -84,6 +84,7 @@
 									<form action="{{ url('actualizar/programacion') }}" id="frmUpdateSchedule">
 										{{ csrf_field() }}
 										<input type="hidden" name="hnpyId" id="pyId" value="{{ $pry->pryId }}">
+										<input type="hidden" name="hnptId" value="{{ $resumen[0]->iprBudget }}">
 										<table class="table table-bordered table-sm action-table" id="tblSchedule">
 											<thead>
 												<tr>

@@ -16,9 +16,12 @@ class CreateProgfisicaTable extends Migration
         Schema::create('gcoprogfisica', function (Blueprint $table) {
             $table->increments('prgId');
             $table->integer('prgProject')->unsigned();
-            $table->foreign('prgProject')
-                    ->references('pryId')
-                    ->on('gcoproyecto');
+            $table->integer('prgBudget')->unsigned();
+            $table->foreign('prgBudget')
+                    ->references('preId')
+                    ->on('gcopresupuesto')
+                    ->onDelete('cascade');
+                    
             $table->integer('prgNumberVal')->unsigned()->nullable();
             $table->string('prgPeriodo',100)->nullable();
             $table->decimal('prgMount',14,5)->nullable();

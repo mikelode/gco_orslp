@@ -60,24 +60,45 @@
 								</div>
 							</div>
 						</div>
-						<div class="form-group row">
-							<label class="col-sm-2 col-form-label pt-0">Modalidad ejecución</label>
-							<div class="col-sm-10">
-								<select name="npyMod" class="form-control form-control-sm">
-									<option value="NA">-- Seleccione un opción--</option>
-									<option value="AD"> Administración directa </option>
-									<option value="AI"> Administración indirecta o contrata </option>
-								</select>
-							</div>
-						</div>
 					</fieldset>
 					<fieldset>
 						<div class="row">
 							<label class="col-sm-4 col-form-label text-info font-weight-bold">DATOS DE LA EJECUCIÓN</label>
 						</div>
 						<div class="form-group row">
+							<label class="col-sm-2 col-form-label pt-0">Modalidad ejecución</label>
+							<div class="col-sm-3">
+								<select name="npyMod" class="form-control form-control-sm">
+									<option value="NA">-- Seleccione un opción--</option>
+									<option value="AD"> Administración directa </option>
+									<option value="AI"> Por contrata </option>
+								</select>
+							</div>
+							<label class="col-sm-2 col-form-label pt-0">Sistema contratación</label>
+							<div class="col-sm-3">
+								<select name="npyContract" class="form-control form-control-sm">
+									<option value="NA">-- Seleccione un opción--</option>
+									<option value="PU"> Precios unitarios </option>
+									<option value="SA"> Suma alzada </option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-sm-2 col-form-label pt-0">Monto del contrato</label>
+							<div class="col-sm-3">
+								<input type="text" class="form-control form-control-sm" name="npyMountContract" id="txtMountCt" placeholder="Monto Inc. IGV">
+							</div>
+							<label class="col-sm-2 col-form-label pt-0">Monto del valor ref.</label>
+							<div class="col-sm-3">
+								<input type="text" class="form-control form-control-sm" name="npyMountRefValue" id="txtMountVr" placeholder="Monto Inc. IGV">
+							</div>
+							<div class="col-sm-2">
+								<input type="text" class="form-control form-control-sm" name="npyRelFactor" id="txtRelFac" placeholder="F.R." readonly>
+							</div>
+						</div>
+						<div class="form-group row">
 							<label class="col-sm-2 col-form-label">Contratista ejecutor</label>
-							<div class="col-sm-9 px-0">
+							<div class="col-sm-9 pr-0">
 								<input name="nejDenom" type="text" class="form-control form-control-sm" placeholder="NOMBRE O DENOMINACION">
 							</div>
 							<div class="col pl-0">
@@ -86,7 +107,7 @@
 						</div>
 						<div class="form-group row">
 							<label class="col-sm-2 col-form-label">Tipo persona</label>
-							<div class="col-sm-3 pl-0">
+							<div class="col-sm-3">
 								<select name="nejPers" class="form-control form-control-sm">
 									<option value="NA">-- Seleccione un opción--</option>
 									<option value="PN"> Persona Natural </option>
@@ -106,7 +127,7 @@
 						</div>
 						<div class="form-group row">
 							<label class="col-sm-2 col-form-label">Representante legal</label>
-							<div class="col-sm-2 pl-0">
+							<div class="col-sm-2">
 								<input name="nejRepdni" type="text" class="form-control form-control-sm" placeholder="DNI">
 							</div>
 							<div class="col-sm-3 pl-0">
@@ -123,7 +144,7 @@
 							<div class="col">
 								<div class="form-group row">
 									<label class="col-sm-6 col-form-label">Fecha convenio</label>
-									<div class="col-sm-6 pl-0">
+									<div class="col-sm-6">
 										<input name="npyDateAgree" type="date" class="form-control form-control-sm">
 									</div>
 								</div>
@@ -149,7 +170,7 @@
 							<div class="col">
 								<div class="form-group row">
 									<label class="col-sm-4 col-form-label pt-0">Fecha de Inicio</label>
-									<div class="col-sm-8 pl-0">
+									<div class="col-sm-8">
 										<input name="npyStartDate" type="date" class="form-control form-control-sm">
 									</div>
 								</div>
@@ -264,6 +285,36 @@
 	$('table#tblProfessionalTeam').on('click', '.ibtnDel', function(event) {
 		event.preventDefault();
 		$(this).closest('tr').remove();
+	});
+
+	$('#txtMountCt').on('change', function(evt) {
+		evt.preventDefault();
+		var val1 = $(this).val();
+		var val2 = $('#txtMountVr').val();
+
+		if(val1 == 0 || isNaN(val1) || $.trim(val1) == '')
+			return;
+
+		if(val2 == 0 || isNaN(val2) || $.trim(val2) == '')
+			return;
+
+		var fr = numeral(val1/val2).format('0,0.00000');
+		$('#txtRelFac').val(fr);
+	});
+
+	$('#txtMountVr').on('change', function(evt) {
+		evt.preventDefault();
+		var val2 = $(this).val();
+		var val1 = $('#txtMountCt').val();
+
+		if(val1 == 0 || isNaN(val1) || $.trim(val1) == '')
+			return;
+
+		if(val2 == 0 || isNaN(val2) || $.trim(val2) == '')
+			return;
+
+		var fr = numeral(val1/val2).format('0,0.00000');
+		$('#txtRelFac').val(fr);
 	});
 
 </script>

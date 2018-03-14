@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Gco;
 use App\Models\Avance;
 use App\Models\Avdetail;
 use App\Models\Proyecto;
+use App\Models\Itempresupuesto;
 use App\Models\Presupuesto;
 use App\Models\Equiprof;
 use App\Models\Uejecutora;
@@ -55,19 +56,22 @@ class AvanceController extends Controller
     public function create(Request $request)
     {
         $pry = Proyecto::find($request->pyId);
+        $ptId = $request->ptId;
 
         if(!is_null($pry->pryExeUnit)){
             $exe = Uejecutora::find($pry->pryExeUnit);
             $prf = Equiprof::with('individualData')->where('prfUejecutora',$exe->ejeId)->get();
-            $crn = Progfisica::where('prgProject',$pry->pryId)->where('prgClosed',false)->get();
+            $crn = Progfisica::where('prgProject',$pry->pryId)->where('prgBudget',$ptId)->where('prgClosed',false)->get();
+            $pto = Presupuesto::find($ptId);
         }
         else{
             $exe = collect(['sin ejecutor']);
             $prf = collect(['sin equipo']);
             $crn = collect(['sin cronograma']);
+            $pto = collect(['sin presupuesto']);
         }
 
-        $view = view('formularios.nuevo_avance',compact('pry','exe','prf','crn'));
+        $view = view('formularios.nuevo_avance',compact('pry','exe','prf','crn','pto'));
         return $view;
     }
 
@@ -84,7 +88,7 @@ class AvanceController extends Controller
             $exception = DB::transaction(function() use($request){
 
                 $valId = $request->navNumber; // navnumber contiene el id de la programacion
-                $pyId = $request->hnpyId;                
+                $pyId = $request->hnpyId;
 
                 $val = Progfisica::find($valId);
                 $valNumber = $val->prgNumberVal;
@@ -108,6 +112,7 @@ class AvanceController extends Controller
                 $avance->aprResident = $request->hnpyResidente;
                 $avance->aprSupervisor = $request->hnpySupervisor;
                 $avance->aprProject = $request->hnpyId;
+                $avance->aprBudget = $request->hnavPto;
                 $avance->aprProgFisica = $request->navNumber;
                 $avance->aprPeriod = $request->navPeriod;
                 $avance->aprStartDate = $request->navStartDate;
@@ -160,16 +165,16 @@ class AvanceController extends Controller
 
                     }
 
-                    $itemsresumen = Presupuesto::where('preProject',$request->hnpyId)->get();
+                    $itemsresumen = Itempresupuesto::where('iprBudget',$request->hnavPto)->get();
 
                     foreach ($itemsresumen as $i => $item) {
                         
                         $resumen = new Resumenavc();
                         $resumen->avrBudgetProgress = $avance->aprId;
-                        $resumen->avrCodeItem = $item->preCodeItem;
+                        $resumen->avrCodeItem = $item->iprCodeItem;
 
                         if($cant_avncs == 0){
-                            $resumen->avrMountBv = $item->preItemGeneralMount;
+                            $resumen->avrMountBv = $item->iprItemGeneralMount;
                             $resumen->avrPercentBv = 100.00;
                         }
                         else{
@@ -311,6 +316,7 @@ class AvanceController extends Controller
 
                 $pyId = $request->npyId;
                 $apId = $request->nbpId;
+                $ptId = $request->nptId;
 
                 $gridPartidas = (array) json_decode($request->dataGridDetail);
                 $gridResumen = (array) json_decode($request->dataGridResume);
@@ -332,9 +338,9 @@ class AvanceController extends Controller
                     $partida->save();
                 }
 
-                $proyecto = Proyecto::find($pyId);
-                $presupuesto = Presupuesto::find($proyecto->pryBaseBudget);
-                $presupuestoCode = $presupuesto->preCodeItem;
+                //$proyecto = Proyecto::find($pyId);
+                $presupuesto = Itempresupuesto::find($ptId);
+                $presupuestoCode = $presupuesto->iprCodeItem;
 
 
                 foreach ($gridResumen as $item) {
@@ -400,9 +406,9 @@ class AvanceController extends Controller
 
     public function list(Request $request)
     {
-        $pyId = $request->pyId;
+        $ptId = $request->ptId;
 
-        $avancesPy = Avance::where('aprProject',$pyId)->get();
+        $avancesPy = Avance::where('aprBudget',$ptId)->get();
 
         $optionHtml = '<optgroup label="Opciones"><option value="NA"> Elija o agregue un avance </option>';
         if(Auth::user()->hasPermission(14)){
@@ -411,7 +417,7 @@ class AvanceController extends Controller
         $optionHtml .= '<optgroup label="Avances registrados">';
 
         foreach($avancesPy as $av){
-            $optionHtml .= '<option value="' . $av->aprId . '">' . $av->aprPeriod . ' - ' . $av->aprStartDate . ' a ' . $av->aprEndDate .'</option>';
+            $optionHtml .= '<option value="' . $av->aprId . '">' . $av->aprPeriod . ' -> ' . $av->aprStartDate . ' a ' . $av->aprEndDate .'</option>';
         }
 
         $optionHtml .= '</optgroup>';

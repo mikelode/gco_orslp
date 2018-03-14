@@ -62,24 +62,45 @@
 								</div>
 							</div>
 						</div>
-						<div class="form-group row">
-							<label class="col-sm-2 col-form-label pt-0">Modalidad ejecución</label>
-							<div class="col-sm-10">
-								<select name="npyMod" class="form-control form-control-sm">
-									<option value="NA" {{ $proyecto->pryExeMode=='NA'?'selected':'' }}>-- Seleccione un opción--</option>
-									<option value="AD" {{ $proyecto->pryExeMode=='AD'?'selected':'' }}> Administración directa </option>
-									<option value="AI" {{ $proyecto->pryExeMode=='AI'?'selected':'' }}> Administración indirecta o contrata </option>
-								</select>
-							</div>
-						</div>
 					</fieldset>
 					<fieldset>
 						<div class="row">
 							<label class="col-sm-4 col-form-label text-info font-weight-bold">DATOS DE LA EJECUCIÓN</label>
 						</div>
 						<div class="form-group row">
+							<label class="col-sm-2 col-form-label pt-0">Modalidad ejecución</label>
+							<div class="col-sm-3">
+								<select name="npyMod" class="form-control form-control-sm">
+									<option value="NA" {{ $proyecto->pryExeMode=='NA'?'selected':'' }}>-- Seleccione un opción--</option>
+									<option value="AD" {{ $proyecto->pryExeMode=='AD'?'selected':'' }}> Administración directa </option>
+									<option value="AI" {{ $proyecto->pryExeMode=='AI'?'selected':'' }}> Por contrata </option>
+								</select>
+							</div>
+							<label class="col-sm-2 col-form-label pt-0">Sistema contratación</label>
+							<div class="col-sm-3">
+								<select name="npyContract" class="form-control form-control-sm">
+									<option value="NA" {{ $proyecto->prySisContract=='NA'?'selected':'' }}>-- Seleccione un opción--</option>
+									<option value="PU" {{ $proyecto->prySisContract=='PU'?'selected':'' }}> Precios unitarios </option>
+									<option value="SA" {{ $proyecto->prySisContract=='SA'?'selected':'' }}> Suma alzada </option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-sm-2 col-form-label pt-0">Monto del contrato</label>
+							<div class="col-sm-3">
+								<input type="text" class="form-control form-control-sm" name="npyMountContract" id="txtMountCt" placeholder="Monto Inc. IGV" value="{{ $proyecto->pryMountContract }}">
+							</div>
+							<label class="col-sm-2 col-form-label pt-0">Monto del valor ref.</label>
+							<div class="col-sm-3">
+								<input type="text" class="form-control form-control-sm" name="npyMountRefValue" id="txtMountVr" placeholder="Monto Inc. IGV" value="{{ $proyecto->pryMountRefValue }}">
+							</div>
+							<div class="col-sm-2">
+								<input type="text" class="form-control form-control-sm" name="npyRelFactor" id="txtRelFac" placeholder="F.R." readonly value="{{ $proyecto->pryRelationFactor }}">
+							</div>
+						</div>
+						<div class="form-group row">
 							<label class="col-sm-2 col-form-label">Contratista ejecutor</label>
-							<div class="col-sm-9 px-0">
+							<div class="col-sm-9 pr-0">
 								<input name="nejDenom" type="text" class="form-control form-control-sm" placeholder="NOMBRE O DENOMINACION" value="{{ $ejecutor->ejeBusiName }}">
 							</div>
 							<div class="col pl-0">
@@ -88,7 +109,7 @@
 						</div>
 						<div class="form-group row">
 							<label class="col-sm-2 col-form-label">Tipo persona</label>
-							<div class="col-sm-3 pl-0">
+							<div class="col-sm-3">
 								<select name="nejPers" class="form-control form-control-sm">
 									<option value="NA" {{ $ejecutor->ejePersonType=='NA'?'selected':'' }}>-- Seleccione un opción--</option>
 									<option value="PN" {{ $ejecutor->ejePersonType=='PN'?'selected':'' }}> Persona Natural </option>
@@ -108,7 +129,7 @@
 						</div>
 						<div class="form-group row">
 							<label class="col-sm-2 col-form-label ">Representante legal</label>
-							<div class="col-sm-2 pl-0">
+							<div class="col-sm-2">
 								<input name="nejRepdni" type="text" class="form-control form-control-sm" placeholder="DNI" value="{{ $ejecutor->ejeLegalRepDni }}">
 							</div>
 							<div class="col-sm-3 pl-0">
@@ -125,7 +146,7 @@
 							<div class="col">
 								<div class="form-group row">
 									<label class="col-sm-6 col-form-label pt-0">Fecha convenio</label>
-									<div class="col-sm-6 pl-0">
+									<div class="col-sm-6">
 										<input name="npyDateAgree" type="date" class="form-control form-control-sm" value="{{ $proyecto->pryDateAgree }}">
 									</div>
 								</div>
@@ -151,7 +172,7 @@
 							<div class="col">
 								<div class="form-group row">
 									<label class="col-sm-4 col-form-label pt-0">Fecha de Inicio</label>
-									<div class="col-sm-8 pl-0">
+									<div class="col-sm-8">
 										<input name="npyStartDate" type="date" class="form-control form-control-sm" value="{{ $proyecto->pryStartDateExe }}">
 									</div>
 								</div>
@@ -166,7 +187,7 @@
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-form-label text-info font-weight-bold mx-3">Equipo profesional</label>
+							<label class="col-form-label text-info font-weight-bold mx-3">EQUIPO PROFESIONAL</label>
 							<button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#mdlPersona">
 								Agregar<span class="oi oi-plus ml-1"></span>
 							</button>
@@ -320,6 +341,36 @@
             if(!response.success) return "Error en el intento de cambiar el estado";
             console.log(newValue);
         }
+	});
+
+	$('#txtMountCt').on('change', function(evt) {
+		evt.preventDefault();
+		var val1 = $(this).val();
+		var val2 = $('#txtMountVr').val();
+
+		if(val1 == 0 || isNaN(val1) || $.trim(val1) == '')
+			return;
+
+		if(val2 == 0 || isNaN(val2) || $.trim(val2) == '')
+			return;
+
+		var fr = numeral(val1/val2).format('0,0.00000');
+		$('#txtRelFac').val(fr);
+	});
+
+	$('#txtMountVr').on('change', function(evt) {
+		evt.preventDefault();
+		var val2 = $(this).val();
+		var val1 = $('#txtMountCt').val();
+
+		if(val1 == 0 || isNaN(val1) || $.trim(val1) == '')
+			return;
+
+		if(val2 == 0 || isNaN(val2) || $.trim(val2) == '')
+			return;
+
+		var fr = numeral(val1/val2).format('0,0.00000');
+		$('#txtRelFac').val(fr);
 	});
 
 </script>

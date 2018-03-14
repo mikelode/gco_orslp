@@ -6,6 +6,9 @@ use App\Models\Avance;
 use App\Models\Avdetail;
 use App\Models\Proyecto;
 use App\Models\Presupuesto;
+use App\Models\Listpresupuesto;
+use App\Models\Itempresupuesto;
+use App\Models\Tipopresupuesto;
 use App\Models\Equiprof;
 use App\Models\Uejecutora;
 use App\Models\Partida;
@@ -80,8 +83,9 @@ class ProgramaFisicoController extends Controller
     {
 
         $pyId = $request->pyId;
+        $prId = $request->prId;
 
-        $resumen = Presupuesto::where('preProject',$pyId)->get();
+        $resumen = Presupuesto::with('items')->where('preProject',$pyId)->where('preId',$prId)->get();
 
         $cronograma = array();
 
@@ -135,6 +139,7 @@ class ProgramaFisicoController extends Controller
             $exception = DB::transaction(function() use($request){
 
                 $pyId = $request->hnpyId;
+                $prId = $request->hnprId;
                 $keyPto = explode('-', $request->hnpyResumenPto);
                 $ptoId = $keyPto[0];
 
@@ -146,6 +151,7 @@ class ProgramaFisicoController extends Controller
                     
                     $cronograma = new Progfisica();
                     $cronograma->prgProject = $pyId;
+                    $cronograma->prgBudget = $prId;
                     $cronograma->prgNumberVal = $val;
                     $cronograma->prgPeriodo = $request->nvalPeriod[$i];
                     $cronograma->prgMount = floatval(str_replace(',', '', $request->nvalMount[$i]));
@@ -187,7 +193,8 @@ class ProgramaFisicoController extends Controller
     public function show(Request $request, $curva)
     {
         $pyId = $request->pyId;
-        $cronograma = Progfisica::where('prgProject',$pyId)->orderBy('prgNumberVal','asc')->get();
+        $prId = $request->prId;
+        $cronograma = Progfisica::where('prgProject',$pyId)->where('prgBudget',$prId)->orderBy('prgNumberVal','asc')->get();
 
         if($curva == '1'){
             $chartData = '';
@@ -228,7 +235,8 @@ class ProgramaFisicoController extends Controller
             }
             else{
                 $pry = Proyecto::find($pyId);
-                $resumen = Presupuesto::where('preProject',$pyId)->get();
+                //$resumen = Presupuesto::where('preId',$prId)->where('preProject',$pyId)->get();
+                $resumen = Itempresupuesto::where('iprBudget',$prId)->get();
 
                 $view = view('formularios.editar_programacion', compact('cronograma','pry','resumen'));
 
@@ -303,11 +311,15 @@ class ProgramaFisicoController extends Controller
     public function update(Request $request)
     {
         $pyId = $request->hnpyId;
+        $ptId = $request->hnptId;
 
         try{
 
             $exception = DB::transaction(function() use($request){
+
                 $pyId = $request->hnpyId;
+                $ptId = $request->hnptId;
+                
                 foreach ($request->hnvalId as $i => $val) {
                     
                     if($val != 0){
@@ -326,6 +338,7 @@ class ProgramaFisicoController extends Controller
                     else{
                         $periodo = new Progfisica();
                         $periodo->prgProject = $pyId;
+                        $periodo->prgBudget = $ptId;
                         $periodo->prgNumberVal = $request->nvalNumber[$i];
                         $periodo->prgPeriodo = $request->nvalPeriod[$i];
                         $periodo->prgMount = floatval(str_replace(',', '', $request->nvalMount[$i]));
@@ -353,7 +366,7 @@ class ProgramaFisicoController extends Controller
             $url = '';
         }
 
-        return response()->json(compact('msg','msgId','url','pyId'));
+        return response()->json(compact('msg','msgId','url','pyId','ptId'));
     }
 
     /**
@@ -417,21 +430,28 @@ class ProgramaFisicoController extends Controller
         $sheet->setTitle('CurvaS');
 
         $pyId = $request->pyId;
-        $cronograma = Progfisica::where('prgProject',$pyId)->orderBy('prgNumberVal','asc')->get();
+        $prId = $request->prId;
+
+        $cronograma = Progfisica::where('prgProject',$pyId)
+                        ->where('prgBudget',$prId)
+                        ->orderBy('prgNumberVal','asc')
+                        ->get();
+
         $pry = Proyecto::where('pryId',$pyId)->with('ejecutor')->get();
         $prf = Equiprof::with('individualData')
                 ->where('prfUejecutora',$pry[0]->pryExeUnit)
                 ->where('prfJob','SUPERVISOR')
                 ->orWhere('prfJob','INSPECTOR')
                 ->get();
-        $preB = Presupuesto::where('preProject',$pyId)
-                ->where('preId',$pry[0]->pryBaseBudget)
+        //$preB = Presupuesto::where('preProject',$pyId)
+        $preB = Itempresupuesto::where('iprBudget',$prId)
+                ->where('iprId',$pry[0]->pryBaseBudget)
                 ->get();
-        $preS = Presupuesto::where('preProject',$pyId)
-                ->where('preCodeItem','ST')
+        $preS = Itempresupuesto::where('iprBudget',$prId)
+                ->where('iprCodeItem','ST')
                 ->get();
-        $preT = Presupuesto::where('preProject',$pyId)
-                ->where('preCodeItem', 'PT')
+        $preT = Itempresupuesto::where('iprBudget',$prId)
+                ->where('iprCodeItem', 'PT')
                 ->get();
 
         $nval = $cronograma->count();
@@ -495,7 +515,7 @@ class ProgramaFisicoController extends Controller
         $sheet->setCellValue('B1', 'AVANCE DEL CALENDARIO PROGRAMADO VS EJECUTADO');
         $sheet->getStyle('B1')->applyFromArray($titleStyle);
         $sheet->mergeCells('B2:I2');
-        $sheet->setCellValue('B2', 'VALORIZACIÓN: ');
+        $sheet->setCellValue('B2', 'VALORIZACIÓN NRO: ');
         $sheet->getStyle('B2')->applyFromArray($subtitleStyle);
 
 
@@ -542,11 +562,11 @@ class ProgramaFisicoController extends Controller
         $sheet->setCellValue('B8', 'SUPERVISIÓN');
         $sheet->setCellValue('C8', ': ' . $prf[0]->individualData->perFullName);
         $sheet->setCellValue('B9', 'PRESUPUESTO BASE');
-        $sheet->setCellValue('C9', ": S/ " . number_format($preB[0]->preItemGeneralMount,2,'.',','));
+        $sheet->setCellValue('C9', ": S/ " . number_format($preB[0]->iprItemGeneralMount,2,'.',','));
         $sheet->setCellValue('B10', 'PRESUPUESTO CONTRATADO');
-        $sheet->setCellValue('C10', ": S/" . number_format($preS[0]->preItemGeneralMount,2,'.',','));
+        $sheet->setCellValue('C10', ": S/" . number_format($preS[0]->iprItemGeneralMount,2,'.',','));
         $sheet->setCellValue('B11', 'PRESUPUESTO CONTRATADO');
-        $sheet->setCellValue('C11', ": S/" . number_format($preT[0]->preItemGeneralMount,2,'.',','));
+        $sheet->setCellValue('C11', ": S/" . number_format($preT[0]->iprItemGeneralMount,2,'.',','));
         $sheet->setCellValue('B12', 'PLAZO DE EJECUCIÓN');
         $sheet->setCellValue('C12', ': ' . $pry[0]->pryDaysTerm . ' DÍAS CALENDARIOS');
         $sheet->setCellValue('B13', 'FECHA DE INICIO');

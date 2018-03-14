@@ -3,7 +3,7 @@
 		<div class="card-header py-1">
 			<b> Presupuesto Resumen </b>
 			<div class="float-right">
-				<button type="button" class="btn btn-primary btn-sm" id="btnAddItemBudget" onclick="agregar_itempres($('#tblSummaryBudget'))"><i class="fas fa-plus"></i> Añadir Item</button>
+				<button type="button" class="btn btn-primary btn-sm" id="btnAddItemBudget" onclick="agregar_itempres($('#tblSummaryBudget'))"><i class="fas fa-plus"></i> Agregar Item</button>
 			</div>
 		</div>
 		<div class="card-body">

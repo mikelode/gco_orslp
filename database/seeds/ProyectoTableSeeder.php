@@ -18,6 +18,7 @@ class ProyectoTableSeeder extends Seeder
     		'pryViabilityResolution' => 'RGR N° 236-2017-GGR-GR PUNO',
             'pryDateResolution' => '2017-6-18',
     		'pryExeMode' => 'AI',
+            'prySisContract' => 'SA',
     		'pryExeUnit' => 1,
             'pryDateAgree' => '2013-12-23',
             'pryMonthTerm' => 18,

@@ -22,6 +22,10 @@ class CreateProyectoTable extends Migration
             $table->string('pryViabilityResolution',100)->nullable();
             $table->date('pryDateResolution')->nullable();
             $table->string('pryExeMode',50);
+            $table->string('prySisContract',50);
+            $table->decimal('pryMountContract',14,5)->default(0)->nullable();
+            $table->decimal('pryMountRefValue',14,5)->default(0)->nullable();
+            $table->decimal('pryRelationFactor',14,5)->nullable();
             $table->integer('pryExeUnit')->unsigned()->nullable();
             $table->foreign('pryExeUnit')
                     ->references('ejeId')

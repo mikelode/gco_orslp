@@ -19,15 +19,20 @@
 			</div>
 		</div>
 		<dv class="col-md-7">
-			<div class="form-group">
+			<div class="form-group mb-1">
 				<label>Ejecutor: </label>
 					<input type="text" class="form-control-plaintext form-control-sm" id="pyEjecutor" name="npyEjecutor" value="{{ $exe->ejeBusiName }}">
 					<input type="hidden" name="hnpyEjecutor" value="{{ $exe->ejeId }}">
 			</div>
-			<div class="form-group">
+			<div class="form-group mb-1">
 				<label>Proyecto: </label>
-				<textarea class="form-control-plaintext form-control-sm" id="pyDenom" name="npyDenom" rows="4" readonly>{{ $pry->pryDenomination }}</textarea>
+				<textarea class="form-control-plaintext form-control-sm" id="pyDenom" name="npyDenom" rows="3" readonly>{{ $pry->pryDenomination }}</textarea>
 				<input type="hidden" name="hnpyId" value="{{ $pry->pryId }}">
+			</div>
+			<div class="form-group mb-1">
+				<label>Presupuesto:</label>
+				<input type="text" class="form-control-plaintext form-control-sm" id="avPto" name="navPto" value="{{ $pto->preType . ' - ' . $pto->preName }}">
+				<input type="hidden" name="hnavPto" id="havPto" value="{{ $pto->preId }}">
 			</div>
 		</dv>
 	</div>
@@ -38,7 +43,7 @@
 				<div class="col-md-6">
 					<select class="form-control form-control-sm" name="navNumber">
 						@foreach($crn as $c)
-						<option value="{{ $c->prgId }}">{{ $c->prgNumberVal.' - '.$c->prgPeriodo }}</option>
+						<option value="{{ $c->prgId }}">{{ $c->prgNumberVal.' -> '.$c->prgPeriodo }}</option>
 						@endforeach
 					</select>
 				</div>

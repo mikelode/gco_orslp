@@ -9,4 +9,10 @@ class Presupuesto extends Model
     protected $table = 'gcopresupuesto';
     protected $primaryKey = 'preId';
     public $timestamps = false;
+
+    public function items()
+	{
+		return $this->hasMany('App\Models\Itempresupuesto','iprBudget','preId');
+	}
+
 }

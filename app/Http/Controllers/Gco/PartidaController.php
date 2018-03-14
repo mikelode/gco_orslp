@@ -120,7 +120,7 @@ class PartidaController extends Controller
 
     public function list(Request $request)
     {
-        $ptd = Partida::where('parProject',$request->pyId)->get();
+        $ptd = Partida::where('parProject',$request->pyId)->where('parBudget',$request->ptId)->get();
         return response()->json(compact('ptd'));
     }
 
@@ -129,15 +129,17 @@ class PartidaController extends Controller
         try{
 
             $pyId = $request->hnimpPry;
+            $ptId = $request->nimpPto;
+
             $url = url('ver/presupuesto');
 
             if($request->hnimpAction == 'clear'){
-                $avance = Avance::where('aprProject',$pyId)->get();
+                $avance = Avance::where('aprProject',$pyId)->where('aprBudget',$ptId)->get();
                 
                 if(!$avance->isEmpty())
                     throw new Exception("Las partidas presupuestarias presentan registros de avance o valorizaciones por lo que no es posible realizar esta acción");
                 
-                $limpiarPartidas = Partida::where('parProject',$pyId)->delete();
+                $limpiarPartidas = Partida::where('parProject',$pyId)->where('aprBudget',$ptId)->delete();
             }
 
             if($request->hasFile('nimpFile')){
@@ -289,15 +291,16 @@ class PartidaController extends Controller
         try{
 
             $pyId = $request->hnimpPry;
+            $ptId = $request->nimpPto;
             $url = url('ver/presupuesto');
 
             if($request->hnimpAction == 'clear'){
-                $avance = Avance::where('aprProject',$pyId)->get();
+                $avance = Avance::where('aprProject',$pyId)->where('aprBudget',$ptId)->get();
                 
                 if(!$avance->isEmpty())
                     throw new Exception("Las partidas presupuestarias presentan registros de avance o valorizaciones por lo que no es posible realizar esta acción");
                 
-                $limpiarPartidas = Partida::where('parProject',$pyId)->delete();
+                $limpiarPartidas = Partida::where('parProject',$pyId)->where('parBudget',$ptId)->delete();
             }
 
             if($request->hasFile('nimpFile')){
@@ -322,6 +325,7 @@ class PartidaController extends Controller
 
                             $insert[] = [
                                 'parProject' => $pyId,
+                                'parBudget' => $ptId,
                                 'parLevel' => $nivel,
                                 'parItem' => trim($value['A']),
                                 'parDescription' => $value['B'],

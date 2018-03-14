@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Gco;
 use App\Models\Proyecto;
 use App\Models\Presupuesto;
 use App\Models\Listpresupuesto;
+use App\Models\Itempresupuesto;
+use App\Models\Tipopresupuesto;
 use App\Models\Partida;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -55,6 +57,19 @@ class PresupuestoController extends Controller
         //
     }
 
+    public function createPrestacion(Request $request)
+    {
+        $ptoIniId = $request->ipto;
+
+        $items = Presupuesto::find($ptoIniId)->items;
+        $pto = Presupuesto::find($ptoIniId);
+        $ptoTipo = Tipopresupuesto::where('tprId','!=',1)->get(); // los tipos que no sean inicial
+
+        $view = view('formularios.nuevo_prestacion', compact('items','ptoTipo','pto'));
+
+        return $view;
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -67,21 +82,28 @@ class PresupuestoController extends Controller
         try{
             $exception = DB::transaction(function() use($request){
 
+                $presupuesto = new Presupuesto();
+                $presupuesto->preProject = $request->hnpyId;
+                $presupuesto->preType = 1;
+                $presupuesto->preName = 'Expediente';
+                $presupuesto->save();
+
                 foreach ($request->nptoItemGral as $i => $item) {
                     if($i != 0){
 
-                        $itemPres = Listpresupuesto::find($item);
+                        $itemList = Listpresupuesto::find($item);
 
-                        $presupuesto = new Presupuesto();
-                        $presupuesto->preProject = $request->hnpyId;
-                        $presupuesto->preOrder = $itemPres->lprOrderItem;
-                        $presupuesto->preCodeItem = $itemPres->lprCodeItem;
-                        $presupuesto->preItemGeneral = $itemPres->lprDescriptionItem;
-                        if($itemPres->lprIsProportion)
-                            $presupuesto->preItemGeneralPrcnt = $request->nptoItemPercent[$i];// / 100;
-                        $presupuesto->preItemGeneralMount = floatval(str_replace(',', '', $request->nptoItemMount[$i]));
-                        $presupuesto->save();
-                        unset($presupuesto);
+                        $itemPto = new Itempresupuesto();
+                        
+                        $itemPto->iprBudget = $presupuesto->preId;
+                        $itemPto->iprOrder = $itemList->lprOrderItem;
+                        $itemPto->iprCodeItem = $itemList->lprCodeItem;
+                        $itemPto->iprItemGeneral = $itemList->lprDescriptionItem;
+                        if($itemList->lprIsProportion)
+                            $itemPto->iprItemGeneralPrcnt = $request->nptoItemPercent[$i];// / 100;
+                        $itemPto->iprItemGeneralMount = floatval(str_replace(',', '', $request->nptoItemMount[$i]));
+                        $itemPto->save();
+                        unset($itemPto);
                     }
                 }
 
@@ -89,6 +111,52 @@ class PresupuestoController extends Controller
 
             if(is_null($exception)){
                 $msg = 'Presupuesto General Resumen ha sido registrado con éxito';
+                $msgId = 200;
+                $url = url('ver/presupuesto');
+            }
+            else{
+                throw new Exception($exception);
+            }
+        }
+        catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' -- ' . $e->getFile() . ' - ' . $e->getLine() . " \n";
+            $msgId = 500;
+            $url = '';
+        }
+
+        return response()->json(compact('msg','msgId','url','pyId'));
+    }
+
+    public function storePrestacion(Request $request)
+    {
+        $pyId = $request->hnpryId;
+        
+        try{
+            $exception = DB::transaction(function() use($request){
+
+                $presupuesto = new Presupuesto();
+                $presupuesto->preProject = $request->hnpryId;
+                $presupuesto->preType = $request->nptoTipo;
+                $presupuesto->preNote = $request->nptoNote;
+                $presupuesto->preName = $request->nptoDescPrest;
+                $presupuesto->save();
+
+                foreach ($request->niprCode as $i => $item) {
+                        $itemPto = new Itempresupuesto();
+                        
+                        $itemPto->iprBudget = $presupuesto->preId;
+                        $itemPto->iprOrder = $request->hniprOrder[$i];
+                        $itemPto->iprCodeItem = $item;
+                        $itemPto->iprItemGeneral = $request->niprGnrl[$i];
+                        $itemPto->iprItemGeneralPrcnt = $request->niprPrcnt[$i];
+                        $itemPto->iprItemGeneralMount = floatval(str_replace(',', '', $request->niprMountPrest[$i]));
+                        $itemPto->save();
+                        unset($itemPto);
+                }
+            });
+
+            if(is_null($exception)){
+                $msg = 'Los montos de la prestación han sido registrados con éxito';
                 $msgId = 200;
                 $url = url('ver/presupuesto');
             }
@@ -116,7 +184,7 @@ class PresupuestoController extends Controller
         $pyId = $request->pyId;
 
         $pry = Proyecto::find($pyId);
-        $pto = Presupuesto::where('preProject',$pyId)->get();
+        $pto = Presupuesto::select(DB::raw("*, fnItemsGetDescription(preType) as itemDsc"))->with('items')->where('preProject',$pyId)->get();
         $listPto = Listpresupuesto::all();
 
         $sinPto = $pto->isEmpty();
@@ -125,8 +193,33 @@ class PresupuestoController extends Controller
             $view = view('formularios.nuevo_presupuesto',compact('pry','listPto'));
         }
         else{
+
+            $totalPtos = collect();
+            
+            foreach($pto as $p){
+
+                if($p->preType == 4){ // si se trata de un presupuesto deductivo
+                    $ptoDeducible = $p->items;
+                    $deductivo = $ptoDeducible->map(function($ptoDeducible){
+                        $ptoDeducible->iprItemGeneralMount = $ptoDeducible->iprItemGeneralMount * -1;
+                        return $ptoDeducible;
+                    });
+
+                    $totalPtos = $totalPtos->merge($deductivo);
+                } 
+                else{
+                    $totalPtos = $totalPtos->merge($p->items);
+                }
+            }
+
+            $itemGroup = $totalPtos->groupBy('iprCodeItem');
+
+            $ptoFinal = $itemGroup->map(function($it,$k){
+                return $it->sum('iprItemGeneralMount');
+            });
+
             $ptd = Partida::where('parProject',$pyId)->get();
-            $view = view('formularios.editar_presupuesto',compact('pry','pto','ptd','listPto'));
+            $view = view('formularios.editar_presupuesto',compact('pry','pto','ptd','listPto','ptoFinal'));
         }
 
         return $view;
@@ -151,21 +244,72 @@ class PresupuestoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function update(Request $request)
+    {
+
+        $pto = Presupuesto::find($request->hnptoId[0]);
+        $pyId = $pto->preProject;
+
+        try{
+            $exception = DB::transaction(function() use($request){
+
+                $pto = Presupuesto::find($request->hnptoId[0]);
+                $pto->preNote = $request->nptoNote;
+                $pto->save();
+
+
+                foreach ($request->nptoItemId as $i => $itemId) {
+
+                    $itemList = Listpresupuesto::find($itemId);
+                
+                    $presupItem = Itempresupuesto::find($itemId);
+                    /*if($itemList->lprIsProportion)
+                            $presupItem->iprItemGeneralPrcnt = $request->nptoItemPercent[$i];// / 100;*/
+                    $presupItem->iprItemGeneralMount = floatval(str_replace(',', '', $request->nptoItemMount[$i]));
+                    $presupItem->save();
+
+                    unset($presupItem);
+                }
+
+            });
+
+            if(is_null($exception)){
+                $msg = 'Cambios almacenados correctamente';
+                $msgId = 200;
+                $url = 'ver/presupuesto';
+            }
+            else{
+                throw new Exception($exception);
+            }
+
+        }catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' -Archivo- ' . $e->getFile() . ' -Linea- ' . $e->getLine() . " \n";
+            $msgId = 500;
+            $url= '';
+        }
+
+        return response()->json(compact('msg','msgId','url','pyId'));
+    }
+
+    public function update1(Request $request) // funcion para actualizar de golpe los presupuesto modificados fue cambiando a row by row
     {
         $pyId = $request->hnpyId;
 
         try{
             $exception = DB::transaction(function() use($request){
 
-                foreach ($request->nptoId as $i => $ptoId) {
-                
-                    $presupuesto = Presupuesto::find($ptoId);
-                    $presupuesto->preItemGeneralPrcnt = $request->nptoItemPercent[$i] / 100;
-                    $presupuesto->preItemGeneralMount = floatval(str_replace(',', '', $request->nptoItemMount[$i]));
-                    $presupuesto->save();
+                foreach ($request->nptoItemId as $i => $itemId) {
 
-                    unset($presupuesto);
+                    $itemList = Listpresupuesto::find($itemId);
+                
+                    $presupItem = Itempresupuesto::find($itemId);
+                    if($itemList->lprIsProportion)
+                            $presupItem->iprItemGeneralPrcnt = $request->nptoItemPercent[$i];// / 100;
+                    $presupItem->iprItemGeneralMount = floatval(str_replace(',', '', $request->nptoItemMount[$i]));
+                    $presupItem->save();
+
+                    unset($presupItem);
                 }
 
             });
@@ -201,13 +345,29 @@ class PresupuestoController extends Controller
 
     public function getMontoItemResumen(Request $request)
     {
-        $keyId = explode('-', $request->ptoId) ;
-        $preId = $keyId[0];
+        $keyId = explode('-', $request->itemId) ;
+        $itemId = $keyId[0];
         $itemCode = $keyId[1];
 
-        $ptoResumen = Presupuesto::find($preId);
+        //$ptoResumen = Presupuesto::find($preId);
+        $ptoResumen = Itempresupuesto::find($itemId);
 
-        return $ptoResumen->preItemGeneralMount;
+        return $ptoResumen->iprItemGeneralMount;
 
+    }
+
+    public function list(Request $request)
+    {
+        $pyId = $request->pyId;
+
+        $presupuestoPy = Presupuesto::where('preProject',$pyId)->get();
+
+        $optionHtml = '<option value="NA"> Elija un presupuesto </option>';
+
+        foreach($presupuestoPy as $pto){
+            $optionHtml .= '<option value="' . $pto->preId . '">' . $pto->preType . ' - ' . $pto->preName .'</option>';
+        }
+
+        return response()->json(compact('presupuestoPy','optionHtml'));
     }
 }

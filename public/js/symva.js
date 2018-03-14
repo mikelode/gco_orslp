@@ -157,18 +157,20 @@ function editar_presupuesto(btn, form)
 		btn[0].value = 'cancelar';
 		btn.text('Cancelar Edición');
 		btn.attr('class', 'btn btn-sm btn-warning btn-block');
-		$('#btnUpdateBudget').show();
+		$('.btnUpdateBudget').show();
+		$('#btnAddPrestBudget').show();
 	}
 	else if(action == 'cancelar'){
 		$('.preEdit').prop('readonly', true);
 		btn[0].value = 'editar';
 		btn.text('Editar Presupuesto');
 		btn.attr('class', 'btn btn-sm btn-primary btn-block');
-		$('#btnUpdateBudget').hide();
+		$('.btnUpdateBudget').hide();
+		$('#btnAddPrestBudget').hide();
 	}
 }
 
-function actualizar_presupuesto(form)
+function actualizar_presupuesto(form) // descartado por el metodo de guardado de presupuesto por presupuesto row by row
 {
 	var url = form.prop('action');
 	var data = form.serialize();
@@ -181,12 +183,37 @@ function actualizar_presupuesto(form)
 	});
 }
 
-function cargar_presupuesto(id, callback)
+function actualizar_presupuesto(element)
+{
+	var data = {};
+	var row = $(element).closest('tr');
+	var token = $('#frmUpdateBudget').find('input[name="_token"]').get(0);
+
+	var form = document.createElement('form');
+	form.setAttribute('action','actualizar/presupuesto');
+
+	row.find('input,textarea').each(function(i, el) {
+		form.appendChild(el);
+	});
+	form.appendChild(token);
+
+	var url = $(form).prop('action');
+	var data = $(form).serialize();
+
+	$.post(url, data, function(response) {
+		console.log(response);
+		alert(response.msg)
+		if(response.msgId == '200')
+			mostrar_presupuesto(response.pyId, response.url);
+	});
+}
+
+function cargar_presupuesto(pyId, ptId, callback)
 {
 	$.ajax({
 		'url': 'list/partidas',
 		'type': 'GET',
-		'data': {pyId: id},
+		'data': {pyId: pyId, ptId: ptId},
 		'success': callback
 	});
 }
@@ -333,16 +360,16 @@ function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource
 				dataTarget[i].avrMountCv = cd = total;
 				break;
 			case 'GG':
-				dataTarget[i]['avrMountCv'] = gg = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
+				dataTarget[i]['avrMountCv'] = gg = Math.round((parseFloat(dataTarget[i]['iprItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
 				break;
 			case 'GGF':
-				dataTarget[i]['avrMountCv'] = ggf = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
+				dataTarget[i]['avrMountCv'] = ggf = Math.round((parseFloat(dataTarget[i]['iprItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
 				break;
 			case 'GGV':
-				dataTarget[i]['avrMountCv'] = ggv = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
+				dataTarget[i]['avrMountCv'] = ggv = Math.round((parseFloat(dataTarget[i]['iprItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
 				break;
 			case 'U':
-				dataTarget[i]['avrMountCv'] = u = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
+				dataTarget[i]['avrMountCv'] = u = Math.round((parseFloat(dataTarget[i]['iprItemGeneralPrcnt'])/100 * total) * 100 ) / 100;
 				break;
 			case 'ST':
 				//dataTarget[i]['avrMountCv'] = st = Math.round((parseFloat(dataTarget[rowDc]['avrMountCv']) + parseFloat(dataTarget[rowDc + 1]['avrMountCv']) + parseFloat(dataTarget[rowDc + 2]['avrMountCv']) ) * 100 ) / 100;
@@ -350,7 +377,7 @@ function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource
 				break;
 			case 'IGV':
 				//dataTarget[i]['avrMountCv'] = igv = Math.round((parseFloat(dataTarget[rowDc + 4]['preItemGeneralPrcnt']) * parseFloat(dataTarget[rowDc + 3]['avrMountCv'])) * 100 ) / 100;
-				dataTarget[i]['avrMountCv'] = igv = Math.round((parseFloat(dataTarget[i]['preItemGeneralPrcnt'])/100 * st) * 100 ) / 100;
+				dataTarget[i]['avrMountCv'] = igv = Math.round((parseFloat(dataTarget[i]['iprItemGeneralPrcnt'])/100 * st) * 100 ) / 100;
 				break;
 			case 'PT':
 				//dataTarget[i]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 3]['avrMountCv']) + parseFloat(dataTarget[rowDc + 4]['avrMountCv'])) * 100 ) / 100;
@@ -358,10 +385,10 @@ function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource
 				break;
 		}
 
-		dataTarget[i]['avrPercentCv'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) / parseFloat(dataTarget[i]['preItemGeneralMount'])) * 10000) / 100;
+		dataTarget[i]['avrPercentCv'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) / parseFloat(dataTarget[i]['iprItemGeneralMount'])) * 10000) / 100;
 		dataTarget[i]['avrMountCa'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) + parseFloat(dataTarget[i]['avrMountBa'])) * 100 ) / 100;
-		dataTarget[i]['avrPercentCa'] = Math.round((parseFloat(dataTarget[i]['avrMountCa']) / parseFloat(dataTarget[i]['preItemGeneralMount'])) * 10000) / 100;
-		dataTarget[i]['avrMountBv'] = Math.round((parseFloat(dataTarget[i]['preItemGeneralMount']) - parseFloat(dataTarget[i]['avrMountCa'])) * 100 ) / 100;
+		dataTarget[i]['avrPercentCa'] = Math.round((parseFloat(dataTarget[i]['avrMountCa']) / parseFloat(dataTarget[i]['iprItemGeneralMount'])) * 10000) / 100;
+		dataTarget[i]['avrMountBv'] = Math.round((parseFloat(dataTarget[i]['iprItemGeneralMount']) - parseFloat(dataTarget[i]['avrMountCa'])) * 100 ) / 100;
 		dataTarget[i]['avrPercentBv'] = 100 - parseFloat(dataTarget[i]['avrPercentCa']);
 
 		gridToUpdate.invalidateRow(i);
@@ -407,7 +434,7 @@ function check_cien(celda){
 	return sum;
 }
 
-function mostrar_cronograma(py,url)
+function mostrar_cronograma(py,pt,url)
 {
 	var pyId = py;
 
@@ -416,7 +443,12 @@ function mostrar_cronograma(py,url)
 		return;
 	}
 
-	$.get(url, { pyId: pyId}, function(data) {
+	if(pt == 'NA'){
+		alert('Debe seleccionar el presupuesto correspondiente para ingresar su cronograma');
+		return;
+	}
+
+	$.get(url, { pyId: pyId, prId: pt}, function(data) {
 		$('#content-programacion').html(data);
 	});
 }
@@ -506,7 +538,7 @@ function actualizar_cronograma(form)
 	$.post(url, data, function(response) {
 		alert(response.msg)
 		if(response.msgId == '200'){
-			mostrar_cronograma(response.pyId, response.url);
+			mostrar_cronograma(response.pyId, response.ptId, response.url);
 		}
 
 	});
@@ -517,4 +549,17 @@ function change_to_submenu(path)
     $.get(path, function(data){
         $('#sub-content').html(data);
     });
+}
+
+function registrar_prestacion(form)
+{
+	var url = form.prop('action');
+	var data = form.serialize();
+
+	$.post(url, data, function(response) {
+		alert(response.msg);
+		$('#mdlAddPrestacion').modal('hide');
+		if(response.msgId == '200')
+			mostrar_presupuesto(response.pyId, response.url);
+	});
 }

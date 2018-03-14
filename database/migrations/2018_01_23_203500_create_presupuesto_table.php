@@ -20,16 +20,12 @@ class CreatePresupuestoTable extends Migration
                     ->references('pryId')
                     ->on('gcoproyecto')
                     ->onDelete('cascade');
-
-            $table->integer('preOrder')->unsigned()->nullable();
-            $table->string('preCodeItem',20)->nullable();
-            $table->string('preItemGeneral',100)->nullable();
-            $table->decimal('preItemGeneralPrcnt',14,5)->nullable();
-            $table->decimal('preItemGeneralMount',14,5)->nullable();
-            $table->boolean('preItemDisable')->default(0)->nullable();
-            $table->string('preItemDisableDetail',500)->nullable();
-            $table->datetime('preItemUpdateAt')->nullable();
-            $table->string('preItemUpdateDetail')->nullable();
+            $table->integer('preType')->unsigned(); // inicial = 1, adicional = 2, mayores metrados = 3, deductivos = 4.
+            $table->foreign('preType')
+                    ->references('tprId')
+                    ->on('gcotpresupuesto');
+            $table->string('preNote',1000)->nullable();
+            $table->string('preName',100)->nullable();
         });
     }
 

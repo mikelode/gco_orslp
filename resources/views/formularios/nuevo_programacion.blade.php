@@ -45,9 +45,10 @@
 												<div class="col-md-7">
 													<select class="form-control form-control-sm mt-2" id="pyResumenPto">
 														<option value="NA">-- Seleccionar --</option>
-														@foreach($resumen as $pto)
-														<option value="{{ $pto->preId.'-'.$pto->preCodeItem }}">{{ $pto->preItemGeneral }}</option>
+														@foreach($resumen[0]->items as $pto)
+														<option value="{{ $pto->iprId.'-'.$pto->iprCodeItem }}">{{ $pto->iprItemGeneral }}</option>
 														@endforeach()
+														<option value="OBM"> OTRO </option>
 													</select>
 												</div>
 											</div>
@@ -75,6 +76,7 @@
 										{{ csrf_field() }}
 										<input type="hidden" name="hnpyResumenPto" id="pyInputRsmnPto">
 										<input type="hidden" name="hnpyId" id="pyId" value="{{ $pry->pryId }}">
+										<input type="hidden" name="hnprId" id="prId" value="{{ $resumen[0]->preId }}">
 										<table class="table table-bordered table-sm action-table">
 											<thead>
 												<tr>
@@ -210,7 +212,12 @@
 
 		$('#pyInputRsmnPto').val(this.value);
 
-		$.get('{{ url('monto/presupuesto') }}',{ ptoId: this.value }, function(data) {			
+		if(this.value == 'OBM'){
+			$('#ptoResumenMonto').attr('readonly', false).focus();
+			return;
+		}
+
+		$.get('{{ url('monto/presupuesto') }}',{ itemId: this.value }, function(data) {			
 			$('#ptoResumenMonto').val(numeral(data).format('0,0.00'));
 		});
 	});

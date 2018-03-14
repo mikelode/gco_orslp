@@ -14,13 +14,17 @@
 						{{ csrf_field() }}
 						<div class="form-group row mb-0">
 							<label class="col-md-1">Proyecto: </label>
-							<div class="col-md-7">
+							<div class="col-md-4">
 								<select id="pyName" name="npyName">
 									<option value="NA">-- Seleccione un Proyecto --</option>
 									@foreach($pys as $py)
 										<option value="{{ $py->pryId }}">{{ $py->pryDenomination }}</option>
 									@endforeach
 								</select>
+							</div>
+							<label class="col-md-1">Presup: </label>
+							<div class="col-md-2">
+								<select id="ptSelect" name="nptSelect" class="form-control form-control-sm"></select>
 							</div>
 							<label class="col-md-1">Avance: </label>
 							<div class="col-md-2">
@@ -44,6 +48,7 @@
 		<input type="hidden" name="dataGridDetail" value="">
 		<input type="hidden" name="dataGridResume" value="">
 		<input type="hidden" id="dataProject" name="npyId" value="">
+		<input type="hidden" id="dataBudget" name="nptId" value="">
 		<input type="hidden" id="dataProgress" name="nbpId" value="">
 	</form>
 </div>
@@ -76,9 +81,10 @@ $(document).ready(function(){
 	$('#mdlFormProgress').on('show.bs.modal', function(event) {
 
 		var py = $('#pyName').val();
+		var pt = $('#ptSelect').val();
 		var modal = $(this);
 
-		$.get('{{ url('avance/nuevo') }}',{pyId: py}, function(data) {
+		$.get('{{ url('avance/nuevo') }}',{pyId: py, ptId: pt}, function(data) {
 			
 			modal.find('.modal-body #content-frm').html(data);
 
@@ -110,13 +116,28 @@ $(document).ready(function(){
 	$('#pyName').change(function(ev) {
 
 		if(this.value == 'NA'){
+			$('#ptSelect').html('');
 			$('#avSelect').html('');
 			return;
 		}
 
 		$('#dataProject').val(this.value);
 
-		$.get('{{ url('list/avance') }}',{pyId: this.value}, function(data) {
+		$.get('{{ url('list/presupuesto') }}', {pyId: this.value}, function(data){
+			$('#ptSelect').html(data.optionHtml);
+		})
+	});
+
+	$('#ptSelect').change(function(evt) {
+		
+		if(this.value == 'NA'){
+			$('#avSelect').html('');
+			return;
+		}
+
+		$('#dataBudget').val(this.value);
+
+		$.get('{{ url('list/avance') }}',{ptId: this.value}, function(data) {
 			
 			$('#avSelect').html(data.optionHtml);
 

@@ -15,7 +15,7 @@ class CreateLpresupuestoTable extends Migration
     {
         Schema::create('gcolpresupuesto', function (Blueprint $table) {
             $table->increments('lprId');
-            $table->integer('lprOrderItem')->unsigned();
+            $table->decimal('lprOrderItem')->unsigned();
             $table->string('lprCodeItem',20)->nullable();
             $table->string('lprDescriptionItem');
             $table->boolean('lprIsProportion');

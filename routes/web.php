@@ -27,6 +27,9 @@ Route::get('monto/presupuesto','Gco\PresupuestoController@getMontoItemResumen');
 Route::get('ver/presupuesto','Gco\PresupuestoController@show');
 Route::post('nuevo/presupuesto','Gco\PresupuestoController@store');
 Route::post('actualizar/presupuesto','Gco\PresupuestoController@update');
+Route::get('create/prestacion','Gco\PresupuestoController@createPrestacion');
+Route::post('store/prestacion','Gco\PresupuestoController@storePrestacion');
+Route::get('list/presupuesto','Gco\PresupuestoController@list');
 
 Route::post('importar/partidas','Gco\PartidaController@importExcel');
 Route::get('list/partidas','Gco\PartidaController@list');

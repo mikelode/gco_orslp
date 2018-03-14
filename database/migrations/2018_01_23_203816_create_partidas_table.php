@@ -16,9 +16,10 @@ class CreatePartidasTable extends Migration
         Schema::create('gcopartidas', function (Blueprint $table) {
             $table->increments('parId');
             $table->integer('parProject')->unsigned();
-            $table->foreign('parProject')
-                    ->references('pryId')
-                    ->on('gcoproyecto');
+            $table->integer('parBudget')->unsigned();
+            $table->foreign('parBudget')
+                    ->references('preId')
+                    ->on('gcopresupuesto');
 
             $table->integer('parLevel')->unsigned();
             $table->string('parItem',20)->nullable();

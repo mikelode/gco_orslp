@@ -1,71 +1,124 @@
 <div class="col-md-10 pr-0">
 	<div class="card">
-		<div class="card-header py-1"><b> Presupuesto Resumen </b></div>
+		<div class="card-header py-1">
+			<b> Presupuesto Resumen </b>
+		</div>
 		<div class="card-body">
 			<form id="frmUpdateBudget" action="{{ url('actualizar/presupuesto') }}">
 				{{ csrf_field() }}
 				<input type="hidden" name="hnpyId" value="{{ $pry->pryId }}">
-				<table class="table table-sm">
-					<thead class="thead-dark">
-						<tr>
-							<th>Descripción</th>
-							<th>Proporción</th>
-							<th>Presupuesto</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach($pto as $item)
-						<tr>
-							<td>
-								<input type="hidden" name="nptoId[]" value="{{ $item->preId }}">
-								<input type="text" name="nptoItemGral[]" class="form-control-plaintext" readonly value="{{ $item->preItemGeneral }}" readonly>
-								<input type="hidden" name="nptoCodeItem[]" value="{{ $item->preCodeItem }}">
-								<input type="hidden" name="nptoOrder[]" value="{{ $item->preOrder }}">
-							</td>
-							@if($item->preCodeItem == 'CD' || $item->preCodeItem == 'ST' || $item->preCodeItem == 'PT')
-							<td>
-								<input type="hidden" name="nptoItemPercent[]">
-							</td>
-							@else
-							<td>
-								<div class="input-group input-group-sm">
-									<input type="text" class="form-control percentage preEdit" name="nptoItemPercent[]" value="{{ $item->preItemGeneralPrcnt }}" readonly>
-									<div class="input-group-append">
-										<span class="input-group-text">%</span>
-									</div>
-								</div>
-							</td>
-							@endif
-							<td>
-								<div class="input-group input-group-sm">
-									<input type="text" class="form-control amount preEdit" name="nptoItemMount[]" value="{{ number_format($item->preItemGeneralMount,2,'.',',') }}" readonly>
-									<div class="input-group-append">
-										<span class="input-group-text">S/</span>
-									</div>
-								</div>
-							</td>
-						</tr>
-						@endforeach
-					</tbody>
-				</table>
+				<div class="table-responsive">
+					<table class="table table-sm" id="tblSummaryBudget">
+						<thead class="thead-dark">
+							<tr>
+								<th></th>
+								<th>Presupuesto</th>
+								@foreach($pto[0]->items as $item)
+								<th>{{ $item->iprItemGeneral }}</th>
+								@endforeach
+								<th>Nota</th>
+							</tr>
+							<tr>
+								<th></th>
+								<th>%</th>
+								@foreach($pto[0]->items as $item)
+									@if($item->iprCodeItem == 'CD' || $item->iprCodeItem == 'ST' || $item->iprCodeItem == 'PT')
+										<th>
+											<input type="hidden" name="nptoItemPercent[]">
+										</th>
+									@else
+										<th>
+											<div class="input-group input-group-sm">
+												<input type="text" class="form-control percentage preEdit" name="nptoItemPercent[]" value="{{ $item->iprItemGeneralPrcnt }}" readonly>
+												<div class="input-group-append">
+													<span class="input-group-text">%</span>
+												</div>
+											</div>
+										</th>
+									@endif
+								@endforeach
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach($pto as $p)
+							<tr id="{{ 'pto-'.$p->preId }}">
+								<td class="tdEdit">
+									<a href="javascript:" class="btnUpdateBudget" onclick="actualizar_presupuesto(this)" style="display: none;">
+										<img src="{{ asset('/img/guardar32.png') }}">
+									</a>
+								</td>
+								<td>
+									<input type="text" name="nptoItemGral[]" class="form-control-plaintext" readonly value="{{ $p->preName }}" readonly>
+									<input type="hidden" id="ptoId" value="{{ $p->preId }}" name="hnptoId[]">
+								</td>
+								@foreach($p->items as $item)
+									<td>
+										<input type="text" class="form-control form-control-sm amount preEdit" name="nptoItemMount[]" value="{{ number_format($item->iprItemGeneralMount,2,'.',',') }}" readonly>
+										<input type="hidden" name="nptoItemId[]" value="{{ $item->iprId }}">
+										<input type="hidden" name="nptoItemCode[]" value="{{ $item->iprCodeItem }}">
+										<input type="hidden" name="nptoItemOrder[]" value="{{ $item->iprOrder }}">
+									</td>
+								@endforeach
+								<td>
+									<textarea class="form-control form-control-sm preEdit" name="nptoNote" readonly>{{ $p->preNote }}</textarea>
+								</td>
+							</tr>
+							@endforeach
+						</tbody>
+						<tfoot>
+							<tr>
+								<th></th>
+								<th>Total</th>
+								@foreach($ptoFinal as $final)
+									<th class="amount">{{ number_format($final,2,'.',',') }}</th>
+								@endforeach
+								<th></th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+				
 				@if(Auth::user()->hasPermission(7))
-				<button type="button" class="btn btn-sm btn-success float-right" style="display: none;" id="btnUpdateBudget" onclick="actualizar_presupuesto($('#frmUpdateBudget'))">Guardar Cambios</button>
+				<div class="btn-group" role="group" style="display: none;" id="btnAddPrestBudget">
+					<button type="button" class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#mdlAddPrestacion">
+						<i class="fas fa-plus"></i> Añadir Prestación
+					</button>
+				</div>
 				@endif
 			</form>
 		</div>
 		<div class="card-header">
-			<b>Partidas Presupuestarias</b>
-			@if(Auth::user()->hasPermission(7))
-				@if($ptd->isEmpty())
-				<div class="float-right">
-					<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-action="new" data-target="#mdlImportFile">Importar</button>
+			<div class="row">
+				<div class="col-md-4">
+					<b>Partidas Presupuestarias</b>
 				</div>
-				@else
-				<div class="float-right">
-					<button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-action="clear" data-target="#mdlImportFile">Limpiar e Importar</button>
+				<div class="col-md-4">
+					<div class="form-group row mb-0">
+						<label class="col-form-label col-md-4">Presupuesto:</label>
+						<div class="col-md-8">
+							<select class="form-control form-control-sm" id="slcPartidasPto">
+								@foreach($pto as $p)
+								<option value="{{ $p->preId }}">{{ $p->itemDsc . ' - ' . $p->preName }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
 				</div>
-				@endif
-			@endif
+				<div class="col-md-4">
+					@if(Auth::user()->hasPermission(7))
+						@if($ptd->isEmpty())
+						<div class="float-right">
+							<button type="button" class="btn btn-sm btn-primary" id="btnImportPart" data-toggle="modal" data-action="new" data-target="#mdlImportFile">Importar</button>
+						</div>
+						@else
+						<div class="float-right">
+							<button type="button" class="btn btn-sm btn-info" id="btnImportPart" data-toggle="modal" data-action="clear" data-target="#mdlImportFile">Limpiar e Importar</button>
+						</div>
+						@endif
+					@endif
+				</div>
+			</div>
 		</div>
 		<div class="card-body">
 			<div id="myGrid" style="height:500px; font-family: arial; font-size: 8pt; box-sizing: content-box;"></div>
@@ -103,8 +156,16 @@
 					<input type="hidden" name="hnimpAction" id="himpAction">
 					<div class="form-group">
 						<label>Proyecto: </label>
-						<textarea class="form-control-plaintext input-sm" id="impPry" name="nimpPry" readonly></textarea>
+						<textarea class="form-control-plaintext form-control-sm" id="impPry" name="nimpPry" readonly></textarea>
 						<input type="hidden" id="himpPry" name="hnimpPry">
+					</div>
+					<div class="form-group">
+						<label>Presupuesto: </label>
+						<select class="form-control form-control-sm" id="impPto" name="nimpPto">
+							@foreach($pto as $p)
+							<option value="{{ $p->preId }}">{{ $p->itemDsc . ' - ' . $p->preName }}</option>
+							@endforeach
+						</select>
 					</div>
 					<div class="form-group">
 						<label>Seleccionar Archivo Excel del Presupuesto</label>
@@ -121,7 +182,41 @@
 	</div>
 </div>
 
+<div class="modal fade" id="mdlAddPrestacion" tabindex="-1" role="dialog" aria-labelledy="prestacionModal" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				Agregar Prestación al Presupuesto del Proyecto
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div id="content-frm">
+					
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="registrar_prestacion($('#frmCreatePrestacion'))">Registrar</button>
+        		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script type="text/javascript">
+
+	$('#mdlAddPrestacion').on('show.bs.modal', function(event){
+
+		var ptoInit = $('#ptoId').val();
+		var modal = $(this);
+
+		$.get('{{ url('create/prestacion') }}', {ipto: ptoInit}, function(data){
+			modal.find('.modal-body #content-frm').html(data);
+		});
+
+	});
+
 	$('#mdlImportFile').on('show.bs.modal', function(event) {
 		var button = $(event.relatedTarget);
 		var dataSelect = $('#pyName').select2('data');
@@ -133,6 +228,37 @@
 		modal.find('.modal-body #impPry').val(pryText);
 		modal.find('.modal-body #himpPry').val(pryId);
 		modal.find('.modal-body #himpAction').val(action);
+	});
+
+	$('#slcPartidasPto').change(function(event) {
+		
+		cargar_presupuesto({{ $pto[0]->preProject }}, this.value, function(data){
+
+			$('#myGrid').empty();
+			
+			if(data.ptd.length == 0){
+				$('#btnImportPart').attr('data-action', 'new');
+			}
+			else{
+				$('#btnImportPart').attr('data-action','clear');
+			}
+
+			grid = new Slick.Grid("#myGrid", data.ptd, columns, options);
+
+				grid.onCellChange.subscribe(function(e,args){
+									
+					$.get('actualizar/partida', args.item, function(response) {
+						if(response.msgId == '500'){
+							alert(response.msg);
+						}
+					});
+
+					grid.invalidateRow(args.row);
+					grid.render();
+
+				});
+		});
+
 	});
 
 	var grid;
@@ -157,12 +283,10 @@
 
 		$(function(){
 
-			cargar_presupuesto({{ $pto[0]->preProject }}, function(data){
+			cargar_presupuesto({{ $pto[0]->preProject }}, {{ $pto[0]->preId }}, function(data){
 				grid = new Slick.Grid("#myGrid", data.ptd, columns, options);
 
 				grid.onCellChange.subscribe(function(e,args){
-					console.log(e);
-					console.log(args);
 									
 					$.get('actualizar/partida', args.item, function(response) {
 						if(response.msgId == '500'){

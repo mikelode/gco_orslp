@@ -70,9 +70,9 @@
 
 	var columnsFoot = [
 		//{id: "id", name: "Id", field: "aprId", width: 30},
-		{id: "descripcion", name: "Descripción", field: "preItemGeneral", width: 150},
-		{id: "proporcion", name: "Proporción %", field: "preItemGeneralPrcnt", width: 100},
-		{id: "monto", name: "Monto", field: "preItemGeneralMount", width: 100, formatter: Slick.Formatters.Miles},
+		{id: "descripcion", name: "Descripción", field: "iprItemGeneral", width: 150},
+		{id: "proporcion", name: "Proporción %", field: "iprItemGeneralPrcnt", width: 100},
+		{id: "monto", name: "Monto", field: "iprItemGeneralMount", width: 100, formatter: Slick.Formatters.Miles},
 		{id: "vacio_ba", name: "METRADO", field: "avrMetradoBa", width: 50, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
 		{id: "rmonto_ba", name: "MONTO", field: "avrMountBa", width: 80, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
 		{id: "rporcentaje_ba", name: "%", field: "avrPercentBa", width: 80, columnGroup: "ACUMULADO ANTERIOR"},
@@ -115,6 +115,15 @@
 
 	data =  {!! $avd !!};
 
+	data.getItemMetadata = function(row){
+		if(data[row].parLevel == 1){
+			return{
+				cssClasses: 'gridRowLvlOne'
+			}
+			return null;
+		}
+	}
+
 	grid = new Slick.Grid("#myGrid", data, columns, options);
 	grid.setSelectionModel(new Slick.CellSelectionModel());
 	grid.registerPlugin(new Slick.AutoTooltips());
@@ -122,8 +131,9 @@
 	grid.registerPlugin(new Slick.CellExternalCopyManager(pluginOptions));
 
 	footData = {!! $rsmn !!};
+	
 	footData.getItemMetadata = function(row){
-		if(footData[row].preId == '{{ $pry->pryBaseBudget }}'){
+		if(footData[row].iprId == '{{ $pry->pryBaseBudget }}'){
 			return{
 				cssClasses: 'baserowbudget'
 			};
