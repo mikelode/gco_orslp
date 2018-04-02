@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Exception;
 use Excel;
 use File;
@@ -255,6 +256,7 @@ class PresupuestoController extends Controller
             $exception = DB::transaction(function() use($request){
 
                 $pto = Presupuesto::find($request->hnptoId[0]);
+                $pto->preName = $request->nptoItemGral[0];
                 $pto->preNote = $request->nptoNote;
                 $pto->save();
 
@@ -369,5 +371,53 @@ class PresupuestoController extends Controller
         }
 
         return response()->json(compact('presupuestoPy','optionHtml'));
+    }
+
+    public function uploadFilePrestacion(Request $request)
+    {
+        try{
+            $pyId = $request->hnatchPry;
+            $ptId = $request->natchPto;
+            $url = url('ver/presupuesto');
+
+            if($request->hasFile('natchFile')){
+
+                $file = $request->file('natchFile');
+                $path_parts = pathinfo($_FILES['natchFile']['name']);
+                $filename = $path_parts['filename'];
+                $fileext = $path_parts['extension'];
+
+                $path_saved = $file->storeAs('docsobras',$filename . '_' . time() . '.' . $fileext);
+
+                if(Storage::disk('public')->exists($path_saved)){
+                    $presupuesto = Presupuesto::find($ptId);
+                    $presupuesto->prePathFile = $path_saved;
+                    //$presupuesto->save();
+
+                    if($presupuesto->save()){
+                        $msg = 'Archivo adjunto subido y registrado correctamente.';
+                        $msgId = 200;
+                    }
+                    else{
+                        throw new Exception("Error al registrar la ruta del archivo en la base de datos. Revise su conexión.");
+                    }
+
+                }
+                else{
+                    throw new Exception("El archivo no se ha almacenado correctamente.");
+                }
+            }
+            else{
+                throw new Exception("No se ha adjuntado ningun archivo");
+                
+            }
+        }
+        catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' -Archivo- ' . $e->getFile() . ' -Linea- ' . $e->getLine() . " \n";
+            $msgId = 500;
+            $url= '';
+        }
+
+        return response()->json(compact('msg','msgId','url','pyId'));
     }
 }

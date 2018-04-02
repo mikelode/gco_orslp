@@ -143,11 +143,15 @@
       
       _bodyElement.removeChild(ta);
       for (var i=0; i<clipRows.length; i++) {
-        if (clipRows[i]!="")
+        if (clipRows[i]!=""){
           clippedRange[j++] = clipRows[i].split("\t");
-          else
-          clippedRange[i] = [""];
+        }
+        else{
+          /* the orginal was only clippedRange[i] == [""], but copy and paste blank spaces failed, with this work -> modified by SYMVA */
+          clippedRange[j++] = [""];
+        }
       }
+      
       var selectedCell = _grid.getActiveCell();
       var ranges = _grid.getSelectionModel().getSelectedRanges();
       var selectedRange = ranges && ranges.length ? ranges[0] : null;   // pick only one selection

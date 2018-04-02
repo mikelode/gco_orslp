@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Gco;
 
 use App\Models\Proyecto;
 use App\Models\Equiprof;
+use App\Models\Seleccion;
 use App\Models\Uejecutora;
+use App\Models\Postor;
+use App\Models\Condicionpostor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -23,20 +26,26 @@ class ProyectoController extends Controller
     {
         $pyAccess = Auth::user()->tusProject;
 
-        if($pyAccess == 0){
+        if($pyAccess == 0){ /* zero is all access */
             $pys = Proyecto::with('ejecutor')
+                    ->join('gcouejecutora','pryId','=','ejeProject')
+                    ->join('gcoprocseleccion','pslProject','=','pryId')
+                    ->join('gcopspostores','pslId','=','pstSelectionProc')
+                    ->join('gcojpersona','prjId','=','pstJpersona')
                     ->where('pryInvalidate',false)
                     ->get();
         }
         else{
             $pys = Proyecto::with('ejecutor')
+                    ->join('gcouejecutora','pryId','=','ejeProject')
+                    ->join('gcoprocseleccion','pslProject','=','pryId')
+                    ->join('gcopspostores','pslId','=','pstSelectionProc')
+                    ->join('gcojpersona','prjId','=','pstJpersona')
                     ->where('pryInvalidate',false)
                     ->where('pryId',$pyAccess)
                     ->get();
         }
-
-        
-
+        //dd(count($pys[0]->ejecutor));
         $tms = Equiprof::with('individualData')->get();
 
         $view = view('gestion.panel_proyectos', compact('pys','tms'));
@@ -51,7 +60,8 @@ class ProyectoController extends Controller
      */
     public function create()
     {
-        $view = view('formularios.nuevo_proyecto');
+        $condicion = Condicionpostor::all();
+        $view = view('formularios.nuevo_proyecto', compact('condicion'));
         return $view;
     }
 
@@ -61,7 +71,44 @@ class ProyectoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
     public function store(Request $request)
+    {
+        try{
+
+            $proyecto = new Proyecto();
+
+            $exception = DB::transaction(function() use($request, &$proyecto){
+
+                $proyecto->prySnip = $request->npySnip;
+                $proyecto->pryUnifiedCode = $request->npyCu;
+                $proyecto->pryDenomination = $request->npyDenom;
+                $proyecto->pryShortDenomination = $request->npyShortdenom;
+                $proyecto->pryViabilityResolution = $request->npyResol;
+                $proyecto->pryDateResolution = $request->npyDateresol;
+                $proyecto->save();
+
+            });
+
+            if(is_null($exception)){
+                $msgId = 200;
+                $msg = 'Proyecto registrado correctamente';
+                $url = url('proyecto');
+            }
+            else{
+                throw new Exception($exception);
+            }
+        }
+        catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' -- ' . $e->getFile() . ' - ' . $e->getLine() . " \n";
+            $msgId = 500;
+            $url = '';
+        }
+
+        return response()->json(compact('msg','msgId','url','proyecto'));
+    }
+    
+    public function store_agrupado(Request $request)
     {
         try{
             $exception = DB::transaction(function() use($request){
@@ -147,10 +194,14 @@ class ProyectoController extends Controller
     public function edit(Request $request)
     {
         $proyecto = Proyecto::find($request->pyId);
-        $ejecutor = Uejecutora::find($proyecto->pryExeUnit);
-        $equipo = Equiprof::with('individualData')->where('prfUejecutora',$ejecutor->ejeId)->get();
+        $seleccion = Seleccion::where('pslProject', $request->pyId)->get();
+        $postor = Postor::with('individualData')->where('pstSelectionProc',$seleccion[0]->pslId)->get();
+        $ejecutor = Proyecto::find($request->pyId)->ejecutor()->get();
+        $contratista = Postor::with('individualData')->find($ejecutor[0]->ejeId);
+        $equipo = Equiprof::with('individualData')->where('prfUejecutora',$ejecutor[0]->ejeId)->get();
+        $condicion = Condicionpostor::all();
 
-        $view = view('formularios.editar_proyecto', compact('proyecto','ejecutor','equipo'));
+        $view = view('formularios.editar_proyecto', compact('proyecto','ejecutor','equipo','seleccion','postor','contratista','condicion'));
 
         return $view;
     }
@@ -162,7 +213,41 @@ class ProyectoController extends Controller
      * @param  \App\Models\Proyecto  $proyecto
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Proyecto $proyecto)
+
+    public function update(Request $request)
+    {
+        try{
+            $exception = DB::transaction(function() use($request){
+
+                $proyecto = Proyecto::find($request->npyId);
+                $proyecto->prySnip = $request->npySnip;
+                $proyecto->pryUnifiedCode = $request->npyCu;
+                $proyecto->pryDenomination = $request->npyDenom;
+                $proyecto->pryShortDenomination = $request->npyShortdenom;
+                $proyecto->pryViabilityResolution = $request->npyResol;
+                $proyecto->pryDateResolution = $request->npyDateresol;
+                $proyecto->save();
+            });
+
+            if(is_null($exception)){
+                $msgId = 200;
+                $msg = 'Los datos del proyecto se actualizaron correctamente';
+                $pyId = $request->npyId;
+            }
+            else{
+                throw new Exception($exception);
+            }
+
+        }catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' -- ' . $e->getFile() . ' - ' . $e->getLine() . " \n";
+            $msgId = 500;
+            $pyId = '';
+        }
+
+        return response()->json(compact('msg','msgId','pyId'));
+    }
+
+    public function update_agrupado(Request $request, Proyecto $proyecto)
     {
         try{
             $exception = DB::transaction(function() use($request){

@@ -23,10 +23,20 @@
 				</div>
 			</div>
 			@else
-			<div class="card text-white bg-info">
-				<div class="card-header py-1"><b>Operaciones</b></div>
-				<div class="card-body px-2">		
-					<h5 class="card-title">VALORIZACION COMPLETADA</h5>
+			<div class="card border-success text-success">
+				<div class="card-header py-1">
+					<b>Operaciones</b>
+					@if(Auth::user()->hasPermission(7))
+					<div class="float-right">
+						<a href="#" id="btnEditClosedValor" onclick="habilitar_edicion_avance($(this),grid)" data-value="disable">
+							<img id="imgEdit" src="{{ asset('/img/edit_22.png') }}">
+							<img id="imgCancel" src="{{ asset('/img/cancel_22.png') }}" style="display: none;">
+						</a>
+					</div>
+					@endif
+				</div>
+				<div class="card-body text-success px-2">		
+					<h5 class="card-title">VALORIZACION #{{ $valorizacion->prgNumberVal }} COMPLETADA</h5>
 					<p class="card-text">
 						El registro del presente avance correspondiente al periodo seleccionado ha concluido.
 					</p>
@@ -54,9 +64,9 @@
 		{id: "unidad", name: "Und", field: "parUnit", width: 30},
 		{id: "precio", name: "P.Unit.", field: "parPrice", width: 50, formatter: Slick.Formatters.Miles},
 		{id: "parcial", name: "Presupuesto", field: "parPartial", width: 80, formatter: Slick.Formatters.Miles},
-		{id: "metrado_ba", name: "METRADO", field: "avcMeteredBa", width: 50, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
-		{id: "monto_ba", name: "MONTO", field: "avcMountBa", width: 80, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
-		{id: "porcentaje_ba", name: "%", field: "avcPercentBa", width: 50, columnGroup: "ACUMULADO ANTERIOR"},
+		{id: "metrado_ba", name: "METRADO", field: "pavcMeteredCa", width: 50, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
+		{id: "monto_ba", name: "MONTO", field: "pavcMountCa", width: 80, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
+		{id: "porcentaje_ba", name: "%", field: "pavcPercentCa", width: 50, columnGroup: "ACUMULADO ANTERIOR"},
 		{id: "metrado_cv", name: "METRADO", field: "avcMeteredCv", width: 50, editor: Slick.Editors.Text, columnGroup: "VALORIZACIÓN PRESENTE", formatter: Slick.Formatters.Miles, cssClass: 'basecolbudget'},
 		{id: "monto_cv", name: "MONTO", field: "avcMountCv", width: 80, columnGroup: "VALORIZACIÓN PRESENTE", formatter: Slick.Formatters.Miles},
 		{id: "porcentaje_cv", name: "%", field: "avcPercentCv", width: 50, columnGroup: "VALORIZACIÓN PRESENTE"},
@@ -74,8 +84,8 @@
 		{id: "proporcion", name: "Proporción %", field: "iprItemGeneralPrcnt", width: 100},
 		{id: "monto", name: "Monto", field: "iprItemGeneralMount", width: 100, formatter: Slick.Formatters.Miles},
 		{id: "vacio_ba", name: "METRADO", field: "avrMetradoBa", width: 50, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
-		{id: "rmonto_ba", name: "MONTO", field: "avrMountBa", width: 80, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
-		{id: "rporcentaje_ba", name: "%", field: "avrPercentBa", width: 80, columnGroup: "ACUMULADO ANTERIOR"},
+		{id: "rmonto_ba", name: "MONTO", field: "pavrMountCa", width: 80, columnGroup: "ACUMULADO ANTERIOR", formatter: Slick.Formatters.Miles},
+		{id: "rporcentaje_ba", name: "%", field: "pavrPercentCa", width: 80, columnGroup: "ACUMULADO ANTERIOR"},
 		{id: "vacio_cv", name: "METRADO", field: "avrMetradoCv", width: 50, columnGroup: "VALORIZACIÓN PRESENTE", formatter: Slick.Formatters.Miles},
 		{id: "rmonto_cv", name: "MONTO", field: "avrMountCv", width: 80, columnGroup: "VALORIZACIÓN PRESENTE", formatter: Slick.Formatters.Miles},
 		{id: "rporcentaje_cv", name: "%", field: "avrPercentCv", width: 80, columnGroup: "VALORIZACIÓN PRESENTE"},
@@ -116,9 +126,13 @@
 	data =  {!! $avd !!};
 
 	data.getItemMetadata = function(row){
-		if(data[row].parLevel == 1){
+
+		var lvl = data[row].parLevel;
+		var style = 'gridRowLvl-' + lvl;
+
+		if(data[row].parUnit == ''){
 			return{
-				cssClasses: 'gridRowLvlOne'
+				cssClasses: style
 			}
 			return null;
 		}
@@ -155,7 +169,18 @@
     });
 	CreateAddlHeaderRow(footGrid,columnsFoot);
 
+	grid.onBeforeEditCell.subscribe(function(e, args){
+		console.log(args);
+	});
+
+	@if($valorizacion->prgClosed == false)
+
 	grid.onCellChange.subscribe(function(e, args){
+
+		var newValue = parseFloat(args.item.avcMeteredCv);
+
+		if(isNaN(newValue))
+			return false;
 
 		grid.invalidateRow(args.row);
 
@@ -182,11 +207,30 @@
 		updateDirectCost(0, args.cell + 1, footGrid, grid, grid.getData(), footGrid.getData());
 	});
 
-	footGrid.onCellChange.subscribe(function(e, args){
+	@else
 
-		alert('cambiando');
+	grid.onCellChange.subscribe(function(e, args){
+		var newValue = parseFloat(args.item.avcMeteredCv);
+
+		if(isNaN(newValue))
+			return false;
+
+		grid.invalidateRow(args.row);
+
+		args.item.avcMountCv = Math.round(parseFloat(args.item.avcMeteredCv) * parseFloat(args.item.parPrice) * 100 ) / 100;
+		args.item.avcPercentCv = Math.round((parseFloat(args.item.avcMountCv) / parseFloat(args.item.parPartial)) * 10000) / 100;
+		args.item.avcMeteredCa = Math.round((parseFloat(args.item.avcMeteredBa) + parseFloat(args.item.avcMeteredCv)) * 100 ) / 100;
+		args.item.avcMountCa = Math.round((parseFloat(args.item.avcMountBa) + parseFloat(args.item.avcMountCv)) * 100 ) / 100;
+		args.item.avcPercentCa = Math.round((parseFloat(args.item.avcMountCa) / parseFloat(args.item.parPartial)) * 10000) / 100;
+		args.item.avcMeteredBv = Math.round((parseFloat(args.item.parMetered) - parseFloat(args.item.avcMeteredCa)) * 100 ) / 100;
+		args.item.avcMountBv = Math.round((parseFloat(args.item.parPartial) - parseFloat(args.item.avcMountCa)) * 100 ) / 100;
+		args.item.avcPercentBv = 100 - parseFloat(args.item.avcPercentCa);
+
+		grid.render();
 
 	});
+
+	@endif
 
 	//});
 

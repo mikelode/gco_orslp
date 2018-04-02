@@ -12,6 +12,6 @@ class Proyecto extends Model
 
     public function ejecutor()
     {
-    	return $this->hasMany('App\Models\Uejecutora','ejeId','pryExeUnit');	
+    	return $this->belongsTo('App\Models\Uejecutora','pryId','ejeProject');	
     }
 }

@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(UsuarioTableSeeder::class);
         $this->call(SistemaTableSeeder::class);
         $this->call(LpresupuestoTableSeeder::class);
+        $this->call(CondicionTableSeeder::class);
     }
 }

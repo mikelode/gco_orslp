@@ -1,10 +1,10 @@
-<div class="col-md-10 pr-0">
+<div class="col-md-12">
 	<div class="card">
 		<div class="card-body">
 			<div class="row">
 				<div class="col-md-12">
 					<div class="row">
-						<div class="col-md-12">
+						<div class="col-md-10">
 							<div class="card">
 								<div class="card-header py-0">
 									Plazo de Ejecución
@@ -68,58 +68,113 @@
 								</div>
 							</div>
 						</div>
+						<div class="col-md-2 pl-1">
+							<div class="card border-success">
+								<div class="card-header py-1"><b>Operaciones</b></div>
+								<div class="card-body px-2">
+									@if(Auth::user()->hasPermission(11))
+									<button type="button" id="btnActionEdit" class="btn btn-sm btn-info btn-block" onclick="editar_cronograma($(this),$('#frmUpdateSchedule'))" value="editar">Editar Cronograma</button>
+									@endif
+									@if(Auth::user()->hasPermission(12))
+									<button type="button" id="btnActionDelete" class="btn btn-sm btn-danger btn-block">Eliminar</button>
+									@endif
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="row">
 						<div class="col-md-12">
-							<div class="widget mt-3">
-								<div class="widget-header">
-									<i class="icon-briefcase"></i>
-									<h3>Datos del Cronograma Calendarizado</h3>
+							<div class="card mt-3">
+								<div class="card-header">
+									<p style="display: inline;"><i class="fas fa-calendar"></i> Datos del Cronograma Calendarizado</p>
 									<div class="float-right">
 										<button type="button" class="btn btn-secondary btn-sm mr-2 mb-1" id="btnAddPeriod" style="display: none;" onclick="agregar_periodo($('#tblSchedule'))">Agregar Periodo</button>
 										<button type="button" class="btn btn-info btn-sm mr-2 mb-1" id="btnEditSchedule" style="display: none;" onclick="actualizar_cronograma($('#frmUpdateSchedule'))">Guardar Cambios</button>
 									</div>
 								</div>
-								<div class="widget-content p-0">
+								<div class="card-body p-0">
 									<form action="{{ url('actualizar/programacion') }}" id="frmUpdateSchedule">
 										{{ csrf_field() }}
 										<input type="hidden" name="hnpyId" id="pyId" value="{{ $pry->pryId }}">
-										<input type="hidden" name="hnptId" value="{{ $resumen[0]->iprBudget }}">
+										<input type="hidden" name="hnptId" id="ptId" value="{{ $resumen[0]->iprBudget }}">
 										<table class="table table-bordered table-sm action-table" id="tblSchedule">
 											<thead>
 												<tr>
-													<th width="20">Valorización</th>
-													<th>Periodo</th>
-													<th>Monto</th>
-													<th>% Avance</th>
-													<th>% Acumulado</th>
-													<th>Nota</th>
-													<th>Acción</th>
+													<th width="5%" rowspan="2">Val</th>
+													<th colspan="2">Periodo</th>
+													<th width="7%" rowspan="2">Monto</th>
+													<th width="5%" rowspan="2">% Avance</th>
+													<th width="5%" rowspan="2">% Acum</th>
+													<th rowspan="2">Nota</th>
+													<th rowspan="2"><img src="{{ asset('/img/fileattach_24.png') }}"></th>
+													<th colspan="3">Estado de Obra</th>
+													<th rowspan="2"></th>
+												</tr>
+												<tr>
+													<th>Inicial</th>
+													<th>Final</th>
+													<th>Valoriz</th>
+													<th>Ejecución</th>
+													<th>Pago</th>
 												</tr>
 											</thead>
 											<tbody id="cuerpo">
 												<?php $total = 0; ?>
 												@foreach($cronograma as $i => $item)
-													<tr id="{{ 'val-'.$item->prgNumberVal }}">
+													<tr id="{{ 'val-'.$item->prgNumberVal }}" data-key="{{ $item->prgId }}">
 														<td>
 															<input type="hidden" name="hnvalId[]" value="{{ $item->prgId }}">
 															<input type="number" name="nvalNumber[]" readonly class="form-control-plaintext" value="{{ $item->prgNumberVal }}">
 														</td>
 														<td>
-															<input type="date" name="nvalPeriod[]" readonly class="form-control-plaintext cronoedit" value="{{ $item->prgPeriodo }}" >
+															<input type="date" name="nvalPeriodi[]" readonly class="form-control-plaintext {{ $item->prgClosed ? '' : 'cronoedit' }}" value="{{ $item->prgStartPeriod }}" >
 														</td>
 														<td>
-															<input type="text" name="nvalMount[]" readonly class="form-control-plaintext valMount cronoedit" value="{{ number_format($item->prgMount,2,'.',',') }}">
+															<input type="date" name="nvalPeriodf[]" readonly class="form-control-plaintext {{ $item->prgClosed ? '' : 'cronoedit' }}" value="{{ $item->prgEndPeriod }}" >
 														</td>
 														<td>
-															<input type="text" name="nvalPrcnt[]" readonly class="form-control-plaintext valPrcnt cronoedit" value="{{ ($item->prgPercent * 100) . '%' }}">
+															<input type="text" name="nvalMount[]" readonly class="form-control-plaintext valMount {{ $item->prgClosed ? '' : 'cronoedit' }}" value="{{ number_format($item->prgMount,2,'.',',') }}">
 														</td>
 														<td>
-															<input type="text" name="nvalAggrt[]" readonly class="form-control-plaintext valAggrt cronoedit" value="{{ ($item->prgAggregate * 100) . '%' }}">
+															<input type="text" name="nvalPrcnt[]" readonly class="form-control-plaintext valPrcnt {{ $item->prgClosed ? '' : 'cronoedit' }}" value="{{ number_format($item->prgPercent * 100,2,'.','') . '%' }}">
 														</td>
 														<td>
-															<textarea name="nvalNote[]" readonly="readonly" class="textarea-cell cronoedit" rows="1" cols="10">{{ $item->prgEditNote }}</textarea>
+															<input type="text" name="nvalAggrt[]" readonly class="form-control-plaintext valAggrt {{ $item->prgClosed ? '' : 'cronoedit' }}" value="{{ number_format($item->prgAggregate * 100,2,'.','') . '%' }}">
 														</td>
+														<td>
+															<textarea name="nvalNote[]" readonly="readonly" class="textarea-cell {{ $item->prgClosed ? '' : 'cronoedit' }}" rows="1" cols="10">{{ $item->prgEditNote }}</textarea>
+														</td>
+														<td>
+															@if(\Storage::disk('public')->exists($item->prgPathFile))
+															<a href="{{ url('/storage/' . $item->prgPathFile) }}" target="_blank" title="Ver archivo">
+																<img src="{{ asset('/img/pdf-file_16.png') }}">
+															</a>
+															<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Cambiar archivo">
+																<img src="{{ asset('/img/refresh_16.png') }}">
+															</a>
+															@else
+															<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Adjuntar archivo">
+																<img src="{{ asset('/img/upload_file_20.png') }}">
+															</a>
+															@endif
+														</td>
+														<td>
+															@if($item->prgClose)
+															Terminado
+															@else
+															Pendiente
+															@endif
+														</td>
+														<td>
+															<select name="nvalStatus[]" class="form-control form-control-sm">
+																<option value="NA" {{ $item->prgStatus==null?'selected':'' }}>-- Elegir --</option>
+																<option value="Normal" {{ $item->prgStatus=='Normal'?'selected':'' }}>Normal</option>
+																<option value="Suspendido" {{ $item->prgStatus=='Suspendido'?'selected':'' }}>Suspendido</option>
+																<option value="Adelantado" {{ $item->prgStatus=='Adelantado'?'selected':'' }}>Adelantado</option>
+																<option value="Atrasado" {{ $item->prgStatus=='Atrasado'?'selected':'' }}>Atrazado</option>
+															</select>
+														</td>
+														<td></td>
 														<td></td>
 													</tr>
 													<?php $total = $total + $item->prgMount; ?>
@@ -133,7 +188,7 @@
 													<td>
 														<input type="text" class="form-control-plaintext" name="nvalTotal" id="valTotal" value="{{ number_format($total,2,'.',',') }}">
 													</td>
-													<td colspan="4"></td>
+													<td colspan="8"></td>
 												<tr>
 											</tfoot>
 										</table>
@@ -147,21 +202,61 @@
 		</div>
 	</div>
 </div>
-<div class="col-md-2 pl-1">
-	<div class="card border-success">
-		<div class="card-header py-1"><b>Operaciones</b></div>
-		<div class="card-body px-2">
-			@if(Auth::user()->hasPermission(11))
-			<button type="button" id="btnActionEdit" class="btn btn-sm btn-info btn-block" onclick="editar_cronograma($(this),$('#frmUpdateSchedule'))" value="editar">Editar Cronograma</button>
-			@endif
-			@if(Auth::user()->hasPermission(12))
-			<button type="button" id="btnActionDelete" class="btn btn-sm btn-danger btn-block">Eliminar</button>
-			@endif
+<div class="modal fade" id="mdlAttachFile" tabindex="-1" role="dialog" aria-labelledby="attachModal" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				ADJUNTAR DOCUMENTO SUSTENTATORIO
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form id="frmAttachFile" enctype="multipart/form-data">
+					{{ csrf_field() }}
+					<input type="hidden" name="hnatchAction" id="hatchAction">
+					<div class="form-group">
+						<label>Proyecto: </label>
+						<textarea class="form-control-plaintext form-control-sm" id="atchPry" name="natchPry" readonly></textarea>
+						<input type="hidden" id="hatchPry" name="hnatchPry">
+					</div>
+					<div class="form-group">
+						<label>Periodo: </label>
+						<input type="text" readonly class="form-control form-control-sm" id="atchPrg" name="natchPrg">
+						<input type="hidden" id="hatchPrg" name="hnatchPrg">
+					</div>
+					<div class="form-group">
+						<label>Seleccionar Archivo</label>
+						<input type="file" class="form-control-file" id="atchFile" name="natchFile">
+						<progress class="form-control" value="0"></progress>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="adjuntar_archivo_prg($('#frmAttachFile')[0])">Subir documento</button>
+        		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+			</div>
 		</div>
 	</div>
 </div>
 
 <script type="text/javascript">
+
+	$('#mdlAttachFile').on('show.bs.modal', function(event) {
+		var button = $(event.relatedTarget);
+		var action = button.data('action');
+		var prId = button.closest('tr').attr('data-key');
+		var prNro = button.closest('tr').attr('id');
+		var dataSelect = $('#pyName').select2('data');
+		var pryText = dataSelect[0].text;
+		var pryId = dataSelect[0].id;
+		var modal = $(this);
+
+		modal.find('.modal-body #atchPry').val(pryText);
+		modal.find('.modal-body #hatchPry').val(pryId);
+		modal.find('.modal-body #atchPrg').val('Número - ' + prNro.split('-')[1]);
+		modal.find('.modal-body #hatchPrg').val(prId);
+	});
 
 	$('#tblSchedule').on('focusin', '.valMount', function() {
 		
@@ -241,7 +336,6 @@
 				$(nextrow).find('input.valMount').trigger('change');
 			}
 		}
-
 	});
 
 	$('#pyResumenPto').change(function(evt) {

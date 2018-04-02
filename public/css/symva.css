@@ -305,13 +305,68 @@ input.editor-checkbox {
 }
 
 .basecolbudget{
-  background-color: rgba(255, 243, 205, 1); !important;
+  background-color: rgba(255, 243, 205, 0.5); !important;
 }
 
-.gridRowLvlOne{
+.gridRowLvl-1{
   color: red;
+  font-weight: bold;
+  background-color: rgba(140, 200, 250, 0.8);
+}
+
+.gridRowLvl-2{
+  color: #0000FF;
+  font-weight: bold;
+  background-color: rgba(185, 250, 100, 0.8);
+}
+
+.gridRowLvl-3{
+  color: #003200;
+  font-weight: bold;
+  background-color: rgba(220, 250, 200, 0.8);
+}
+
+.gridRowLvl-4{
+  color: purple;
+  font-weight: bold;
+  background-color: rgba(220, 240, 255, 0.8);
+}
+
+.gridRowLvl-5{
+  color: orange;
+  font-weight: bold;
+  background-color: rgba(255, 255, 210, 0.8);
+}
+
+.gridRowLvl-6{
+  color: #0064FA;
+  font-weight: bold;
+  background-color: rgba(220, 220, 220, 0.8);
+}
+
+.gridRowLvl-7{
+  color: brown;
+  font-weight: bold;
+  background-color: rgba();
+}
+
+.gridRowLvl-8{
+  color: yellow;
+  background-color: rgba();
+}
+
+.gridRowLvl-9{
+  background-color: rgba();
+}
+
+.gridRowLvl-10{
+  background-color: rgba();
 }
 
 .percentage, .amount{
   text-align: right;
+}
+
+.caption-label{
+  font-weight: bold;
 }

@@ -46,7 +46,7 @@ function check_persona(element, event)
 {
 	if(event.which == 13)
 	{
-		$.get('check/person', {dni:element.value}, function(data) {
+		$.get('../check/person', {dni:element.value}, function(data) {
 			alert(data.msg);
 			if(data.msgId == 1){
 				$('#prsNames').val(data.persona.perNames);
@@ -76,25 +76,14 @@ function append_profesional(form)
 	var url = form.prop('action');
 
 	$.post(url, data, function(response) {
+		alert(response.msg);
 		if(response.msgId == '200'){
-			var newRow = $('<tr>');
-			var cols = '';
-
-			cols += '<td width="10%"><input name="nteamId[]" type="hidden" value="' + response.persona.perId +'"><input type="text" class="form-control form-control-sm" value="' + response.persona.perDni +'" readonly></td>';
-			cols += '<td width="20%"><select name="nteamJob[]" class="form-control form-control-sm"><option value="NA">-- Cargo --</option><option value="RESIDENTE"> Residente </option><option value="SUPERVISOR"> Supervisor </option><option value="INSPECTOR"> Inspector </option><option value="ASISTENTE ADMINISTRATIVO"> Asistente Administrativo </option><option value="ASISTENTE TECNICO"> Asistente Técnico </option><option value="OTRO"> Otro </option></select></td>';
-			cols += '<td width="60%"><input type="text" readonly class="form-control-plaintext" value="' + response.persona.perFullName + '"></td>';
-			cols += '<td width="10%"><button type="button" class="ibtnDel btn btn-sm btn-danger">Quitar</button></td>';
-
-			newRow.append(cols);
-			$('table#tblProfessionalTeam').append(newRow);
-		}
-		else{
-			alert(response.msg);
+			window.location = response.url;
 		}
 	});
 }
 
-function registrar_proyecto(form, event)
+/*function registrar_proyecto(form, event, campo)
 {
 	event.preventDefault();
 	var data = form.serialize();
@@ -106,9 +95,131 @@ function registrar_proyecto(form, event)
 			window.location = response.url;
 		}
 	});
+}*/
+
+function registrar_proyecto(form, event, campo)
+{
+	event.preventDefault();
+
+	if(campo == 'dtaPrc'){
+
+		var frmData = new FormData(form);
+		$.ajax({
+			type: 'post',
+			url: 'nuevo/prc',
+			data: frmData,
+			cache: false,
+			contentType: false,
+			processData: false,
+			success: function(response){
+				alert(response.msg);
+				if(response.msgId == 200){
+					console.log(response);
+					$('#epyId').val(response.proyecto.pryId);
+					$('#epyNameStored').val(response.proyecto.pryDenomination);
+
+					var slcPostores = document.createElement('select');
+					slcPostores.className = "form-control form-control-sm";
+					slcPostores.name = "nejePostor";
+					$.each(response.postores, function(i, value){
+						slcOpcion = document.createElement('option');
+						slcOpcion.value = value.pstId;
+						slcOpcion.text = value.individual_data.prjBusiName;
+						slcPostores.add(slcOpcion);
+					});
+
+					document.getElementById('divContratista').appendChild(slcPostores);
+
+					$('#ed-tab').tab('show');
+				}
+			},
+			xhr: function(){
+				var myXhr = $.ajaxSettings.xhr();
+				if(myXhr.upload){
+					myXhr.upload.addEventListener('progress', function(ev){
+						if(ev.lengthComputable){
+							$('progress').attr({
+								value: ev.loaded,
+								max: ev.total,
+							});
+						}
+					}, false);
+				}
+				return myXhr;
+			},
+		});
+	}
+	else{
+		var url = form.prop('action');
+		var data = form.serialize();
+
+		$.post(url, data, function(response){
+			alert(response.msg);
+			if(response.msgId == '200'){
+				if(campo == 'dtaPrj'){
+					$('#pyId').val(response.proyecto.pryId);
+					$('#pyNameStored').val(response.proyecto.pryDenomination);
+					$('#ps-tab').tab('show');
+				}
+				else if(campo == 'dtaExe'){
+					window.location = response.url;
+				}
+			}
+		});
+	}
 }
 
-function actualizar_proyecto(form, event)
+function actualizar_proyecto(form, event, campo)
+{
+	event.preventDefault();
+
+	if(campo == 'dtaPrc'){
+
+		var frmData = new FormData(form);
+		console.log(frmData);
+		$.ajax({
+			type: 'post',
+			url: 'editar/prc',
+			data: frmData,
+			cache: false,
+			contentType: false,
+			processData: false,
+			success: function(response){
+				alert(response.msg);
+				if(response.msgId == 200){
+					editar_proyecto(response.pyId);
+				}
+			},
+			xhr: function(){
+				var myXhr = $.ajaxSettings.xhr();
+				if(myXhr.upload){
+					myXhr.upload.addEventListener('progress', function(ev){
+						if(ev.lengthComputable){
+							$('progress').attr({
+								value: ev.loaded,
+								max: ev.total,
+							});
+						}
+					}, false);
+				}
+				return myXhr;
+			},
+		});
+	}
+	else{
+		var data = form.serialize();
+		var url = form.prop('action');
+
+		$.post(url, data, function(response){
+			alert(response.msg);
+			if(response.msgId == '200'){
+				editar_proyecto(response.pyId);
+			}
+		});
+	}
+}
+
+/* function actualizar_proyecto(form, event)
 {
 	event.preventDefault();
 	var data = form.serialize();
@@ -120,7 +231,7 @@ function actualizar_proyecto(form, event)
 			editar_proyecto(response.pyId);
 		}
 	});
-}
+} */
 
 function registrar_presupuesto(form)
 {
@@ -170,7 +281,7 @@ function editar_presupuesto(btn, form)
 	}
 }
 
-function actualizar_presupuesto(form) // descartado por el metodo de guardado de presupuesto por presupuesto row by row
+function actualizar_presupuesto1(form) // descartado por el metodo de guardado de presupuesto por presupuesto row by row
 {
 	var url = form.prop('action');
 	var data = form.serialize();
@@ -200,8 +311,9 @@ function actualizar_presupuesto(element)
 	var url = $(form).prop('action');
 	var data = $(form).serialize();
 
+	console.log(data);
+
 	$.post(url, data, function(response) {
-		console.log(response);
 		alert(response.msg)
 		if(response.msgId == '200')
 			mostrar_presupuesto(response.pyId, response.url);
@@ -230,6 +342,76 @@ function cargar_presupuesto1(id)
 	});
 
 	return partidas;
+}
+
+function adjuntar_archivo_prg(form)
+{
+	var frmData = new FormData(form);
+
+	$.ajax({
+        type: 'post',
+        url: '../documento/programacion',
+        data: frmData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response){
+            alert(response.msg);
+            $('#mdlAttachFile').modal('hide');
+            if(response.msgId == 200){
+				mostrar_cronograma(response.pyId, response.ptId, response.url);
+            }
+        },
+        xhr: function(){
+            var myXhr = $.ajaxSettings.xhr();
+            if(myXhr.upload){
+                myXhr.upload.addEventListener('progress', function(ev){
+                    if(ev.lengthComputable){
+                        $('progress').attr({
+                            value: ev.loaded,
+                            max: ev.total,
+                        });
+                    }
+                }, false);
+            }
+            return myXhr;
+        },
+    });
+}
+
+function adjuntar_archivo(form)
+{
+	var frmData = new FormData(form);
+
+	$.ajax({
+        type: 'post',
+        url: 'documento/prestacion',
+        data: frmData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response){
+            alert(response.msg);
+            $('#mdlAttachFile').modal('hide');
+            if(response.msgId == 200){
+				mostrar_presupuesto(response.pyId, response.url);
+            }
+        },
+        xhr: function(){
+            var myXhr = $.ajaxSettings.xhr();
+            if(myXhr.upload){
+                myXhr.upload.addEventListener('progress', function(ev){
+                    if(ev.lengthComputable){
+                        $('progress').attr({
+                            value: ev.loaded,
+                            max: ev.total,
+                        });
+                    }
+                }, false);
+            }
+            return myXhr;
+        },
+    });
 }
 
 function importar_partidas(form)
@@ -281,6 +463,25 @@ function habilitar_edicion(btn, grid)
 		btn[0].value = 'enable';
 		btn.text('Cancelar');
 		btn.attr('class', 'btn btn-sm btn-warning btn-block');
+	}
+}
+
+function habilitar_edicion_avance(btn, grid)
+{
+	console.log(btn.data('value'));
+	if(btn.data('value') === 'enable'){
+		grid.setOptions({editable: false});
+		//btn.attr('data-value', 'disable');
+		btn.data('value','disable');
+		btn.find('img#imgCancel').hide();
+		btn.find('img#imgEdit').show();
+	}
+	else if(btn.data('value') === 'disable'){
+		grid.setOptions({editable: true});
+		//btn.attr('data-value', 'enable');
+		btn.data('value','enable');
+		btn.find('img#imgCancel').show();
+		btn.find('img#imgEdit').hide();
 	}
 }
 
@@ -350,7 +551,7 @@ function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource
 	while(i--){
 		total += (parseFloat(dataSource[i][columnId]) || 0);
 	}
-	console.log(dataTarget);
+	
 	for(var i=0; i<dataTarget.length; i++){
 
 		var itemCode = dataTarget[i].avrCodeItem;
@@ -383,6 +584,9 @@ function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource
 				//dataTarget[i]['avrMountCv'] = Math.round((parseFloat(dataTarget[rowDc + 3]['avrMountCv']) + parseFloat(dataTarget[rowDc + 4]['avrMountCv'])) * 100 ) / 100;
 				dataTarget[i]['avrMountCv'] = Math.round((st + igv) * 100 ) / 100;
 				break;
+			case 'STFR':
+				dataTarget[i]['avrMountCv'] = st = Math.round(( st  * parseFloat(dataTarget[i]['iprItemGeneralPrcnt'])) * 100) / 100;
+				break;
 		}
 
 		dataTarget[i]['avrPercentCv'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) / parseFloat(dataTarget[i]['iprItemGeneralMount'])) * 10000) / 100;
@@ -414,7 +618,7 @@ function guardar_avance(gridDetail, gridResume, form, close)
 	$.post(url, data, function(response) {
 		alert(response.msg);
 		if(response.msgId == '200')
-			window.location = response.url;
+			mostrar_avance(response.pyId, response.apId, response.url); //window.location = response.url;
 	});
 }
 
@@ -478,7 +682,7 @@ function editar_cronograma(btn, form)
 		$('#btnAddPeriod').show();
 	}
 	else if(action == 'cancelar'){
-		mostrar_cronograma(form.find('#pyId').val(),'../ver/programacion/0');
+		mostrar_cronograma(form.find('#pyId').val(),form.find('#ptId').val(),'../ver/programacion/0');
 		/*$('.cronoedit').prop('readonly', true);
 		btn[0].value = 'editar';
 		btn.text('Editar Cronograma');
@@ -496,18 +700,20 @@ function agregar_periodo(table)
 
 	var rowHtml = '<tr id="val-' + newNumber + '">';
 	rowHtml += '<td><input type="hidden" name="hnvalId[]" value="0"><input type="number" name="nvalNumber[]" class="form-control-plaintext" readonly value="' + newNumber + '"></td>';
-	rowHtml += '<td><input type="date" name="nvalPeriod[]" class="form-control-plaintext cronoedit"></td>';
+	rowHtml += '<td><input type="date" name="nvalPeriodi[]" class="form-control-plaintext cronoedit"></td>';
+	rowHtml += '<td><input type="date" name="nvalPeriodf[]" class="form-control-plaintext cronoedit"></td>';
 	rowHtml += '<td><input type="text" name="nvalMount[]" class="form-control-plaintext valMount cronoedit"></td>';
 	rowHtml += '<td><input type="text" name="nvalPrcnt[]" class="form-control-plaintext valPrcnt cronoedit"></td>';
 	rowHtml += '<td><input type="text" name="nvalAggrt[]" class="form-control-plaintext valAggrt cronoedit"></td>';
 	rowHtml += '<td><textarea class="textarea-cell" name="nvalNote[]" rows="1" cols="10"></textarea></td>';
+	rowHtml += '<td></td>'
 	rowHtml += '<td><a href="javascript:void(0)" onclick="eliminar_fila(this)" class="text-danger">(-) Quitar</a></td>';
 	rowHtml += '</tr>';
 
 	table.find('tbody tr:last').after(rowHtml);
 }
 
-function agregar_itempres(table)
+function agregar_fila(table)
 {
 	var firstRow = table.find('tbody tr:first');
 	var newRow = firstRow.clone(true,true);

@@ -13,6 +13,7 @@ use App\Models\Partida;
 use App\Models\Progfisica;
 use App\Models\Resumenavc;
 use App\Models\Vpiepresupuesto;
+use App\Models\Postor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -56,13 +57,15 @@ class AvanceController extends Controller
     public function create(Request $request)
     {
         $pry = Proyecto::find($request->pyId);
+        $eje = Uejecutora::where('ejeProject',$request->pyId)->get();
         $ptId = $request->ptId;
 
-        if(!is_null($pry->pryExeUnit)){
-            $exe = Uejecutora::find($pry->pryExeUnit);
+        if(!$eje->isEmpty()){
+            $exe = $eje[0];
             $prf = Equiprof::with('individualData')->where('prfUejecutora',$exe->ejeId)->get();
             $crn = Progfisica::where('prgProject',$pry->pryId)->where('prgBudget',$ptId)->where('prgClosed',false)->get();
             $pto = Presupuesto::find($ptId);
+            $pst = Postor::with('individualData')->find($exe->ejePostor);
         }
         else{
             $exe = collect(['sin ejecutor']);
@@ -71,7 +74,7 @@ class AvanceController extends Controller
             $pto = collect(['sin presupuesto']);
         }
 
-        $view = view('formularios.nuevo_avance',compact('pry','exe','prf','crn','pto'));
+        $view = view('formularios.nuevo_avance',compact('pry','exe','prf','crn','pto','pst'));
         return $view;
     }
 
@@ -89,15 +92,16 @@ class AvanceController extends Controller
 
                 $valId = $request->navNumber; // navnumber contiene el id de la programacion
                 $pyId = $request->hnpyId;
+                $ptId = $request->hnavPto;
 
                 $val = Progfisica::find($valId);
                 $valNumber = $val->prgNumberVal;
 
-                $prevVal = Progfisica::where('prgProject',$pyId)->where('prgNumberVal',$valNumber - 1)->get();
+                $prevVal = Progfisica::where('prgProject',$pyId)->where('prgBudget',$ptId)->where('prgNumberVal',$valNumber - 1)->get();
                 $prevAvance = 0;
 
                 if(!is_null($val->prgBudgetProgress))
-                    throw new Exception("EL número de valorización elegido ya presenta avance de metrados registrado \nPara registrar el avance de metrados para una nueva valorización primero debe finalizar el registro de la valorización número: {$valNumber}");
+                    throw new Exception("El número de valorización elegido ya presenta avance de metrados registrado \nPara registrar el avance de metrados para una nueva valorización primero debe finalizar el registro de la valorización número: {$valNumber}");
 
                 if(!$prevVal->isEmpty())
                     if($prevVal[0]->prgClosed == false)
@@ -114,9 +118,7 @@ class AvanceController extends Controller
                 $avance->aprProject = $request->hnpyId;
                 $avance->aprBudget = $request->hnavPto;
                 $avance->aprProgFisica = $request->navNumber;
-                $avance->aprPeriod = $request->navPeriod;
-                $avance->aprStartDate = $request->navStartDate;
-                $avance->aprEndDate = $request->navEndDate;
+                $avance->aprBefprog = $prevAvance;
                 $avance->aprRegisterAt = Carbon::now();
                 $avance->aprRegisterBy = Auth::user()->tusId . ' - ' . Auth::user()->tusDni;
                 $avance->save();
@@ -210,15 +212,9 @@ class AvanceController extends Controller
                             $avpart->avcPercentBv = null;
                         }
                         else{
-                            $avpart->avcMeteredBa = $part->avcMeteredCa;
+                            /* $avpart->avcMeteredBa = $part->avcMeteredCa;
                             $avpart->avcMountBa = $part->avcMountCa;
-                            $avpart->avcPercentBa = $part->avcPercentCa;
-                            /*$avpart->avcMeteredCv = null;
-                            $avpart->avcMountCv = null;
-                            $avpart->avcPercentCv = null;
-                            $avpart->avcMeteredCa = null;
-                            $avpart->avcMountCa = null;
-                            $avpart->avcPercentCa = null;*/
+                            $avpart->avcPercentBa = $part->avcPercentCa; no necesario almacenar con la nueva consulta */
                             $avpart->avcMeteredBv = $part->avcMeteredBv;
                             $avpart->avcMountBv = $part->avcMountBv;
                             $avpart->avcPercentBv = $part->avcPercentBv;
@@ -235,8 +231,8 @@ class AvanceController extends Controller
                         $resumen = new Resumenavc();
                         $resumen->avrBudgetProgress = $avance->aprId;
                         $resumen->avrCodeItem = $item->avrCodeItem;
-                        $resumen->avrMountBa = $item->avrMountCa;
-                        $resumen->avrPercentBa = $item->avrPercentCa;
+                        /* $resumen->avrMountBa = $item->avrMountCa;
+                        $resumen->avrPercentBa = $item->avrPercentCa; no necesario almacenar con la nueva consulta */
                         $resumen->avrMountBv = $item->avrMountBv;
                         $resumen->avrPercentBv = $item->avrPercentBv;
                         $resumen->save();
@@ -271,17 +267,52 @@ class AvanceController extends Controller
     public function show(Request $request)
     {
         $pyId = $request->pyId;
-        $avId = $request->avId;
+        $avId = $request->avId; // current progress selected
 
         $pry = Proyecto::find($pyId);
-        //$apr = Avance::find($avId);
+        $apr = Avance::find($avId);
 
-        $avd = Avdetail::select('*')
+        if($apr->aprBefprog == 0){
+            $avd = Avdetail::select('*')
                 ->join('gcopartidas','parId','=','avcPartidaId')
                 ->where('avcBudgetProgress',$avId)
                 ->get();
+            $rsmn = Vpiepresupuesto::where('aprId',$avId)->get();
+        }
+        else{
+            $avd = Avdetail::select('*')
+            ->join(
+                DB::raw('(select avcId as pavcId, avcPartidaId as pavcPartidaId, avcMeteredCa as pavcMeteredCa, avcMountCa as pavcMountCa, avcPercentCa as pavcPercentCa from gcoavancedet 
+                where avcBudgetProgress = ' . $apr->aprBefprog . ') as b'),
+                function($join){
+                    $join->on('gcoavancedet.avcPartidaId','=','b.pavcPartidaId');
+                }
+            )
+            ->join('gcopartidas','parId','=','avcPartidaId')
+            ->where('gcoavancedet.avcBudgetProgress', $apr->aprId)
+            ->get();
+
+            $rsmn = Resumenavc::select('*')
+            ->join(
+                DB::raw('(select avrId as pavrId, avrBudgetProgress as pavrBudgetProgress, avrCodeItem as pavrCodeItem, avrMountCa as pavrMountCa, avrPercentCa as pavrPercentCa from gcoavanceresumen 
+                WHERE avrBudgetProgress = ' . $apr->aprBefprog . ') as z '),
+                function($join){
+                    $join->on('gcoavanceresumen.avrCodeItem','=','z.pavrCodeItem');
+                }
+            )
+            ->join('gcoavancepres','gcoavanceresumen.avrBudgetProgress','=','gcoavancepres.aprId')
+            ->join('gcoitempresupuesto', function($join){
+                $join->on('gcoavancepres.aprBudget','=','gcoitempresupuesto.iprBudget')
+                        ->on('gcoavanceresumen.avrCodeItem','=','gcoitempresupuesto.iprCodeItem');
+                }
+            )
+            ->where('gcoavanceresumen.avrBudgetProgress', $apr->aprId)
+            ->get();
+        }
+
         //$pto = Presupuesto::where('preProject',$pyId)->get();
-        $rsmn = Vpiepresupuesto::where('aprId',$avId)->get();
+        
+
         $valorizacion = Progfisica::where('prgProject',$pyId)->where('prgBudgetProgress',$avId)->first();
 
         //$view = view('formularios.editar_avance',compact('pry','apr','avd','pto','rsmn'));
@@ -312,6 +343,9 @@ class AvanceController extends Controller
     {
         try{
 
+            $pyId = $request->npyId;
+            $apId = $request->nbpId;
+
             $exception = DB::transaction(function() use($request, $close){
 
                 $pyId = $request->npyId;
@@ -323,10 +357,10 @@ class AvanceController extends Controller
 
                 foreach ($gridPartidas as $part) {
                     $partida = Avdetail::find($part->avcId);
-                    $partida->avcMeteredBa = $part->avcMeteredBa;
+                    /*$partida->avcMeteredBa = $part->avcMeteredBa;
                     $partida->avcMountBa = $part->avcMountBa;
-                    $partida->avcPercentBa = $part->avcPercentBa;
-                    $partida->avcMeteredCv = $part->avcMeteredCv;
+                    $partida->avcPercentBa = $part->avcPercentBa; no necesario almacenar con la nueva consulta */
+                    $partida->avcMeteredCv = $part->avcMeteredCv == '' ? null : $part->avcMeteredCv;
                     $partida->avcMountCv = $part->avcMountCv;
                     $partida->avcPercentCv = $part->avcPercentCv;
                     $partida->avcMeteredCa = $part->avcMeteredCa;
@@ -338,15 +372,15 @@ class AvanceController extends Controller
                     $partida->save();
                 }
 
-                //$proyecto = Proyecto::find($pyId);
-                $presupuesto = Itempresupuesto::find($ptId);
+                $proyecto = Proyecto::find($pyId);
+                $presupuesto = Itempresupuesto::find($proyecto->pryBaseBudget);
                 $presupuestoCode = $presupuesto->iprCodeItem;
 
 
                 foreach ($gridResumen as $item) {
                     $resumen = Resumenavc::find($item->avrId);
-                    $resumen->avrMountBa = $item->avrMountBa;
-                    $resumen->avrPercentBa = $item->avrPercentBa;
+                    /* $resumen->avrMountBa = $item->avrMountBa;
+                    $resumen->avrPercentBa = $item->avrPercentBa; no necesario almacenar con la nueva consulta */
                     $resumen->avrMountCv = $item->avrMountCv;
                     $resumen->avrPercentCv = $item->avrPercentCv;
                     $resumen->avrMountCa = $item->avrMountCa;
@@ -378,7 +412,7 @@ class AvanceController extends Controller
             if(is_null($exception)){
                 $msgId = 200;
                 $msg = 'Las modificaciones realizadas han sido almacenadas con éxito';
-                $url = url('presupuesto/avance');
+                $url = url('ver/avance');
             }
             else{
                 throw new Exception($exception);
@@ -390,7 +424,7 @@ class AvanceController extends Controller
             $url = '';
         }
         
-        return response()->json(compact('msg','msgId','url'));
+        return response()->json(compact('msg','msgId','url','pyId','apId'));
     }
 
     /**
@@ -410,14 +444,15 @@ class AvanceController extends Controller
 
         $avancesPy = Avance::where('aprBudget',$ptId)->get();
 
-        $optionHtml = '<optgroup label="Opciones"><option value="NA"> Elija o agregue un avance </option>';
+        $optionHtml = '<optgroup label="Opciones"><option value="NA"> Elija o registre una valorización </option>';
         if(Auth::user()->hasPermission(14)){
-            $optionHtml .= '<option value="CP"> Registrar Nuevo Avance </option></optgroup>';
+            $optionHtml .= '<option value="CP"> Registrar Nueva Valorización </option></optgroup>';
         }
-        $optionHtml .= '<optgroup label="Avances registrados">';
+        $optionHtml .= '<optgroup label="Valorizaciones registradas">';
 
         foreach($avancesPy as $av){
-            $optionHtml .= '<option value="' . $av->aprId . '">' . $av->aprPeriod . ' -> ' . $av->aprStartDate . ' a ' . $av->aprEndDate .'</option>';
+            $programacion = Progfisica::find($av->aprProgFisica);
+            $optionHtml .= '<option value="' . $av->aprId . '">' . $programacion->prgNumberVal . ': ' . $programacion->prgStartPeriod . ' a ' . $programacion->prgEndPeriod . '</option>';
         }
 
         $optionHtml .= '</optgroup>';

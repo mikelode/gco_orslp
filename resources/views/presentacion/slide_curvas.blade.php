@@ -10,7 +10,7 @@
 				<div class="row">
 					<div class="col-md-12">
 						<!--<div id="curve-s" style="position: relative; height: 400px;"></div>-->
-						<canvas id="curve-s" width="400" height="200"></canvas>
+						<div id="curve-s" width="400" height="200"></div>
 					</div>
 				</div>
 			</div>
@@ -29,6 +29,7 @@
 							<th rowspan="2">Periodo</th>
 							<th colspan="3">Programado</th>
 							<th colspan="3">Ejecutado</th>
+							<th rowspan="2">% Val <br> Ejec/Prog</th>
 						</tr>
 						<tr>
 							<th>Monto S/</th>
@@ -50,6 +51,29 @@
 							<td class="amount">{{ number_format($crono->prgMountExec,2,'.',',') }}</td>
 							<td class="amount">{{ number_format($crono->prgPercentExec * 100,2,'.',',') }}</td>
 							<td class="amount">{{ number_format($crono->prgAggregateExec * 100,2,'.',',') }}</td>
+							<?php 
+								if($crono->prgAggregate == 0.0)
+									$performance = '0.0';
+								else
+									$performance = $crono->prgAggregateExec/$crono->prgAggregate; 
+							?>
+							@if($performance <= 0.8)
+							<td class="text-danger font-weight-bold">
+								<img src="{{ asset('/img/danger_16.png') }}">  {{ number_format(($performance) * 100,2,'.','') }}
+							</td>
+							@elseif($performance > 0.8 && $performance <= 0.9)
+							<td class="text-warning font-weight-bold">
+								<img src="{{ asset('/img/warning_16.png') }}"> {{ number_format(($performance) * 100,2,'.','') }} 
+							</td>
+							@elseif($performance > 0.9 && $performance <= 1)
+							<td class="text-info font-weight-bold">
+								<img src="{{ asset('/img/info_16.png') }}"> {{ number_format(($performance) * 100,2,'.','') }} 
+							</td>
+							@elseif($performance > 1)
+							<td class="text-success font-weight-bold">
+								<img src="{{ asset('/img/success_16.png') }}"> {{ number_format(($performance) * 100,2,'.','') }} 
+							</td>
+							@endif
 						</tr>
 						@endforeach
 					</tbody>
@@ -95,10 +119,41 @@
         ]
 	});
 
+	Highcharts.chart('curve-s',{
+		chart:{
+			type: 'line'
+		},
+		title:{
+			text: 'AVANCE PORCENTUAL ACUMULADO PROGRAMADO VS EJECUTADO'
+		},
+		subtitle:{
+			text: 'ORSyLP'
+		},
+		xAxis:{
+			categories: {!! $labels !!}
+		},
+		yAxis:{
+			title:{
+				text: 'Porcentaje de Ejecución'
+			}
+		},
+		plotOptions:{
+			line:{
+				dataLabels:{
+					enabled: true
+				},
+				enableMouseTracking: true
+			}
+		},
+		series: {!! $chartData !!}
+	});
+
+	/*
+
 	var ctx = $('#curve-s');
 	var myChart = new Chart(ctx, {
 	    type: 'line',
-	    data: {!! $chartData !!},
+	    data: {! $chartData !!},
 	    options: {
 	    	responsive: true,
 	    	title: {
@@ -139,19 +194,8 @@
 	});
 
 	Chart.defaults.line.spanGaps = true;
-	/*var line_chart = Morris.Line({
-		element: 'curve-s',
-		data: [<php echo $data ?>],
-		xkey: 'periodo',
-		xLabelAngle: 45,
-		ykeys: ['programado','ejecutado'],
-		postUnits: '%',
-		labels: ['Cantidad Programada','Cantidad Ejecutada'],
-		lineColors: ['#36A2EB','#FF6384'],
-		lineWidth: [1.5,1.5],
-		fillOpacity: 0.5,
-		hideHover: 'auto'
-	});*/
+
+	*/
 
 	$('#btnMake').click(function(evt) {
 		evt.preventDefault();

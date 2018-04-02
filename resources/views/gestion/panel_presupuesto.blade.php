@@ -7,7 +7,9 @@
 		<div class="col-md-12">
 			<div class="card border-info mb-2">
 				<div class="card-header">
-					<h5 class="float-left"><i class="icon-th-list mr-2"></i>Presupuesto por Partidas</h5>
+					<div class="card-title mb-0 font-weight-bold">
+						<i class="fas fa-list"></i> Módulo de Presupuesto de Obra
+					</div>
 				</div>
 				<div class="card-body">
 					<div class="row">

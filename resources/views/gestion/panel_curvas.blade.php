@@ -72,10 +72,3 @@ $(document).ready(function(){
 </script>
 
 @endsection
-
-@section('custom-scripts')
-<script>
-
-
-</script>
-@endsection

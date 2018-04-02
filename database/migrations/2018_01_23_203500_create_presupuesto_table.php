@@ -26,6 +26,7 @@ class CreatePresupuestoTable extends Migration
                     ->on('gcotpresupuesto');
             $table->string('preNote',1000)->nullable();
             $table->string('preName',100)->nullable();
+            $table->string('prePathFile',500)->nullable();
         });
     }
 

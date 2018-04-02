@@ -20,7 +20,11 @@ class PersonaController extends Controller
      */
     public function index()
     {
-        //
+        $personas = Persona::all();
+
+        $view = view('gestion.panel_personan', compact('personas'));
+        
+        return $view;
     }
 
     /**
@@ -43,7 +47,7 @@ class PersonaController extends Controller
     {
         try{
 
-            if($this->exist_persona($request->nprsDni)->getData()->msgId == 1){
+            if($this->exist_persona($request->nprsDni, 'natural')->getData()->msgId == 1){
                 $persona = Persona::where('perDni',$request->nprsDni)->first();
                 $msg = 'Persona registrada anteriormente';
                 $msgId = '200';
@@ -70,6 +74,7 @@ class PersonaController extends Controller
                 if(is_null($exception)){
                     $msg = 'Persona registrada correctamente';
                     $msgId = '200';
+                    $url = url('tablas/npersona');
                 }
                 else{
                     throw new Exception($exception);
@@ -79,9 +84,10 @@ class PersonaController extends Controller
         }catch(Exception $e){
             $msg = 'Error: ' . $e->getMessage() . ' -- ' . $e->getFile() . ' - ' . $e->getLine() . " \n";
             $msgId = 500;
+            $url = '';
         }
 
-        return response()->json(compact('msgId','msg','persona'));
+        return response()->json(compact('msgId','msg','persona','url'));
     }
 
     /**
@@ -92,7 +98,7 @@ class PersonaController extends Controller
      */
     public function show($id)
     {
-        //
+        return Persona::where('perDni',$id)->first();
     }
 
     /**
@@ -131,7 +137,7 @@ class PersonaController extends Controller
 
     public function exist(Request $request)
     {
-        return $this->exist_persona($request->dni);
+        return $this->exist_persona($request->dni, 'natural');
         /*$persona = Persona::where('perDni',$request->dni)->first();
 
         if($persona->count() == 0)

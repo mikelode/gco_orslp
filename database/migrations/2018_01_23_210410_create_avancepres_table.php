@@ -21,9 +21,7 @@ class CreateAvancepresTable extends Migration
             $table->integer('aprProject')->unsigned();
             $table->integer('aprBudget')->unsigned();
             $table->integer('aprProgFisica')->unsigned();
-            $table->string('aprPeriod',50);
-            $table->date('aprStartDate');
-            $table->date('aprEndDate');
+            $table->integer('aprBefprog')->unsigned();
             $table->string('aprWorkBook',300)->nullable();
             $table->boolean('aprInvalidate')->default(0);
             $table->string('aprInvalidateDetail',200)->nullable();

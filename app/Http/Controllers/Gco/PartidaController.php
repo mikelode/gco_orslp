@@ -286,7 +286,7 @@ class PartidaController extends Controller
         return response()->json(compact('msgId','msg','pyId','url'));
     }
 
-    public function importExcel(Request $request)
+    public function importExcel(Request $request) // CURRENT EXECUTED FUNCTION
     {
         try{
 
@@ -323,16 +323,18 @@ class PartidaController extends Controller
                             $div = explode('.', $value['A']);
                             $nivel = count($div);
 
+                            $und = trim($value['C']);
+
                             $insert[] = [
                                 'parProject' => $pyId,
                                 'parBudget' => $ptId,
                                 'parLevel' => $nivel,
                                 'parItem' => trim($value['A']),
                                 'parDescription' => $value['B'],
-                                'parUnit' => trim($value['C']),
-                                'parMetered' => floatval(str_replace(',', '', $value['D'])),
-                                'parPrice' => floatval(str_replace(',', '', $value['E'])),
-                                'parPartial' => floatval(str_replace(',', '', $value['F'])),
+                                'parUnit' => $und,
+                                'parMetered' => $und == '' ? null : floatval(str_replace(',', '', $value['D'])),
+                                'parPrice' => $und == '' ? null : floatval(str_replace(',', '', $value['E'])),
+                                'parPartial' => $und == '' ? null : floatval(str_replace(',', '', $value['F'])),
                             ];
                         }
 

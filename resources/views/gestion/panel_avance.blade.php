@@ -6,10 +6,12 @@
 	<div class="row">
 		<div class="col-md-12">
 			<div class="card border-info mb-2">
-				<div class="card-header">
-					<h5 class="float-left"><i class="icon-th-list mr-2"></i>Gestión de Avance de Metrados</h5>
+				<div class="card-header py-1">
+					<div class="card-title mb-0 font-weight-bold">
+						<i class="fas fa-list"></i> Módulo de Valorizaciónes de Obra:	
+					</div>
 				</div>
-				<div class="card-body">
+				<div class="card-body py-2">
 					<form action="{{ url('detallado/avance') }}" id="frmDetailProgress">
 						{{ csrf_field() }}
 						<div class="form-group row mb-0">
@@ -22,11 +24,11 @@
 									@endforeach
 								</select>
 							</div>
-							<label class="col-md-1">Presup: </label>
+							<label class="col-md-1">Presupuesto: </label>
 							<div class="col-md-2">
 								<select id="ptSelect" name="nptSelect" class="form-control form-control-sm"></select>
 							</div>
-							<label class="col-md-1">Avance: </label>
+							<label class="col-md-1">Valorización: </label>
 							<div class="col-md-2">
 								<select id="avSelect" name="navSelect" class="form-control form-control-sm">
 								</select>
@@ -56,18 +58,18 @@
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				Registrar datos generales del avance
+				Registro de Nueva Valorización
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<div class="modal-body" style="font-size: 10px">
+			<div class="modal-body">
 				<div id="content-frm">
 					
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" onclick="registrar_avance($('#frmCreateProgress'))">Crear Avance</button>
+				<button type="button" class="btn btn-primary" onclick="registrar_avance($('#frmCreateProgress'))">Registrar</button>
         		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
 			</div>
 		</div>

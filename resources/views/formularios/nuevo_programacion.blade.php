@@ -15,13 +15,13 @@
 											<div class="form-group row mb-0">
 												<label class="col-md-5 col-form-label">Meses</label>
 												<div class="col-md-7">
-													<input type="text" class="form-control-plaintext" id="pyMesesPlazo" name="npyMesesPlazo" value="{{ $pry->pryMonthTerm }} meses" readonly>
+													<input type="text" class="form-control-plaintext" id="pyMesesPlazo" name="npyMesesPlazo" value="{{ $eje[0]->ejeMonthTerm }} meses" readonly>
 												</div>
 											</div>
 											<div class="form-group row mb-0">
 												<label class="col-md-5 col-form-label">Días</label>
 												<div class="col-md-7">
-													<input type="text" class="form-control-plaintext" id="pyDiasPlazo" name="npyDiasPlazo" value="{{ $pry->pryDaysTerm }} días" readonly>
+													<input type="text" class="form-control-plaintext" id="pyDiasPlazo" name="npyDiasPlazo" value="{{ $eje[0]->ejeDaysTerm }} días" readonly>
 												</div>
 											</div>
 										</div>
@@ -29,13 +29,13 @@
 											<div class="form-group row mb-0">
 												<label class="col-md-5 col-form-label">Inicio de Obra</label>
 												<div class="col-md-7">
-													<input type="date" class="form-control-plaintext" id="pyFechaInicio" name="npyFechaInicio" value="{{ Carbon\Carbon::parse($pry->pryStartDateExe)->format('Y-m-d') }}" readonly>
+													<input type="date" class="form-control-plaintext" id="pyFechaInicio" name="npyFechaInicio" value="{{ is_null($eje[0]->ejeStartDate)?null:Carbon\Carbon::parse($eje[0]->ejeStartDate)->format('Y-m-d') }}" readonly>
 												</div>
 											</div>
 											<div class="form-group row mb-0">
 												<label class="col-md-5 col-form-label">Término de Obra</label>
 												<div class="col-md-7">
-													<input type="date" class="form-control-plaintext" id="pyFechaFinal" name="npyFechaFinal" value="{{ Carbon\Carbon::parse($pry->pryEndDateExe)->format('Y-m-d') }}" readonly>
+													<input type="date" class="form-control-plaintext" id="pyFechaFinal" name="npyFechaFinal" value="{{ is_null($eje[0]->ejeEndDate)?null:Carbon\Carbon::parse($eje[0]->ejeEndDate)->format('Y-m-d') }}" readonly>
 												</div>
 											</div>
 										</div>
@@ -80,19 +80,24 @@
 										<table class="table table-bordered table-sm action-table">
 											<thead>
 												<tr>
-													<th width="20">Valorización</th>
-													<th>Periodo</th>
-													<th>Monto</th>
-													<th>% Avance</th>
-													<th>% Acumulado</th>
+													<th width="20" rowspan="2">Valorización</th>
+													<th colspan="2">Periodo</th>
+													<th rowspan="2">Monto</th>
+													<th rowspan="2">% Avance</th>
+													<th rowspan="2">% Acumulado</th>
+												</tr>
+												<tr>
+													<th>Inicial</th>
+													<th>Final</th>
 												</tr>
 											</thead>
 											<tbody>
 												@foreach($cronograma as $i => $item)
-													@if($item['fecha'] != null)
+													@if($item['fechai'] != null && $item['fechaf'] != null)
 													<tr id="{{ 'val'.($i+1) }}">
 														<td><input type="number" name="nvalNumber[]" readonly class="form-control-plaintext" value="{{ $item['val'] }}"></td>
-														<td><input type="date" name="nvalPeriod[]" class="form-control-plaintext" value="{{ $item['fecha']->format('Y-m-d') }}" ></td>
+														<td><input type="date" name="nvalPeriodi[]" class="form-control-plaintext" value="{{ $item['fechai']->format('Y-m-d') }}"></td>
+														<td><input type="date" name="nvalPeriodf[]" class="form-control-plaintext" value="{{ $item['fechaf']->format('Y-m-d') }}"></td>
 														<td><input type="text" name="nvalMount[]" class="form-control-plaintext valMount"></td>
 														<td><input type="text" name="nvalPrcnt[]" class="form-control-plaintext valPrcnt"></td>
 														<td><input type="text" name="nvalAggrt[]" class="form-control-plaintext valAggrt"></td>

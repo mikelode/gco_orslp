@@ -17,6 +17,7 @@ use App\Models\Progfisica;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Exception;
@@ -90,11 +91,12 @@ class ProgramaFisicoController extends Controller
         $cronograma = array();
 
         $pry = Proyecto::find($pyId);
-        $fecIni = Carbon::parse($pry->pryStartDateExe);
-        $fecFin = Carbon::parse($pry->pryEndDateExe);
-        $plazoMeses = $pry->pryMonthTerm;
-        $plazoDias = $pry->pryDaysTerm;
-        $fechaValorizacion = $fecIni;
+        $eje = Proyecto::find($pyId)->ejecutor()->get();
+        $fecIni = is_null($eje[0]->ejeStartDate) ? null : Carbon::parse($eje[0]->ejeStartDate);
+        $fecFin = is_null($eje[0]->ejeEndDate) ? null : Carbon::parse($eje[0]->ejeEndDate);
+        $plazoMeses = $eje[0]->ejeMonthTerm;
+        $plazoDias = $eje[0]->ejeDaysTerm;
+        $fechaValorizacion = $fecIni->copy();
         $i = 0;
 
         if($plazoMeses == null){
@@ -104,24 +106,35 @@ class ProgramaFisicoController extends Controller
         while($plazoMeses > 0){
 
             $i++;
-            $valorizacion = array('val' => $i, 'fecha' => $fechaValorizacion->endOfMonth());
-            array_push($cronograma,$valorizacion);
-
-            $fechaValorizacion = $fechaValorizacion->copy()->addDays(1);
 
             if($plazoMeses == 1){
-                if($fecFin->diffInDays($fechaValorizacion) < $fechaValorizacion->daysInMonth){
-                    $valorizacion = array('val' => $i+1, 'fecha' => $fecFin);
+                // 24/02/2018 - 01/02/2018
+                //echo $fechaValorizacion . ' / ';
+                //echo $fecFin->diffInDays($fechaValorizacion);
+                if($fecFin > $fechaValorizacion){
+                    if($fecFin->diffInDays($fechaValorizacion) < $fechaValorizacion->daysInMonth){
+                        $valorizacion = array('val' => $i, 'fechai'=>$fechaValorizacion->copy(),'fechaf' => $fecFin);
+                        array_push($cronograma, $valorizacion);
+                    }
+                }
+                else if(is_null($fecFin)){
+                    $valorizacion = array('val' => $i, 'fechai' => $fechaValorizacion->copy(), 'fechaf' => $fechaValorizacion->endOfMonth());
                     array_push($cronograma, $valorizacion);
                 }
             }
+            else{
+                $valorizacion = array('val' => $i, 'fechai' => $fechaValorizacion->copy(), 'fechaf' => $fechaValorizacion->endOfMonth());
+                array_push($cronograma,$valorizacion);
+            }
+
+            $fechaValorizacion = $fechaValorizacion->copy()->addDays(1);
 
             $plazoMeses--;
         }
 
-        array_push($cronograma, array('val' => 'TOTAL','fecha' => null));
-
-        $view = view('formularios.nuevo_programacion',compact('pry','cronograma','resumen'));
+        array_push($cronograma, array('val' => 'TOTAL','fechai' => null, 'fechaf' => null));
+        
+        $view = view('formularios.nuevo_programacion',compact('pry','cronograma','resumen','eje'));
 
         return $view;
     }
@@ -144,6 +157,7 @@ class ProgramaFisicoController extends Controller
                 $ptoId = $keyPto[0];
 
                 $pry = Proyecto::find($pyId);
+                $eje = Proyecto::find($pyId)->ejecutor()->get();
                 $pry->pryBaseBudget = $ptoId;
                 $pry->save();
 
@@ -152,8 +166,11 @@ class ProgramaFisicoController extends Controller
                     $cronograma = new Progfisica();
                     $cronograma->prgProject = $pyId;
                     $cronograma->prgBudget = $prId;
+                    $cronograma->prgExecutor = $eje[0]->ejeId;
                     $cronograma->prgNumberVal = $val;
-                    $cronograma->prgPeriodo = $request->nvalPeriod[$i];
+                    $cronograma->prgStartPeriod = $request->nvalPeriodi[$i];
+                    $cronograma->prgEndPeriod = $request->nvalPeriodf[$i];
+                    $cronograma->prgPeriodo = $request->nvalPeriodf[$i];
                     $cronograma->prgMount = floatval(str_replace(',', '', $request->nvalMount[$i]));
                     $cronograma->prgPercent = floatval($request->nvalPrcnt[$i]) / 100;
                     $cronograma->prgAggregate = floatval($request->nvalAggrt[$i]) / 100;
@@ -201,14 +218,14 @@ class ProgramaFisicoController extends Controller
             $labels = $cronograma->pluck('prgPeriodo');
 
             $programado = $cronograma->map(function($item,$key){
-                return $item->prgAggregate * 100;
+                return round($item->prgAggregate * 100,2);
             });
 
             $ejecutado = $cronograma->map(function($item,$key){
-                return $item->prgAggregateExec * 100;
+                return round($item->prgAggregateExec * 100,2);
             });
 
-            $chartData .= "{ 
+            /*$chartData .= "{ 
                 labels: $labels, 
                 datasets: [{
                     label: 'Cantidad Programada',
@@ -224,9 +241,17 @@ class ProgramaFisicoController extends Controller
                     spanGaps: true,
                     data:$ejecutado
                 }]
-            }";
+            }";*/
 
-            $view = view('presentacion.slide_curvas', compact('cronograma','chartData'));
+            $chartData .= "[{
+                    name: 'Cantidad Programada',
+                    data:$programado
+                },{
+                    name: 'Cantidad Ejecutada',
+                    data:$ejecutado
+                }]";
+
+            $view = view('presentacion.slide_curvas', compact('labels','cronograma','chartData'));
         }
         else{
 
@@ -738,5 +763,53 @@ class ProgramaFisicoController extends Controller
         header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="avance-fisico.xlsx"');
         $writer->save('php://output');
+    }
+
+    public function uploadFileProgramacion(Request $request)
+    {
+        try{
+            $pyId = $request->hnatchPry;
+            $pgId = $request->hnatchPrg;
+            $url = url('ver/programacion/0');
+
+            if($request->hasFile('natchFile')){
+
+                $file = $request->file('natchFile');
+                $path_parts = pathinfo($_FILES['natchFile']['name']);
+                $filename = $path_parts['filename'];
+                $fileext = $path_parts['extension'];
+
+                $path_saved = $file->storeAs('docsprogramacion/' . $pgId, $filename . '_' . time() . '.' . $fileext);
+
+                if(Storage::disk('public')->exists($path_saved)){
+                    $programacion = Progfisica::find($pgId);
+                    $programacion->prgPathFile = $path_saved;
+                    $programacion->save();
+
+                    if($programacion->save()){
+                        $msg = 'Archivo adjunto subido y registrado correctamente.';
+                        $msgId = 200;
+                        $ptId = $programacion->prgBudget;
+                    }
+                    else{
+                        throw new Exception("Error al registrar la ruta del archivo en la base de datos. Revise su conexión.");
+                    }
+
+                }
+                else{
+                    throw new Exception("El archivo no se ha almacenado correctamente.");
+                }
+            }
+            else{
+                throw new Exception("No se ha adjuntado ningun archivo");
+            }
+        }
+        catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' -Archivo- ' . $e->getFile() . ' -Linea- ' . $e->getLine() . " \n";
+            $msgId = 500;
+            $url= '';
+        }
+
+        return response()->json(compact('msg','msgId','url','pyId','ptId'));
     }
 }

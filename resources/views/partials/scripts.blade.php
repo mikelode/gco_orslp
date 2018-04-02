@@ -1,7 +1,11 @@
 <!-- REQUIRED JS SCRIPTS -->
 <script src="{{ asset('/plugins/jsnumeral/min/numeral.min.js') }}" type="text/javascript"></script>
 
-<script src="{{ asset('/plugins/chartjs/Chart.min.js') }}" type="text/javascript"></script>
+<!-- Graph Lib -->
+<!--<script src="{ asset('/plugins/chartjs/Chart.min.js') }}" type="text/javascript"></script>-->
+<script src="{{ asset('/plugins/highchart/highcharts.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/highchart/modules/exporting.js') }}" type="text/javascript"></script>
+
 <script src="{{ asset('/js/popper.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/bootstrap4/dist/js/bootstrap.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
@@ -13,17 +17,17 @@
 <script src="{{ asset('/plugins/select2/select2.full.min.js') }}" type="text/javascript"></script>
 
 <script src="{{ asset('/plugins/jqueryui-editable/js/jqueryui-editable.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/lib/jquery.event.drag-2.3.0.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/lib/jquery.event.drag-2.3.0.js') }}" type="text/javascript"></script>
 
-<script src="{{ asset('/plugins/SlickGrid/slick.core.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/plugins/slick.autotooltips.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/plugins/slick.cellrangedecorator.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/plugins/slick.cellrangeselector.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/plugins/slick.cellexternalcopymanager.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/plugins/slick.cellselectionmodel.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/slick.formatters.js')}}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/slick.editors.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/plugins/SlickGrid/slick.grid.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/slick.core.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.autotooltips.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.cellrangedecorator.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.cellrangeselector.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.cellexternalcopymanager.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.cellselectionmodel.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/slick.formatters.js')}}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/slick.editors.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/slick.grid.js') }}" type="text/javascript"></script>
 
 <!-- DataTables -->
 <!--<script src="{ asset('/plugins/DataTables/datatables.min.js') }}" type="text/javascript"></script>-->

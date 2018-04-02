@@ -15,15 +15,22 @@ class CreateUejecutoraTable extends Migration
     {
         Schema::create('gcouejecutora', function (Blueprint $table) {
             $table->increments('ejeId');
-            $table->string('ejePersonType',10); // natural o jurídica
-            $table->string('ejeRegistType',10)->nullable(); // RUC o DNI u OTRO
-            $table->string('ejeRegistNumber',12)->nullable(); // Numero de RUC o DNI
-            $table->string('ejeBusiName',1000)->nullable();
-            $table->string('ejeAcronym',100)->nullable();
-            $table->string('ejeLegalRepDni',10)->nullable();
-            $table->string('ejeLegalRepName',100)->nullable();
-            $table->string('ejeLegalRepPaterno',100)->nullable();
-            $table->string('ejeLegalRepMaterno',100)->nullable();
+            $table->integer('ejePostor')->unsigned();
+            $table->integer('ejeProject')->unsigned();
+            $table->foreign('ejeProject')
+                    ->references('pryId')
+                    ->on('gcoproyecto')
+                    ->onDelete('cascade');
+            $table->string('ejeMode',50)->nullable();
+            $table->string('ejeSisContract',50)->nullable();
+            $table->decimal('ejeMountContract',14,5)->default(0)->nullable();
+            $table->decimal('ejeMountRefValue',14,5)->default(0)->nullable();
+            $table->decimal('ejeRelationFactor',14,5)->nullable();
+            $table->date('ejeDateAgree')->nullable();
+            $table->integer('ejeMonthTerm')->unsigned()->nullable();
+            $table->integer('ejeDaysTerm')->unsigned()->nullable();
+            $table->date('ejeStartDate')->nullable();
+            $table->date('ejeEndDate')->nullable();
             $table->string('ejeInvalidate')->default(0);
             $table->string('ejeRegisterBy',20)->nullable();
             $table->datetime('ejeRegisterAt')->nullable();

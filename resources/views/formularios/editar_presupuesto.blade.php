@@ -16,7 +16,7 @@
 								@foreach($pto[0]->items as $item)
 								<th>{{ $item->iprItemGeneral }}</th>
 								@endforeach
-								<th>Nota</th>
+								<th>Doc. Adj.</th>
 							</tr>
 							<tr>
 								<th></th>
@@ -42,14 +42,14 @@
 						</thead>
 						<tbody>
 							@foreach($pto as $p)
-							<tr id="{{ 'pto-'.$p->preId }}">
+							<tr id="{{ $p->preId }}">
 								<td class="tdEdit">
 									<a href="javascript:" class="btnUpdateBudget" onclick="actualizar_presupuesto(this)" style="display: none;">
 										<img src="{{ asset('/img/guardar32.png') }}">
 									</a>
 								</td>
 								<td>
-									<input type="text" name="nptoItemGral[]" class="form-control-plaintext" readonly value="{{ $p->preName }}" readonly>
+									<input type="text" name="nptoItemGral[]" class="form-control-plaintext preEdit" readonly value="{{ $p->preName }}" readonly>
 									<input type="hidden" id="ptoId" value="{{ $p->preId }}" name="hnptoId[]">
 								</td>
 								@foreach($p->items as $item)
@@ -61,7 +61,19 @@
 									</td>
 								@endforeach
 								<td>
-									<textarea class="form-control form-control-sm preEdit" name="nptoNote" readonly>{{ $p->preNote }}</textarea>
+									<!--<textarea class="form-control form-control-sm preEdit" name="nptoNote" readonly>{ $p->preNote }}</textarea>-->
+									@if(\Storage::disk('public')->exists($p->prePathFile))
+									<a href="{{ url('/storage/' . $p->prePathFile) }}" target="_blank" title="Ver archivo">
+										<img src="{{ asset('/img/pdf-file_16.png') }}">
+									</a>
+									<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Cambiar archivo">
+										<img src="{{ asset('/img/refresh_16.png') }}">
+									</a>
+									@else
+									<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Adjuntar archivo">
+										<img src="{{ asset('/img/upload_file_20.png') }}">
+									</a>
+									@endif
 								</td>
 							</tr>
 							@endforeach
@@ -204,6 +216,47 @@
 	</div>
 </div>
 
+<div class="modal fade" id="mdlAttachFile" tabindex="-1" role="dialog" aria-labelledby="attachModal" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				ADJUNTAR DOCUMENTO SUSTENTATORIO
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form id="frmAttachFile" enctype="multipart/form-data">
+					{{ csrf_field() }}
+					<input type="hidden" name="hnatchAction" id="hatchAction">
+					<div class="form-group">
+						<label>Proyecto: </label>
+						<textarea class="form-control-plaintext form-control-sm" id="atchPry" name="natchPry" readonly></textarea>
+						<input type="hidden" id="hatchPry" name="hnatchPry">
+					</div>
+					<div class="form-group">
+						<label>Presupuesto: </label>
+						<select class="form-control form-control-sm" id="atchPto" name="natchPto">
+							@foreach($pto as $p)
+							<option value="{{ $p->preId }}">{{ $p->itemDsc . ' - ' . $p->preName }}</option>
+							@endforeach
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Seleccionar Archivo</label>
+						<input type="file" class="form-control-file" id="atchFile" name="natchFile">
+						<progress class="form-control" value="0"></progress>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="adjuntar_archivo($('#frmAttachFile')[0])">Subir documento</button>
+        		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script type="text/javascript">
 
 	$('#mdlAddPrestacion').on('show.bs.modal', function(event){
@@ -230,6 +283,20 @@
 		modal.find('.modal-body #himpAction').val(action);
 	});
 
+	$('#mdlAttachFile').on('show.bs.modal', function(event) {
+		var button = $(event.relatedTarget);
+		var action = button.data('action');
+		var ptId = button.closest('tr').attr('id');
+		var dataSelect = $('#pyName').select2('data');
+		var pryText = dataSelect[0].text;
+		var pryId = dataSelect[0].id;
+		var modal = $(this);
+
+		modal.find('.modal-body #atchPry').val(pryText);
+		modal.find('.modal-body #hatchPry').val(pryId);
+		modal.find('.modal-body #atchPto').val(ptId);
+	});
+
 	$('#slcPartidasPto').change(function(event) {
 		
 		cargar_presupuesto({{ $pto[0]->preProject }}, this.value, function(data){
@@ -243,7 +310,25 @@
 				$('#btnImportPart').attr('data-action','clear');
 			}
 
-			grid = new Slick.Grid("#myGrid", data.ptd, columns, options);
+			var ptdData = data.ptd;
+
+			if(ptdData.length == 0)
+				return;
+
+			ptdData.getItemMetadata = function(row){
+
+				var lvl = ptdData[row].parLevel;
+				var style = 'gridRowLvl-' + lvl;
+
+				if(ptdData[row].parUnit == ''){
+					return{
+						cssClasses: style
+					}
+					return null;
+				}
+			}
+
+			grid = new Slick.Grid("#myGrid", ptdData, columns, options);
 
 				grid.onCellChange.subscribe(function(e,args){
 									
@@ -284,7 +369,23 @@
 		$(function(){
 
 			cargar_presupuesto({{ $pto[0]->preProject }}, {{ $pto[0]->preId }}, function(data){
-				grid = new Slick.Grid("#myGrid", data.ptd, columns, options);
+
+				var ptdData = data.ptd;
+				
+				ptdData.getItemMetadata = function(row){
+					
+					var lvl = ptdData[row].parLevel;
+					var style = 'gridRowLvl-' + lvl;
+
+					if(ptdData[row].parUnit == ''){
+						return{
+							cssClasses: style
+						}
+						return null;
+					}
+				}
+
+				grid = new Slick.Grid("#myGrid", ptdData, columns, options);
 
 				grid.onCellChange.subscribe(function(e,args){
 									
@@ -303,9 +404,3 @@
 	@endif
 
 </script>
-
-@section('custom-scripts')
-<script>
-
-</script>
-@endsection

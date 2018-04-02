@@ -7,7 +7,7 @@
 		<div class="col-md-12">
 			<div class="card border-success mb-3">
 				<div class="card-header">
-					<h5 class="float-left"><i class="icon-th-list mr-2"></i>Proyectos</h5>
+					<h5 class="float-left"><i class="fas fa-list mr-2"></i>Proyectos</h5>
 					@if(Auth::user()->hasPermission(2))
 					<div class="float-right">
 						<button class="btn btn-success btn-sm" onclick="nuevo_proyecto()">Nuevo Proyecto</button>
@@ -33,14 +33,23 @@
 									<td>{{ $py->prySnip.'/'.$py->pryUnifiedCode }}</td>
 									<td>{{ $py->pryDenomination }}</td>
 									<td>{{ $py->pryExeMode }}</td>
-									<td>{{ $py->ejecutor[0]->ejeBusiName }}</td>
-									<td>
-										@foreach($tms as $tm)
-											@if($tm->prfUejecutora == $py->ejecutor[0]->ejeId)
-												{{ $tm->prfJob.': '.$tm->individualData->perFullName  }} <br>
-											@endif
-										@endforeach
-									</td>
+									@if(count($py->ejecutor) == 0)
+										<td>No registrado</td>
+									@else
+										<td>{{ $py->prjBusiName }}</td>
+									@endif
+
+									@if(count($tms) == 0)
+										<td>No registrado</td>
+									@else
+										<td>
+											@foreach($tms as $tm)
+												@if($tm->prfUejecutora == $py->ejecutor->ejeId)
+													{{ $tm->prfJob.': '.$tm->individualData->perFullName  }} <br>
+												@endif
+											@endforeach
+										</td>
+									@endif
 									<td class="td-actions">
 										@if(Auth::user()->hasPermission(3))
 										<a href="javascript:editar_proyecto('{{ $py->pryId }}');" class="btn btn-sm btn-outline-primary">
