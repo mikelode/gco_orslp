@@ -15,13 +15,13 @@
 											<div class="form-group row mb-0">
 												<label class="col-sm-5 col-form-label">Meses</label>
 												<div class="col-sm-7">
-													<input type="text" class="form-control-plaintext" id="pyMesesPlazo" name="npyMesesPlazo" value="{{ $pry->pryMonthTerm }} meses" readonly>
+													<input type="text" class="form-control-plaintext" id="pyMesesPlazo" name="npyMesesPlazo" value="{{ $eje[0]->ejeMonthTerm }} meses" readonly>
 												</div>
 											</div>
 											<div class="form-group row mb-0">
 												<label class="col-sm-5 col-form-label">Días</label>
 												<div class="col-sm-7">
-													<input type="text" class="form-control-plaintext" id="pyDiasPlazo" name="npyDiasPlazo" value="{{ $pry->pryDaysTerm }} días" readonly>
+													<input type="text" class="form-control-plaintext" id="pyDiasPlazo" name="npyDiasPlazo" value="{{ $eje[0]->ejeDaysTerm }} días" readonly>
 												</div>
 											</div>
 										</div>
@@ -29,13 +29,13 @@
 											<div class="form-group row mb-0">
 												<label class="col-sm-5 col-form-label">Inicio de Obra</label>
 												<div class="col-sm-7">
-													<input type="date" class="form-control-plaintext" id="pyFechaInicio" name="npyFechaInicio" value="{{ Carbon\Carbon::parse($pry->pryStartDateExe)->format('Y-m-d') }}" readonly>
+													<input type="date" class="form-control-plaintext" id="pyFechaInicio" name="npyFechaInicio" value="{{ is_null($eje[0]->ejeStartDate) ? null : Carbon\Carbon::parse($eje[0]->ejeStartDate)->format('Y-m-d') }}" readonly>
 												</div>
 											</div>
 											<div class="form-group row mb-0">
 												<label class="col-sm-5 col-form-label">Término de Obra</label>
 												<div class="col-sm-7">
-													<input type="date" class="form-control-plaintext" id="pyFechaFinal" name="npyFechaFinal" value="{{ Carbon\Carbon::parse($pry->pryEndDateExe)->format('Y-m-d') }}" readonly>
+													<input type="date" class="form-control-plaintext" id="pyFechaFinal" name="npyFechaFinal" value="{{ is_null($eje[0]->ejeEndDate) ? null : Carbon\Carbon::parse($eje[0]->ejeEndDate)->format('Y-m-d') }}" readonly>
 												</div>
 											</div>
 										</div>

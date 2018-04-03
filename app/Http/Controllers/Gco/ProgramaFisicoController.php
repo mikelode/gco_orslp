@@ -14,6 +14,7 @@ use App\Models\Uejecutora;
 use App\Models\Partida;
 use App\Models\Resumenavc;
 use App\Models\Progfisica;
+use App\Models\Postor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -262,8 +263,10 @@ class ProgramaFisicoController extends Controller
                 $pry = Proyecto::find($pyId);
                 //$resumen = Presupuesto::where('preId',$prId)->where('preProject',$pyId)->get();
                 $resumen = Itempresupuesto::where('iprBudget',$prId)->get();
+                $eje = Proyecto::find($pyId)->ejecutor()->get();
+                
 
-                $view = view('formularios.editar_programacion', compact('cronograma','pry','resumen'));
+                $view = view('formularios.editar_programacion', compact('cronograma','pry','eje','resumen'));
 
             }
         }
@@ -462,7 +465,8 @@ class ProgramaFisicoController extends Controller
                         ->orderBy('prgNumberVal','asc')
                         ->get();
 
-        $pry = Proyecto::where('pryId',$pyId)->with('ejecutor')->get();
+        $pry = Proyecto::with('ejecutor')->where('pryId',$pyId)->get();
+        $pst = Postor::with('individualData')->where('pstId',$pry[0]->ejecutor->ejePostor)->get();
         $prf = Equiprof::with('individualData')
                 ->where('prfUejecutora',$pry[0]->pryExeUnit)
                 ->where('prfJob','SUPERVISOR')
@@ -583,7 +587,7 @@ class ProgramaFisicoController extends Controller
         $sheet->setCellValue('B6', 'ENTIDAD');
         $sheet->setCellValue('C6', ': GOBIERNO REGIONAL');
         $sheet->setCellValue('B7', 'CONTRATISTA');
-        $sheet->setCellValue('C7', ': ' . $pry[0]->ejecutor[0]->ejeBusiName);
+        $sheet->setCellValue('C7', ': ' . $pst[0]->individualData->prjBusiName);
         $sheet->setCellValue('B8', 'SUPERVISIÓN');
         $sheet->setCellValue('C8', ': ' . $prf[0]->individualData->perFullName);
         $sheet->setCellValue('B9', 'PRESUPUESTO BASE');
@@ -593,11 +597,11 @@ class ProgramaFisicoController extends Controller
         $sheet->setCellValue('B11', 'PRESUPUESTO CONTRATADO');
         $sheet->setCellValue('C11', ": S/" . number_format($preT[0]->iprItemGeneralMount,2,'.',','));
         $sheet->setCellValue('B12', 'PLAZO DE EJECUCIÓN');
-        $sheet->setCellValue('C12', ': ' . $pry[0]->pryDaysTerm . ' DÍAS CALENDARIOS');
+        $sheet->setCellValue('C12', ': ' . $pry[0]->ejecutor->ejeDaysTerm . ' DÍAS CALENDARIOS');
         $sheet->setCellValue('B13', 'FECHA DE INICIO');
-        $sheet->setCellValue('C13', ': ' . $pry[0]->pryStartDateExe);
+        $sheet->setCellValue('C13', ': ' . $pry[0]->ejecutor->ejeStartDate);
         $sheet->setCellValue('B14', 'FECHA DE TÉRMINO');
-        $sheet->setCellValue('C14', ': ' . $pry[0]->pryEndDateExe);
+        $sheet->setCellValue('C14', ': ' . $pry[0]->ejecutor->ejeEndDate);
 
         $sheet->getStyle($bodyInfo1)->applyFromArray($bodyInfoStyle1);
         $sheet->getStyle($bodyInfo2)->applyFromArray($bodyInfoStyle2);

@@ -590,7 +590,13 @@ function updateDirectCost(rowDc, cellMount, gridToUpdate, gridSource, dataSource
 		}
 
 		dataTarget[i]['avrPercentCv'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) / parseFloat(dataTarget[i]['iprItemGeneralMount'])) * 10000) / 100;
-		dataTarget[i]['avrMountCa'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) + parseFloat(dataTarget[i]['avrMountBa'])) * 100 ) / 100;
+
+		var pavrMountCa = parseFloat(dataTarget[i]['pavrMountCa']);
+		
+		if(isNaN(pavrMountCa))
+			pavrMountCa = 0;
+
+		dataTarget[i]['avrMountCa'] = Math.round((parseFloat(dataTarget[i]['avrMountCv']) + pavrMountCa) * 100 ) / 100;
 		dataTarget[i]['avrPercentCa'] = Math.round((parseFloat(dataTarget[i]['avrMountCa']) / parseFloat(dataTarget[i]['iprItemGeneralMount'])) * 10000) / 100;
 		dataTarget[i]['avrMountBv'] = Math.round((parseFloat(dataTarget[i]['iprItemGeneralMount']) - parseFloat(dataTarget[i]['avrMountCa'])) * 100 ) / 100;
 		dataTarget[i]['avrPercentBv'] = 100 - parseFloat(dataTarget[i]['avrPercentCa']);

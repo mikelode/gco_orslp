@@ -73,7 +73,7 @@ class AvanceController extends Controller
             $crn = collect(['sin cronograma']);
             $pto = collect(['sin presupuesto']);
         }
-
+        
         $view = view('formularios.nuevo_avance',compact('pry','exe','prf','crn','pto','pst'));
         return $view;
     }
@@ -272,15 +272,16 @@ class AvanceController extends Controller
         $pry = Proyecto::find($pyId);
         $apr = Avance::find($avId);
 
+        /* aprBefProg contain the previus budget progress ID */
         if($apr->aprBefprog == 0){
-            $avd = Avdetail::select('*')
+            $avd = Avdetail::select(DB::raw('*, (avcMeteredCa) as sumMeteredCa, (avcMountCa) as sumMountCa, (avcPercentCa) as sumPercentCa'))
                 ->join('gcopartidas','parId','=','avcPartidaId')
                 ->where('avcBudgetProgress',$avId)
                 ->get();
             $rsmn = Vpiepresupuesto::where('aprId',$avId)->get();
         }
         else{
-            $avd = Avdetail::select('*')
+            $avd = Avdetail::select(DB::raw('*, (pavcMeteredCa + avcMeteredCv) as sumMeteredCa, (pavcMountCa + avcMountCv) as sumMountCa, (pavcPercentCa + avcPercentCv) as sumPercentCa'))
             ->join(
                 DB::raw('(select avcId as pavcId, avcPartidaId as pavcPartidaId, avcMeteredCa as pavcMeteredCa, avcMountCa as pavcMountCa, avcPercentCa as pavcPercentCa from gcoavancedet 
                 where avcBudgetProgress = ' . $apr->aprBefprog . ') as b'),
@@ -363,9 +364,9 @@ class AvanceController extends Controller
                     $partida->avcMeteredCv = $part->avcMeteredCv == '' ? null : $part->avcMeteredCv;
                     $partida->avcMountCv = $part->avcMountCv;
                     $partida->avcPercentCv = $part->avcPercentCv;
-                    $partida->avcMeteredCa = $part->avcMeteredCa;
-                    $partida->avcMountCa = $part->avcMountCa;
-                    $partida->avcPercentCa = $part->avcPercentCa;
+                    $partida->avcMeteredCa = $part->sumMeteredCa; /* change avc to sum, to calculate sum with zero when progress was 100% */
+                    $partida->avcMountCa = $part->sumMountCa;
+                    $partida->avcPercentCa = $part->sumPercentCa;
                     $partida->avcMeteredBv = $part->avcMeteredBv;
                     $partida->avcMountBv = $part->avcMountBv;
                     $partida->avcPercentBv = $part->avcPercentBv;

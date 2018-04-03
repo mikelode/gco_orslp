@@ -70,9 +70,9 @@
 		{id: "metrado_cv", name: "METRADO", field: "avcMeteredCv", width: 50, editor: Slick.Editors.Text, columnGroup: "VALORIZACIÓN PRESENTE", formatter: Slick.Formatters.Miles, cssClass: 'basecolbudget'},
 		{id: "monto_cv", name: "MONTO", field: "avcMountCv", width: 80, columnGroup: "VALORIZACIÓN PRESENTE", formatter: Slick.Formatters.Miles},
 		{id: "porcentaje_cv", name: "%", field: "avcPercentCv", width: 50, columnGroup: "VALORIZACIÓN PRESENTE"},
-		{id: "metrado_ca", name: "METRADO", field: "avcMeteredCa", width: 50, columnGroup: "ACUMULADO ACTUAL", formatter: Slick.Formatters.Miles},
-		{id: "monto_ca", name: "MONTO", field: "avcMountCa", width: 80, columnGroup: "ACUMULADO ACTUAL", formatter: Slick.Formatters.Miles},
-		{id: "porcentaje_ca", name: "%", field: "avcPercentCa", width: 50, columnGroup: "ACUMULADO ACTUAL"},
+		{id: "metrado_ca", name: "METRADO", field: "sumMeteredCa", width: 50, columnGroup: "ACUMULADO ACTUAL", formatter: Slick.Formatters.Miles},
+		{id: "monto_ca", name: "MONTO", field: "sumMountCa", width: 80, columnGroup: "ACUMULADO ACTUAL", formatter: Slick.Formatters.Miles},
+		{id: "porcentaje_ca", name: "%", field: "sumPercentCa", width: 50, columnGroup: "ACUMULADO ACTUAL"},
 		{id: "metrado_bv", name: "METRADO", field: "avcMeteredBv", width: 50, columnGroup: "SALDO POR VALORIZAR", formatter: Slick.Formatters.Miles},
 		{id: "monto_bv", name: "MONTO", field: "avcMountBv", width: 80, columnGroup: "SALDO POR VALORIZAR", formatter: Slick.Formatters.Miles},
 		{id: "porcentaje_bv", name: "%", field: "avcPercentBv", width: 50, columnGroup: "SALDO POR VALORIZAR"}
@@ -184,14 +184,22 @@
 
 		grid.invalidateRow(args.row);
 
+		var pavcMeteredCa = parseFloat(args.item.pavcMeteredCa);
+		var pavcMountCa = parseFloat(args.item.pavcMountCa);
+
+		if(isNaN(pavcMeteredCa))
+			pavcMeteredCa = 0;
+		if(isNaN(pavcMountCa))
+			pavcMountCa = 0;
+
 		args.item.avcMountCv = Math.round(parseFloat(args.item.avcMeteredCv) * parseFloat(args.item.parPrice) * 100 ) / 100;
 		args.item.avcPercentCv = Math.round((parseFloat(args.item.avcMountCv) / parseFloat(args.item.parPartial)) * 10000) / 100;
-		args.item.avcMeteredCa = Math.round((parseFloat(args.item.avcMeteredBa) + parseFloat(args.item.avcMeteredCv)) * 100 ) / 100;
-		args.item.avcMountCa = Math.round((parseFloat(args.item.avcMountBa) + parseFloat(args.item.avcMountCv)) * 100 ) / 100;
-		args.item.avcPercentCa = Math.round((parseFloat(args.item.avcMountCa) / parseFloat(args.item.parPartial)) * 10000) / 100;
-		args.item.avcMeteredBv = Math.round((parseFloat(args.item.parMetered) - parseFloat(args.item.avcMeteredCa)) * 100 ) / 100;
-		args.item.avcMountBv = Math.round((parseFloat(args.item.parPartial) - parseFloat(args.item.avcMountCa)) * 100 ) / 100;
-		args.item.avcPercentBv = 100 - parseFloat(args.item.avcPercentCa);
+		args.item.sumMeteredCa = Math.round((pavcMeteredCa + parseFloat(args.item.avcMeteredCv)) * 100 ) / 100;
+		args.item.sumMountCa = Math.round((pavcMountCa + parseFloat(args.item.avcMountCv)) * 100 ) / 100;
+		args.item.sumPercentCa = Math.round((parseFloat(args.item.sumMountCa) / parseFloat(args.item.parPartial)) * 10000) / 100;
+		args.item.avcMeteredBv = Math.round((parseFloat(args.item.parMetered) - parseFloat(args.item.sumMeteredCa)) * 100 ) / 100;
+		args.item.avcMountBv = Math.round((parseFloat(args.item.parPartial) - parseFloat(args.item.sumMountCa)) * 100 ) / 100;
+		args.item.avcPercentBv = 100 - parseFloat(args.item.sumPercentCa);
 
 		grid.render();
 
