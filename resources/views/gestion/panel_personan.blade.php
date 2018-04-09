@@ -18,9 +18,11 @@
                             <button type="button" class="btn btn-success btn-sm">Buscar</button>
                         </div>
                         <div class="col-md-1">
+                            @if(Auth::user()->hasPermission(21))
                             <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#mdlPersona">
                                 Añadir Persona<span class="fas fa-plus ml-1"></span>
                             </button>
+                            @endif
                         </div>
                     </div>
                 </div>

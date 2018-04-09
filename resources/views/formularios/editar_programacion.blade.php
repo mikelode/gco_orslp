@@ -73,15 +73,7 @@
 								<div class="card-header py-1"><b>Operaciones</b></div>
 								<div class="card-body px-2">
 									@if(Auth::user()->hasPermission(11))
-									<button type="button" id="btnActionEdit" class="btn btn-sm btn-info btn-block" onclick="editar_cronograma( $,
-									source: [
-              {value: 'A', text: 'Habilitado'},
-              {value: 'B', text: 'Deshabilitdo'}
-           ],
-        success: function(response, newValue){
-            if(!response.success) return "Error en el intento de cambiar el estado";
-            console.log(newValue);
-        }(this),$('#frmUpdateSchedule').find("input[name='_token']").val() )" value="editar">Editar Cronograma</button>
+									<button type="button" id="btnActionEdit" class="btn btn-sm btn-info btn-block" onclick="editar_cronograma($(this),$('#frmUpdateSchedule'))" value="editar">Editar Cronograma</button>
 									@endif
 									@if(Auth::user()->hasPermission(12))
 									<button type="button" id="btnActionDelete" class="btn btn-sm btn-danger btn-block">Eliminar</button>
@@ -97,12 +89,12 @@
 									<p style="display: inline;"><i class="fas fa-calendar"></i> Datos del Cronograma Calendarizado</p>
 									<div class="float-right">
 										<button type="button" class="btn btn-secondary btn-sm mr-2 mb-1" id="btnAddPeriod" style="display: none;" onclick="agregar_periodo($('#tblSchedule'))">Agregar Periodo</button>
-										<button type="button" class="btn btn-info btn-sm mr-2 mb-1" id="btnEditSchedule" style="display: none;" onclick="actualizar_cro nograma($('#frmUpdateSchedule').find("input[name='_token']").val() )">Guardar
+										<button type="button" class="btn btn-info btn-sm mr-2 mb-1" id="btnEditSchedule" style="display: none;" onclick="actualizar_cronograma($('#frmUpdateSchedule'))">Guardar
 										</button>
 									</div>
 								</div>
 								<div class="card-body p-0">
-									<form action="{{ url('actualizar/programacio n') }}" id="frmUpdateSchedule">
+									<form action="{{ url('actualizar/programacion') }}" id="frmUpdateSchedule">
 										{{ csrf_field() }}
 										<input type="hidden" name="hnpyId" id="pyId" value="{{ $pry->pryId }}">
 										<input type="hidden" name="hnptId" id="ptId" value="{{ $resumen[0]->iprBudget }}">
@@ -157,13 +149,17 @@
 															<a href="{{ url('/storage/' . $item->prgPathFile) }}" target="_blank" title="Ver archivo">
 																<img src="{{ asset('/img/pdf-file_16.png') }}">
 															</a>
-															<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Cambiar archivo">
-																<img src="{{ asset('/img/refresh_16.png') }}">
-															</a>
+																@if(Auth::user()->hasPermission(23))
+																<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Cambiar archivo">
+																	<img src="{{ asset('/img/refresh_16.png') }}">
+																</a>
+																@endif
 															@else
-															<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Adjuntar archivo">
-																<img src="{{ asset('/img/upload_file_20.png') }}">
-															</a>
+																@if(Auth::user()->hasPermission(23))
+																<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Adjuntar archivo">
+																	<img src="{{ asset('/img/upload_file_20.png') }}">
+																</a>
+																@endif
 															@endif
 														</td>
 														<td>
@@ -174,31 +170,55 @@
 															@endif
 														</td>
 														<td>
-															@if($item->prgStatus == '')
-															<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="" class="statusExec">No Asignado</a>
-															@else
-															<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="{{ $item->prgStatus }}" class="statusExec">
-																@if($item->prgStatus == 'Adelantado')
-																<span class="badge badge-info" style="font-size:.7rem">{{ $item->prgStatus }}</span>
-																@elseif($item->prgStatus == 'Normal')
-																<span class="badge badge-success" style="font-size:.7rem">{{ $item->prgStatus }}</span>
-																@elseif($item->prgStatus == 'Atrazado')
-																<span class="badge badge-warning" style="font-size:.7rem">{{ $item->prgStatus }}</span>
-																@elseif($item->prgStatus == 'Suspendido')
-																<span class="badge badge-secondary" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+															@if(Auth::user()->hasPermission(24))
+																@if($item->prgStatus == '')
+																<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="" class="statusExec">No Asignado</a>
+																@else
+																<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="{{ $item->prgStatus }}" class="statusExec">
+																	@if($item->prgStatus == 'Adelantado')
+																	<span class="badge badge-info" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																	@elseif($item->prgStatus == 'Normal')
+																	<span class="badge badge-success" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																	@elseif($item->prgStatus == 'Atrazado')
+																	<span class="badge badge-warning" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																	@elseif($item->prgStatus == 'Suspendido')
+																	<span class="badge badge-secondary" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																	@endif
+																</a>
 																@endif
-															</a>
+															@else
+																@if($item->prgStatus == '')
+																No Asignado
+																@else
+																	@if($item->prgStatus == 'Adelantado')
+																	<span class="badge badge-info" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																	@elseif($item->prgStatus == 'Normal')
+																	<span class="badge badge-success" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																	@elseif($item->prgStatus == 'Atrazado')
+																	<span class="badge badge-warning" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																	@elseif($item->prgStatus == 'Suspendido')
+																	<span class="badge badge-secondary" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																	@endif
+																@endif
 															@endif
 														</td>
 														<td>
-															@if($item->prgPaid)
-															<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="A" class="statusPaid">
-																<span class="badge badge-success" style="font-size: .7rem">SI</span>
-															</a>
+															@if(Auth::user()->hasPermission(25))
+																@if($item->prgPaid)
+																<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="A" class="statusPaid">
+																	<span class="badge badge-success" style="font-size: .7rem">SI</span>
+																</a>
+																@else
+																<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="B" class="statusPaid">
+																	<span class="badge badge-warning" style="font-size: .7rem">NO</span>
+																</a>
+																@endif
 															@else
-															<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="B" class="statusPaid">
+																@if($item->prgPaid)
+																<span class="badge badge-success" style="font-size: .7rem">SI</span>
+																@else
 																<span class="badge badge-warning" style="font-size: .7rem">NO</span>
-															</a>
+																@endif
 															@endif
 														</td>
 													</tr>

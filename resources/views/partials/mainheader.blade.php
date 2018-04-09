@@ -15,7 +15,7 @@
         </a>
         </li>
         @endif
-
+        @if(Auth::user()->hasPermission(5) || Auth::user()->hasPermission(9) || Auth::user()->hasPermission(13))
         <li class="dropdown {{ Request::is('presupuesto/*') || Request::is('presupuesto')  ? 'active' : null }}">
           <a href="javascript:;" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
             <i class="fas fa-code-branch"></i><br>Gestión de Obra
@@ -38,6 +38,7 @@
             @endif
           </div>
         </li>
+        @endif
         @if(Auth::user()->hasPermission(17))
         <li class="{{ Request::is('curvas') ? 'active' : null }}">
           <a href="{{ url('curvas') }}">
@@ -45,19 +46,25 @@
           </a>
         </li>
         @endif
+        @if(Auth::user()->hasPermission(19) || Auth::user()->hasPermission(20))
         <li class="dropdown {{ Request::is('tablas/*') || Request::is('tablas')  ? 'active' : null }}">
           <a href="javascript:;" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
             <i class="fas fa-address-book"></i><br>Registro de Personas
           </a>
           <div class="dropdown-menu">
+            @if(Auth::user()->hasPermission(19))
             <a class="dropdown-item" href="{{ url('tablas/npersona') }}">
               <i class="fas fa-male fa-sm"></i> Persona Natural
             </a>
+            @endif
+            @if(Auth::user()->hasPermission(20))
             <a class="dropdown-item" href="{{ url('tablas/jpersona') }}">
               <i class="fas fa-users fa-sm"></i> Persona Jurídica
             </a>
+            @endif
           </div>
         </li>
+        @endif
       </ul>
     </div>
     <!-- /container --> 
