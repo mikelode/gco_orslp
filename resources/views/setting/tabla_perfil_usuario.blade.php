@@ -1,4 +1,21 @@
 <meta name="csrf-token" content="{{ csrf_token() }}" />
+<div class="form-group row">
+    <label class="col-md-3 col-form-label">Acceso al Proyecto</label>
+    <div class="col-md-6">
+        <select id="pyName" name="npyName[]" multiple>
+            <option value="NA">-- Seleccione uno o varios --</option>
+            <option value="0" {{ $user_projects[0] == 0 ? 'selected' : '' }}> -- Todos los Proyectos -- </option>
+            @foreach($projects as $py)
+                <option value="{{ $py->pryId }}" {{ in_array($py->pryId, $user_projects) ? 'selected' : '' }}>
+                    {{ $py->pryShortDenomination }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="button" class="btn btn-success btn-small">Actualizar Acceso</button>
+    </div>
+</div>
 <table class="table table-sm">
     <thead>
     <tr>
@@ -45,6 +62,10 @@ $(function(){
             if(!response.success) return "Error en el intento de cambiar el estado";
             console.log(newValue);
         }
+    });
+
+    $('#pyName').select2({
+        width: '100%'
     });
 });
 </script>

@@ -22,9 +22,11 @@ use Carbon\Carbon;
 use Exception;
 use Excel;
 use File;
+use App\Traits\BusquedaTablas;
 
 class AvanceController extends Controller
 {
+    use BusquedaTablas;
     /**
      * Display a listing of the resource.
      *
@@ -39,7 +41,7 @@ class AvanceController extends Controller
         }
         else{
             $pys = Proyecto::where('pryInvalidate',false)
-                    ->where('pryId',$pyAccess)
+                    ->whereIn('pryId',explode(',',$pyAccess))
                     ->get();
         }
 
@@ -357,6 +359,15 @@ class AvanceController extends Controller
                 $gridResumen = (array) json_decode($request->dataGridResume);
 
                 foreach ($gridPartidas as $part) {
+
+                    if(is_null($part->parMetered) && $part->parUnit == ''){
+                        continue;
+                    }
+
+                    if(!is_numeric($part->avcMeteredCv)){
+                        throw new Exception("El metrado ingresado en la partida $part->parItem debe ser un número. \n- Verifique que no existan comas.\n");
+                    }
+
                     $partida = Avdetail::find($part->avcId);
                     /*$partida->avcMeteredBa = $part->avcMeteredBa;
                     $partida->avcMountBa = $part->avcMountBa;
@@ -406,6 +417,7 @@ class AvanceController extends Controller
                 $cronograma->prgPercentExec = $porceEjecutado / 100;
                 $cronograma->prgAggregateExec = $acumuEjecutado / 100;
                 $cronograma->prgClosed = $close;
+                $cronograma->prgStatus = $this->get_status_obra($cronograma->prgMount, $montoEjecutado);
                 $cronograma->save();
 
             });
@@ -420,7 +432,7 @@ class AvanceController extends Controller
             }
 
         }catch(Exception $e){
-            $msg = 'Error: ' . $e->getMessage() . ' -- ' . $e->getFile() . ' - ' . $e->getLine() . " \n";
+            $msg = 'Error: ' . $e->getMessage() . ' * ' . $e->getLine() . " \n";
             $msgId = 500;
             $url = '';
         }

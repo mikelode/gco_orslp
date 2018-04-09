@@ -33,7 +33,7 @@ class PresupuestoController extends Controller
         }
         else{
             $pys = Proyecto::where('pryInvalidate',false)
-                    ->where('pryId',$pyAccess)
+                    ->whereIn('pryId',explode(',',$pyAccess))
                     ->get();
         }
 

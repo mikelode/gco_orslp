@@ -35,10 +35,10 @@
                     <div class="form-group row">
                         <label class="col-md-2 col-form-label">Acceso al Proyecto</label>
                         <div class="col-md-10">
-                            <select id="pyName" name="npyName">
+                            <select id="pyName" name="npyName[]" multiple>
                                 <option value="0"> -- Todos los Proyectos -- </option>
                                 @foreach($pys as $py)
-                                    <option value="{{ $py->pryId }}">{{ $py->pryDenomination }}</option>
+                                    <option value="{{ $py->pryId }}">{{ $py->pryShortDenomination }}</option>
                                 @endforeach
                             </select>
                         </div>

@@ -42,7 +42,7 @@ class ProyectoController extends Controller
                     ->join('gcopspostores','pslId','=','pstSelectionProc')
                     ->join('gcojpersona','prjId','=','pstJpersona')
                     ->where('pryInvalidate',false)
-                    ->where('pryId',$pyAccess)
+                    ->whereIn('pryId',explode(',',$pyAccess))
                     ->get();
         }
         //dd(count($pys[0]->ejecutor));

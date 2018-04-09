@@ -25,6 +25,7 @@
 <script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.cellrangeselector.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.cellexternalcopymanager.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.cellselectionmodel.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/plugins/SlickGrid-2.3.16/plugins/slick.rowselectionmodel.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/SlickGrid-2.3.16/slick.formatters.js')}}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/SlickGrid-2.3.16/slick.editors.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/SlickGrid-2.3.16/slick.grid.js') }}" type="text/javascript"></script>
@@ -60,6 +61,5 @@
 			});
 	}
 
-   //document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');
-
+   //document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
 </script>

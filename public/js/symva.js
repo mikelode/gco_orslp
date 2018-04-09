@@ -616,6 +616,8 @@ function guardar_avance(gridDetail, gridResume, form, close)
 		}
 	}
 
+	console.log(gridDetail);
+
 	var url = form.prop('action') + '/' + close;
 	form.find("input[name='dataGridDetail']").val(JSON.stringify(gridDetail.getData()));
 	form.find("input[name='dataGridResume']").val(JSON.stringify(gridResume.getData()));

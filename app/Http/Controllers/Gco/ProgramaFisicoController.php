@@ -67,7 +67,7 @@ class ProgramaFisicoController extends Controller
         }
         else{
             $pys = Proyecto::where('pryInvalidate',false)
-                    ->where('pryId',$pyAccess)
+                    ->whereIn('pryId',explode(',',$pyAccess))
                     ->get();
         }
 
@@ -433,7 +433,7 @@ class ProgramaFisicoController extends Controller
         }
         else{
             $pys = Proyecto::where('pryInvalidate',false)
-                    ->where('pryId',$pyAccess)
+                    ->whereIn('pryId',explode(',',$pyAccess))
                     ->get();
         }
 
@@ -815,5 +815,45 @@ class ProgramaFisicoController extends Controller
         }
 
         return response()->json(compact('msg','msgId','url','pyId','ptId'));
+    }
+
+    public function postEditStatusPaid(Request $request)
+    {
+        $prgId = $request->pk;
+        $statusValue = $request->value;
+
+        $prg = Progfisica::find($prgId);
+        $prg->prgPaid = $statusValue == 'A' ? true : false;
+        
+        if($prg->save()){
+            $success = true;
+            $msg = 'Estado cambiado correctamente';
+        }
+        else{
+            $success = false;
+            $msg = 'Error, refresque la página e intente de nuevo';
+        }
+
+        return response()->json(compact('success','msg'));
+    }
+
+    public function postEditStatusExec(Request $request)
+    {
+        $prgId = $request->pk;
+        $statusValue = $request->value;
+
+        $prg = Progfisica::find($prgId);
+        $prg->prgStatus = $statusValue;
+        
+        if($prg->save()){
+            $success = true;
+            $msg = 'Estado cambiado correctamente';
+        }
+        else{
+            $success = false;
+            $msg = 'Error, refresque la página e intente de nuevo';
+        }
+
+        return response()->json(compact('success','msg'));
     }
 }

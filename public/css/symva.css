@@ -191,6 +191,21 @@ input.editor-checkbox {
   -webkit-transition: 0.5s background;
 }
 
+/* Slic Row Selected */
+
+.cell-selection {
+  border-right-color: silver;
+  border-right-style: solid;
+  background: #f5f5f5;
+  color: gray;
+  text-align: right;
+  font-size: 10px;
+}
+.slick-row.selected .cell-selection {
+  background-color: transparent; /* show default selected row background */
+}
+
+
 .lvl-1{
 	color: red;
 	font-weight: bold;
@@ -369,4 +384,21 @@ input.editor-checkbox {
 
 .caption-label{
   font-weight: bold;
+}
+
+.caption-header{
+  color: #07a7e3;
+  font-size: 1rem;
+
+}
+
+.heading{
+  color: #72848c;
+  font-weight: bold;
+}
+
+.subtext{
+  font-size: 0.7rem;
+  font-weight: 300;
+  color: #72848c;
 }

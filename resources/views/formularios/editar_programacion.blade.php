@@ -73,7 +73,15 @@
 								<div class="card-header py-1"><b>Operaciones</b></div>
 								<div class="card-body px-2">
 									@if(Auth::user()->hasPermission(11))
-									<button type="button" id="btnActionEdit" class="btn btn-sm btn-info btn-block" onclick="editar_cronograma($(this),$('#frmUpdateSchedule'))" value="editar">Editar Cronograma</button>
+									<button type="button" id="btnActionEdit" class="btn btn-sm btn-info btn-block" onclick="editar_cronograma( $,
+									source: [
+              {value: 'A', text: 'Habilitado'},
+              {value: 'B', text: 'Deshabilitdo'}
+           ],
+        success: function(response, newValue){
+            if(!response.success) return "Error en el intento de cambiar el estado";
+            console.log(newValue);
+        }(this),$('#frmUpdateSchedule').find("input[name='_token']").val() )" value="editar">Editar Cronograma</button>
 									@endif
 									@if(Auth::user()->hasPermission(12))
 									<button type="button" id="btnActionDelete" class="btn btn-sm btn-danger btn-block">Eliminar</button>
@@ -89,11 +97,12 @@
 									<p style="display: inline;"><i class="fas fa-calendar"></i> Datos del Cronograma Calendarizado</p>
 									<div class="float-right">
 										<button type="button" class="btn btn-secondary btn-sm mr-2 mb-1" id="btnAddPeriod" style="display: none;" onclick="agregar_periodo($('#tblSchedule'))">Agregar Periodo</button>
-										<button type="button" class="btn btn-info btn-sm mr-2 mb-1" id="btnEditSchedule" style="display: none;" onclick="actualizar_cronograma($('#frmUpdateSchedule'))">Guardar Cambios</button>
+										<button type="button" class="btn btn-info btn-sm mr-2 mb-1" id="btnEditSchedule" style="display: none;" onclick="actualizar_cro nograma($('#frmUpdateSchedule').find("input[name='_token']").val() )">Guardar
+										</button>
 									</div>
 								</div>
 								<div class="card-body p-0">
-									<form action="{{ url('actualizar/programacion') }}" id="frmUpdateSchedule">
+									<form action="{{ url('actualizar/programacio n') }}" id="frmUpdateSchedule">
 										{{ csrf_field() }}
 										<input type="hidden" name="hnpyId" id="pyId" value="{{ $pry->pryId }}">
 										<input type="hidden" name="hnptId" id="ptId" value="{{ $resumen[0]->iprBudget }}">
@@ -108,7 +117,6 @@
 													<th rowspan="2">Nota</th>
 													<th rowspan="2"><img src="{{ asset('/img/fileattach_24.png') }}"></th>
 													<th colspan="3">Estado de Obra</th>
-													<th rowspan="2"></th>
 												</tr>
 												<tr>
 													<th>Inicial</th>
@@ -159,23 +167,40 @@
 															@endif
 														</td>
 														<td>
-															@if($item->prgClose)
-															Terminado
+															@if($item->prgClosed)
+															<span class="badge badge-success" style="font-size: .7rem">Concluida</span>
 															@else
 															Pendiente
 															@endif
 														</td>
 														<td>
-															<select name="nvalStatus[]" class="form-control form-control-sm">
-																<option value="NA" {{ $item->prgStatus==null?'selected':'' }}>-- Elegir --</option>
-																<option value="Normal" {{ $item->prgStatus=='Normal'?'selected':'' }}>Normal</option>
-																<option value="Suspendido" {{ $item->prgStatus=='Suspendido'?'selected':'' }}>Suspendido</option>
-																<option value="Adelantado" {{ $item->prgStatus=='Adelantado'?'selected':'' }}>Adelantado</option>
-																<option value="Atrasado" {{ $item->prgStatus=='Atrasado'?'selected':'' }}>Atrazado</option>
-															</select>
+															@if($item->prgStatus == '')
+															<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="" class="statusExec">No Asignado</a>
+															@else
+															<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="{{ $item->prgStatus }}" class="statusExec">
+																@if($item->prgStatus == 'Adelantado')
+																<span class="badge badge-info" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																@elseif($item->prgStatus == 'Normal')
+																<span class="badge badge-success" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																@elseif($item->prgStatus == 'Atrazado')
+																<span class="badge badge-warning" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																@elseif($item->prgStatus == 'Suspendido')
+																<span class="badge badge-secondary" style="font-size:.7rem">{{ $item->prgStatus }}</span>
+																@endif
+															</a>
+															@endif
 														</td>
-														<td></td>
-														<td></td>
+														<td>
+															@if($item->prgPaid)
+															<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="A" class="statusPaid">
+																<span class="badge badge-success" style="font-size: .7rem">SI</span>
+															</a>
+															@else
+															<a href="#" data-type="select" data-title="Cambiar Estado" data-pk="{{ $item->prgId }}" data-value="B" class="statusPaid">
+																<span class="badge badge-warning" style="font-size: .7rem">NO</span>
+															</a>
+															@endif
+														</td>
 													</tr>
 													<?php $total = $total + $item->prgMount; ?>
 												@endforeach
@@ -342,6 +367,30 @@
 		$.get('{{ url('monto/presupuesto') }}',{ ptoId: this.value }, function(data) {			
 			$('#ptoResumenMonto').val(numeral(data).format('0,0.00'));
 		});
+	});
+
+	$('.statusPaid').editable({
+		url: '../edit/statuspaid',
+		params: { _token: $('#frmUpdateSchedule').find("input[name='_token']").val() },
+		source: [
+              {value: 'A', text: 'SI'},
+              {value: 'B', text: 'NO'}
+           ],
+        success: function(response, newValue){
+            if(!response.success) alert("Error en el intento de cambiar el estado");
+        }
+	});
+
+	$('.statusExec').editable({
+		url: '../edit/statusexec',
+		params: { _token: $('#frmUpdateSchedule').find("input[name='_token']").val() },
+		source: [
+			{value: '', text: 'No asignado'},
+			{value: 'Normal', text: 'Normal'},
+			{value: 'Suspendido', text: 'Suspendido'},
+			{value: 'Adelantado', text: 'Adelantado'},
+			{value: 'Atrazado', text: 'Atrazado'}
+		],
 	});
 
 </script>

@@ -10,10 +10,10 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
+Route::get('/','HomeController@index')->middleware('auth');
+/* Route::get('/', function () {
     return view('app');
-})->middleware('auth');
+})->middleware('auth'); */
 
 Route::get('proyecto','Gco\ProyectoController@index')->middleware('auth');
 Route::get('nuevo/pry','Gco\ProyectoController@create');
@@ -82,6 +82,8 @@ Route::get('mostrar/jrd/{id}','Gco\JpersonaController@show');
 
 Route::post('edit/statusteam','Gco\ProyectoController@postEditStatusTeam');
 Route::post('edit/jobteam','Gco\ProyectoController@postEditJobTeam');
+Route::post('edit/statuspaid','Gco\ProgramaFisicoController@postEditStatusPaid');
+Route::post('edit/statusexec','Gco\ProgramaFisicoController@postEditStatusExec');
 
 Auth::routes();
 

@@ -122,7 +122,7 @@ class ConfiguracionController extends Controller
             $user->tusNames = strtoupper($request->name_user);
             $user->tusPaterno = strtoupper($request->patern_user);
             $user->tusMaterno = strtoupper($request->matern_user);
-            $user->tusProject = $request->npyName;
+            $user->tusProject = implode(',',$request->npyName);
             $user->tusJob = strtoupper(trim($request->job_user));
             $user->tusEmail = strtoupper(trim($request->email_user));
             $user->tusPhone = strtoupper(trim($request->phone_user));
@@ -148,7 +148,10 @@ class ConfiguracionController extends Controller
                       FROM tramRoles r
                       INNER JOIN tramSistema s ON r.trolIdSyst = s.tsysId
                       WHERE r.trolIdUser = '".$idUser."';");*/
-
+        $user = User::find($idUser);
+        $projects = Proyecto::all();
+        $user_projects = explode(',',$user->tusProject);
+        
         $profile = Rol::select('*')
                     ->where('trolIdUser',$idUser)
                     ->where('trolEnable',true)
@@ -161,7 +164,7 @@ class ConfiguracionController extends Controller
         $idFunciones = $funciones->pluck('tsysId');
         $idProfile = $profile->pluck('trolIdSyst');
 
-        $view = view('setting.tabla_perfil_usuario', compact('idUser','idProfile','funciones','profile'));
+        $view = view('setting.tabla_perfil_usuario', compact('idUser','idProfile','funciones','profile','projects','user_projects'));
 
         //$prof_func = array_intersect($idFunciones->toArray(), $idProfile->toArray());
         //dd($prof_func);
