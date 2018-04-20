@@ -38,7 +38,7 @@ class HomeController extends Controller
             FROM gcoproyecto a
             left join (select max(aprId) as aprId, aprProject, max(aprProgFisica) as aprProgFisica from gcoavancepres
             group by aprProject) b on a.pryId = b.aprProject
-            left join (select GROUP_CONCAT(round(((b.prgAggregateExec / b.prgAggregate) * 100) - 80,2) separator ', ') as prgProgress, max(a.aprId) as aprId  from gcoavancepres a
+            left join (select GROUP_CONCAT(round(((b.prgAggregateExec / b.prgAggregate) * 100) - 80,2) ORDER by a.aprProgFisica ASC separator ', ') as prgProgress, max(a.aprId) as aprId  from gcoavancepres a
             inner join gcoprogfisica b on a.aprProgFisica = b.prgId
             group by a.aprProject) d on b.aprId = d.aprId
             left join gcoprogfisica c on b.aprProgFisica = c.prgId");
@@ -60,7 +60,7 @@ class HomeController extends Controller
                                 }
                             )
                             ->leftJoin(
-                                DB::raw("(select GROUP_CONCAT(round(((q.prgAggregateExec / q.prgAggregate) * 100) - 80,2) separator ', ') as prgProgress, max(p.aprId) as aprId  from gcoavancepres p inner join gcoprogfisica q on p.aprProgFisica = q.prgId
+                                DB::raw("(select GROUP_CONCAT(round(((q.prgAggregateExec / q.prgAggregate) * 100) - 80,2) ORDER by p.aprProgFisica ASC separator ', ') as prgProgress, max(p.aprId) as aprId  from gcoavancepres p inner join gcoprogfisica q on p.aprProgFisica = q.prgId
                                 group by p.aprProject) as d"), function($join){
                                     $join->on('b.aprId','=','d.aprId');
                                 }

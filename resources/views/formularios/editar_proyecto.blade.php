@@ -321,7 +321,7 @@
 												<div class="form-group row">
 													<label class="col-sm-4 col-form-label pt-0 caption-label">Fecha de Inicio Contractual</label>
 													<div class="col-sm-8">
-														<input name="nejeStartDate" type="date" class="form-control form-control-sm" value="{{ $ejecutor[0]->ejeStartDateExe }}">
+														<input name="nejeStartDate" type="date" class="form-control form-control-sm" value="{{ $ejecutor[0]->ejeStartDate }}">
 													</div>
 												</div>
 											</div>
@@ -329,7 +329,7 @@
 												<div class="form-group row">
 													<label class="col-sm-4 col-form-label pt-0 caption-label">Fecha de Término Contractual</label>
 													<div class="col-sm-8 pl-0">
-														<input name="nejeEndDate" type="date" class="form-control form-control-sm" value="{{ $ejecutor[0]->ejeEndDateExe }}">
+														<input name="nejeEndDate" type="date" class="form-control form-control-sm" value="{{ $ejecutor[0]->ejeEndDate }}">
 													</div>
 												</div>
 											</div>

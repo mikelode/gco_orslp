@@ -364,15 +364,16 @@ class AvanceController extends Controller
                         continue;
                     }
 
-                    if(!is_numeric($part->avcMeteredCv)){
-                        throw new Exception("El metrado ingresado en la partida $part->parItem debe ser un número. \n- Verifique que no existan comas.\n");
+                    if(!is_numeric(trim($part->avcMeteredCv))){
+                        if(strlen(trim($part->avcMeteredCv)) != 0)
+                            throw new Exception("El metrado ingresado en la partida $part->parItem debe ser un número. \n- Verifique que no existan comas o espacios en blanco.\n");
                     }
 
                     $partida = Avdetail::find($part->avcId);
                     /*$partida->avcMeteredBa = $part->avcMeteredBa;
                     $partida->avcMountBa = $part->avcMountBa;
                     $partida->avcPercentBa = $part->avcPercentBa; no necesario almacenar con la nueva consulta */
-                    $partida->avcMeteredCv = $part->avcMeteredCv == '' ? null : $part->avcMeteredCv;
+                    $partida->avcMeteredCv = trim($part->avcMeteredCv) == '' ? null : $part->avcMeteredCv;
                     $partida->avcMountCv = $part->avcMountCv;
                     $partida->avcPercentCv = $part->avcPercentCv;
                     $partida->avcMeteredCa = $part->sumMeteredCa; /* change avc to sum, to calculate sum with zero when progress was 100% */
@@ -417,7 +418,7 @@ class AvanceController extends Controller
                 $cronograma->prgPercentExec = $porceEjecutado / 100;
                 $cronograma->prgAggregateExec = $acumuEjecutado / 100;
                 $cronograma->prgClosed = $close;
-                $cronograma->prgStatus = $this->get_status_obra($cronograma->prgMount, $montoEjecutado);
+                $cronograma->prgStatus = $this->get_status_obra($cronograma->prgAggregate, $acumuEjecutado/100);
                 $cronograma->save();
 
             });

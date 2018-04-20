@@ -139,7 +139,8 @@
 	}
 
 	grid = new Slick.Grid("#myGrid", data, columns, options);
-	grid.setSelectionModel(new Slick.RowSelectionModel());
+	//grid.setSelectionModel(new Slick.RowSelectionModel());
+	grid.setSelectionModel(new Slick.CellSelectionModel());
 	grid.registerPlugin(new Slick.AutoTooltips());
 	grid.getCanvasNode().focus();
 	grid.registerPlugin(new Slick.CellExternalCopyManager(pluginOptions));
