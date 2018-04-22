@@ -2,7 +2,7 @@
 
 @section('main-content')
 
-<div class="container">
+<div class="container" id="container-main">
     <div class="row">
         <div class="col-md-12">
             <div class="alert alert-primary mb-1" role="alert">
@@ -18,6 +18,7 @@
                     <table class="table table-hover align-middle" id="table-sparkline">
                         <thead class="thead-light">
                             <tr>
+                                <th></th>
                                 <th>Obra por Contrata</th>
                                 <th>Proceso</th>
                                 <th>Última Valorización</th>
@@ -29,6 +30,12 @@
                         <tbody id="tbody-sparkline">
                             @foreach($dashboard as $i => $py)
                             <tr>
+                                <td>
+                                    <a href="javascript:resumen_sosem('{{ $py->pryId }}');">
+                                        <img src="{{ asset('/img/revisar_32.png') }}">
+                                    </a>
+                                    
+                                </td>
                                 <td>
                                     <div class="media">
                                         <div class="media-body">

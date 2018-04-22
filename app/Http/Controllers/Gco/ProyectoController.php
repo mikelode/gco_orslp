@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Gco;
 
 use App\Models\Proyecto;
+use App\Models\Presupuesto;
+use App\Models\Progfisica;
 use App\Models\Equiprof;
 use App\Models\Seleccion;
 use App\Models\Uejecutora;
@@ -388,5 +390,26 @@ class ProyectoController extends Controller
 
         return response()->json(compact('success','msg'));
 
+    }
+
+    public function buildSosem(Request $request)
+    {
+        $pyId = $request->pyId;
+
+        $pry = Proyecto::find($pyId);
+        $psl = Seleccion::where('pslProject',$pyId)->get();
+        $pst = Postor::with('individualData')->where('pstSelectionProc',$psl[0]->pslId)->where('pstCondition',1)->get();
+        $eje = Uejecutora::where('ejeProject',$pyId)->get();
+        $eqp = Equiprof::with('individualData')->where('prfUejecutora',$eje[0]->ejeId)->get();
+        $pto = Presupuesto::select('*')
+                ->with('items')
+                ->with('programacion')
+                ->join('gcotpresupuesto','tprId','preType')
+                ->where('preProject',$pyId)
+                ->get();
+
+        $view = view('presentacion.slide_sosem',compact('pry','psl','pst','eje','eqp','pto'));
+
+        return $view;
     }
 }

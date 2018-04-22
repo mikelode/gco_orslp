@@ -13,6 +13,10 @@ class Presupuesto extends Model
     public function items()
 	{
 		return $this->hasMany('App\Models\Itempresupuesto','iprBudget','preId');
-	}
-
+    }
+    
+    public function programacion()
+    {
+        return $this->hasMany('App\Models\Progfisica','prgBudget','preId');
+    }
 }

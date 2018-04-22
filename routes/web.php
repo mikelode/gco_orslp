@@ -21,6 +21,7 @@ Route::post('nuevo/pry','Gco\ProyectoController@store');
 Route::get('editar/pry','Gco\ProyectoController@edit');
 Route::post('editar/pry','Gco\ProyectoController@update');
 Route::post('eliminar/pry','Gco\ProyectoController@destroy');
+Route::get('sosem/pry','Gco\ProyectoController@buildSosem');
 
 Route::post('nuevo/prc','Gco\SeleccionController@store');
 Route::post('editar/prc','Gco\SeleccionController@update');

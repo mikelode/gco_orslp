@@ -777,3 +777,10 @@ function registrar_prestacion(form)
 			mostrar_presupuesto(response.pyId, response.url);
 	});
 }
+
+function resumen_sosem(id)
+{
+	$.get('sosem/pry',{pyId:id},function(data){
+		$('#container-main').html(data);
+	});
+}
