@@ -212,7 +212,10 @@ class ProgramaFisicoController extends Controller
     {
         $pyId = $request->pyId;
         $prId = $request->prId;
-        $cronograma = Progfisica::where('prgProject',$pyId)->where('prgBudget',$prId)->orderBy('prgNumberVal','asc')->get();
+        $cronograma = Progfisica::where('prgProject',$pyId)
+                        ->where('prgBudget',$prId)
+                        ->orderBy('prgStartPeriod','asc')
+                        ->get();
 
         if($curva == '1'){
             $chartData = '';
@@ -347,18 +350,34 @@ class ProgramaFisicoController extends Controller
 
                 $pyId = $request->hnpyId;
                 $ptId = $request->hnptId;
+
+                $count = 0;
                 
                 foreach ($request->hnvalId as $i => $val) {
                     
+                    $cronograma = Progfisica::find($val);
+
+                    if($request->nvalMount[$i] == 0){
+                        $valNro = null;
+                        $count++;
+                    }
+                    else{
+                        $valNro = $cronograma->prgNumberVal - $count;
+                    }
+                    
                     if($val != 0){
 
-                        $cronograma = Progfisica::find($val);
-                        $cronograma->prgPeriodo = $request->nvalPeriod[$i];
+                        $cronograma->prgNumberVal = $valNro;
+                        $cronograma->prgStartPeriod = $request->nvalPeriodi[$i];
+                        $cronograma->prgEndPeriod = $request->nvalPeriodf[$i];
+                        $cronograma->prgPeriodo = $request->nvalMount[$i] == 0 ? 'SV': $request->nvalPeriodf[$i];
                         $cronograma->prgMount = floatval(str_replace(',', '', $request->nvalMount[$i]));
                         $cronograma->prgPercent = floatval($request->nvalPrcnt[$i]) / 100;
                         $cronograma->prgAggregate = floatval($request->nvalAggrt[$i]) / 100;
                         $cronograma->prgEditNote = $request->nvalNote[$i];
                         $cronograma->save();
+
+                        $lastExe = $cronograma->prgExecutor;
 
                         unset($cronograma);
 
@@ -367,8 +386,11 @@ class ProgramaFisicoController extends Controller
                         $periodo = new Progfisica();
                         $periodo->prgProject = $pyId;
                         $periodo->prgBudget = $ptId;
-                        $periodo->prgNumberVal = $request->nvalNumber[$i];
-                        $periodo->prgPeriodo = $request->nvalPeriod[$i];
+                        $periodo->prgExecutor = $lastExe;
+                        $periodo->prgNumberVal = $valNro; // $request->nvalNumber[$i];
+                        $periodo->prgStartPeriod = $request->nvalPeriodi[$i];
+                        $periodo->prgEndPeriod = $request->nvalPeriodf[$i];
+                        $periodo->prgPeriodo = $request->nvalMount[$i] == 0 ? 'SV': $request->nvalPeriodf[$i];
                         $periodo->prgMount = floatval(str_replace(',', '', $request->nvalMount[$i]));
                         $periodo->prgPercent = floatval($request->nvalPrcnt[$i]) / 100;
                         $periodo->prgAggregate = floatval($request->nvalAggrt[$i]) / 100;

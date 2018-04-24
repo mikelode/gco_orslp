@@ -65,7 +65,11 @@ class AvanceController extends Controller
         if(!$eje->isEmpty()){
             $exe = $eje[0];
             $prf = Equiprof::with('individualData')->where('prfUejecutora',$exe->ejeId)->get();
-            $crn = Progfisica::where('prgProject',$pry->pryId)->where('prgBudget',$ptId)->where('prgClosed',false)->get();
+            $crn = Progfisica::where('prgProject',$pry->pryId)
+                    ->where('prgBudget',$ptId)
+                    ->where('prgNumberVal','!=',null)
+                    ->where('prgClosed',false)
+                    ->get();
             $pto = Presupuesto::find($ptId);
             $pst = Postor::with('individualData')->find($exe->ejePostor);
         }
