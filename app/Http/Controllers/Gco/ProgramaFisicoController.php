@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Gco;
 
+use App\Models\Amplazo;
 use App\Models\Avance;
 use App\Models\Avdetail;
+use App\Models\Casosampliacion;
 use App\Models\Proyecto;
 use App\Models\Presupuesto;
 use App\Models\Listpresupuesto;
@@ -213,11 +215,12 @@ class ProgramaFisicoController extends Controller
         $pyId = $request->pyId;
         $prId = $request->prId;
         $cronograma = Progfisica::where('prgProject',$pyId)
-                        ->where('prgBudget',$prId)
-                        ->orderBy('prgStartPeriod','asc')
-                        ->get();
+                        ->where('prgBudget',$prId);
 
         if($curva == '1'){
+
+            $cronograma = $cronograma->where('prgNumberVal','!=',null)->orderBy('prgStartPeriod','asc')->get();
+
             $chartData = '';
             $labels = $cronograma->pluck('prgPeriodo');
 
@@ -259,6 +262,9 @@ class ProgramaFisicoController extends Controller
         }
         else{
 
+            $cronograma = $cronograma->orderBy('prgStartPeriod','asc')->get();
+            $casos = Casosampliacion::all();
+
             if($cronograma->isEmpty()){
                 $view = $this->create($request);
             }
@@ -269,7 +275,7 @@ class ProgramaFisicoController extends Controller
                 $eje = Proyecto::find($pyId)->ejecutor()->get();
                 
 
-                $view = view('formularios.editar_programacion', compact('cronograma','pry','eje','resumen'));
+                $view = view('formularios.editar_programacion', compact('cronograma','pry','eje','resumen','casos'));
 
             }
         }
@@ -409,6 +415,9 @@ class ProgramaFisicoController extends Controller
                 $msgId = 200;
                 $url = url('ver/programacion/0');
             }
+            else{
+                throw new Exception($exception);
+            }
 
         }catch(Exception $e){
             $msg = "Error: " . $e->getMessage();
@@ -484,6 +493,7 @@ class ProgramaFisicoController extends Controller
 
         $cronograma = Progfisica::where('prgProject',$pyId)
                         ->where('prgBudget',$prId)
+                        ->where('prgNumberVal','!=',null)
                         ->orderBy('prgNumberVal','asc')
                         ->get();
 
@@ -877,5 +887,64 @@ class ProgramaFisicoController extends Controller
         }
 
         return response()->json(compact('success','msg'));
+    }
+
+    public function storeTermExtension(Request $request)
+    {/* FALTA ACOMODAR LA REPROGRAMACION AUTOMATICA DEL CRONOGRAMA */
+        try{
+
+            $prg = Progfisica::find($request->nampPrgfisica);
+            $pyId = $prg->prgProject;
+            $ptId = $prg->prgBudget;
+
+            $exception = DB::transaction(function() use($request, $prg){
+
+                $amp = new Amplazo();
+                $amp->ampProject = $prg->prgProject;
+                $amp->ampBudget = $prg->prgBudget;
+                $amp->ampSchedulePeriod = $prg->prgId;
+                $amp->ampCaso = $request->nampCaso;
+                $amp->ampNote = $request->nampNote;
+                $amp->ampStartExterm = $request->nampStart;
+                $amp->ampEndExterm = $request->nampEnd;
+                $amp->ampDaysTerm = $request->nampDays;
+                $amp->ampEndExe = $request->nampEndexec;
+
+                if($request->hasFile('nampFile')){
+
+                    $file = $request->file('nampFile');
+                    $path_parts = pathinfo($_FILES['nampFile']['name']);
+                    $filename = $path_parts['filename'];
+                    $fileext = $path_parts['extension'];
+    
+                    $path_saved = $file->storeAs('docsprogramacion/' . $prg->prgId, $filename . '_' . time() . '.' . $fileext);
+    
+                    if(Storage::disk('public')->exists($path_saved)){
+                        $amp->ampPathFile = $path_saved;
+                    }
+                    else{
+                        throw new Exception("El archivo no se ha almacenado correctamente.");
+                    }
+                }
+
+                $amp->save();
+            });
+
+            if(is_null($exception)){
+                $msg = 'Cronograma calendarizado actualizado correctamente';
+                $msgId = 200;
+                $url = url('ver/programacion/0');
+            }
+            else{
+                throw new Exception($exception);
+            }
+
+        }catch(Exception $e){
+            $msg = 'Error: ' . $e->getMessage() . ' -Archivo- ' . $e->getFile() . ' -Linea- ' . $e->getLine() . " \n";
+            $msgId = 500;
+            $url= '';
+        }
+
+        return response()->json(compact('msg','msgId','url','pyId','ptId'));
     }
 }

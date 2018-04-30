@@ -6,63 +6,64 @@
 					<div class="row">
 						<div class="col-md-10">
 							<div class="card">
-								<div class="card-header py-0">
-									Plazo de Ejecución
+								<div class="card-header">
+									<p style="display: inline;"><i class="fas fa-clock"></i> Plazo de Ejecución</p>
+									<div class="float-right">
+										<button type="button" data-toggle="modal" data-target="#mdlExtendTerm" class="btn btn-primary btn-sm" id="btnExtendTerm" style="display: none;">Ampliar de Plazo</button>
+									</div>
 								</div>
 								<div class="card-body py-0">
 									<div class="row">
-										<div class="col-sm-4">
-											<div class="form-group row mb-0">
-												<label class="col-sm-5 col-form-label">Meses</label>
-												<div class="col-sm-7">
-													<input type="text" class="form-control-plaintext" id="pyMesesPlazo" name="npyMesesPlazo" value="{{ $eje[0]->ejeMonthTerm }} meses" readonly>
-												</div>
-											</div>
-											<div class="form-group row mb-0">
-												<label class="col-sm-5 col-form-label">Días</label>
-												<div class="col-sm-7">
-													<input type="text" class="form-control-plaintext" id="pyDiasPlazo" name="npyDiasPlazo" value="{{ $eje[0]->ejeDaysTerm }} días" readonly>
-												</div>
-											</div>
+										<div class="col-md-12">
+											<table class="table">
+												<thead>
+													<tr>
+														<th>Nro</th>
+														<th>Meses</th>
+														<th>Días</th>
+														<th>Inicio de Obra</th>
+														<th>Final Contractual</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Contractual</td>
+														<td>
+															<input type="text" class="form-control-plaintext" id="pyMesesPlazo" name="npyMesesPlazo" value="{{ $eje[0]->ejeMonthTerm }} meses" readonly>
+														</td>
+														<td>
+															<input type="text" class="form-control-plaintext" id="pyDiasPlazo" name="npyDiasPlazo" value="{{ $eje[0]->ejeDaysTerm }} días" readonly>
+														</td>
+														<td>
+															<input type="date" class="form-control-plaintext" id="pyFechaInicio" name="npyFechaInicio" value="{{ is_null($eje[0]->ejeStartDate) ? null : Carbon\Carbon::parse($eje[0]->ejeStartDate)->format('Y-m-d') }}" readonly>
+														</td>
+														<td>
+															<input type="date" class="form-control-plaintext" id="pyFechaFinal" name="npyFechaFinal" value="{{ is_null($eje[0]->ejeEndDate) ? null : Carbon\Carbon::parse($eje[0]->ejeEndDate)->format('Y-m-d') }}" readonly>
+														</td>
+													</tr>
+												</tbody>
+											</table>
 										</div>
-										<div class="col-sm-4">
-											<div class="form-group row mb-0">
-												<label class="col-sm-5 col-form-label">Inicio de Obra</label>
-												<div class="col-sm-7">
-													<input type="date" class="form-control-plaintext" id="pyFechaInicio" name="npyFechaInicio" value="{{ is_null($eje[0]->ejeStartDate) ? null : Carbon\Carbon::parse($eje[0]->ejeStartDate)->format('Y-m-d') }}" readonly>
-												</div>
-											</div>
-											<div class="form-group row mb-0">
-												<label class="col-sm-5 col-form-label">Término de Obra</label>
-												<div class="col-sm-7">
-													<input type="date" class="form-control-plaintext" id="pyFechaFinal" name="npyFechaFinal" value="{{ is_null($eje[0]->ejeEndDate) ? null : Carbon\Carbon::parse($eje[0]->ejeEndDate)->format('Y-m-d') }}" readonly>
-												</div>
-											</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-2 col-form-label">Monto Base</label>
+										<div class="col-sm-3">
+											<select class="form-control form-control-sm" id="pyResumenPto">
+												<option value="NA">-- Seleccionar --</option>
+												<?php $rsmMount = 0; ?>
+												@foreach($resumen as $pto)
+													@if($pto->iprId == $pry->pryBaseBudget)
+													<option value="{{ $pto->iprId.'-'.$pto->iprCodeItem }}" selected>{{ $pto->iprItemGeneral }}</option>
+													<?php $rsmMount = $pto->iprItemGeneralMount; ?>
+													@else
+													<option value="{{ $pto->iprId.'-'.$pto->iprCodeItem }}">{{ $pto->iprItemGeneral }}</option>
+													@endif
+												@endforeach()
+											</select>
 										</div>
-										<div class="col-sm-4">
-											<div class="form-group row">
-												<label class="col-sm-5 col-form-label">Monto Base</label>
-												<div class="col-sm-7">
-													<select class="form-control form-control-sm mt-2" id="pyResumenPto">
-														<option value="NA">-- Seleccionar --</option>
-														<?php $rsmMount = 0; ?>
-														@foreach($resumen as $pto)
-															@if($pto->iprId == $pry->pryBaseBudget)
-															<option value="{{ $pto->iprId.'-'.$pto->iprCodeItem }}" selected>{{ $pto->iprItemGeneral }}</option>
-															<?php $rsmMount = $pto->iprItemGeneralMount; ?>
-															@else
-															<option value="{{ $pto->iprId.'-'.$pto->iprCodeItem }}">{{ $pto->iprItemGeneral }}</option>
-															@endif
-														@endforeach()
-													</select>
-												</div>
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-5 col-form-label">Soles</label>
-												<div class="col-sm-7">
-													<input type="text" readonly id="ptoResumenMonto" class="form-control-plaintext" value="{{ number_format($rsmMount,2,'.',',') }}">
-												</div>
-											</div>
+										<label class="col-sm-1 col-form-label">S/</label>
+										<div class="col-sm-3">
+											<input type="text" readonly id="ptoResumenMonto" class="form-control-plaintext" value="{{ number_format($rsmMount,2,'.',',') }}">
 										</div>
 									</div>
 								</div>
@@ -86,10 +87,10 @@
 						<div class="col-md-12">
 							<div class="card mt-3">
 								<div class="card-header">
-									<p style="display: inline;"><i class="fas fa-calendar"></i> Datos del Cronograma Calendarizado</p>
+									<p style="display: inline;"><i class="fas fa-calendar-alt"></i> Datos del Cronograma Calendarizado</p>
 									<div class="float-right">
-										<button type="button" class="btn btn-secondary btn-sm mr-2 mb-1" id="btnAddPeriod" style="display: none;" onclick="agregar_periodo($('#tblSchedule'))">Agregar Periodo</button>
-										<button type="button" class="btn btn-info btn-sm mr-2 mb-1" id="btnEditSchedule" style="display: none;" onclick="actualizar_cronograma($('#frmUpdateSchedule'))">Guardar
+										<button type="button" class="btn btn-secondary btn-sm" id="btnAddPeriod" style="display: none;" onclick="agregar_periodo($('#tblSchedule'))">Agregar Periodo</button>
+										<button type="button" class="btn btn-info btn-sm" id="btnEditSchedule" style="display: none;" onclick="actualizar_cronograma($('#frmUpdateSchedule'))">Guardar
 										</button>
 									</div>
 								</div>
@@ -101,8 +102,8 @@
 										<table class="table table-bordered table-sm action-table" id="tblSchedule">
 											<thead>
 												<tr>
-													<th width="5%" rowspan="2">Val</th>
-													<th colspan="2">Periodo</th>
+													<th width="5%" rowspan="2">Nro</th>
+													<th colspan="3">Periodo</th>
 													<th width="7%" rowspan="2">Monto</th>
 													<th width="5%" rowspan="2">% Avance</th>
 													<th width="5%" rowspan="2">% Acum</th>
@@ -113,13 +114,17 @@
 												<tr>
 													<th>Inicial</th>
 													<th>Final</th>
+													<th>Mes</th>
 													<th>Valoriz</th>
 													<th>Ejecución</th>
 													<th>Pago</th>
 												</tr>
 											</thead>
 											<tbody id="cuerpo">
-												<?php $total = 0; ?>
+												<?php 
+													$total = 0;
+													setlocale(LC_TIME, 'spanish');
+												?>
 												@foreach($cronograma as $i => $item)
 													<tr id="{{ 'val-'.$item->prgNumberVal }}" data-key="{{ $item->prgId }}">
 														<td>
@@ -131,6 +136,9 @@
 														</td>
 														<td>
 															<input type="date" name="nvalPeriodf[]" readonly class="form-control-plaintext {{ $item->prgClosed ? '' : 'cronoedit' }}" value="{{ $item->prgEndPeriod }}" >
+														</td>
+														<td>
+															<input type="text" name="nvalMonth[]" readonly class="form-control-plaintext {{ $item->prgClosed ? '' : 'cronoedit' }}" value="{{ $item->prgPeriodo == 'SV' ? $item->prgPeriodo : strftime("%B",strtotime($item->prgPeriodo)) }}">
 														</td>
 														<td>
 															<input type="text" name="nvalMount[]" readonly class="form-control-plaintext valMount {{ $item->prgClosed ? '' : 'cronoedit' }}" value="{{ number_format($item->prgMount,2,'.',',') }}">
@@ -280,6 +288,88 @@
 			<div class="modal-footer">
 				<button type="button" class="btn btn-primary" onclick="adjuntar_archivo_prg($('#frmAttachFile')[0])">Subir documento</button>
         		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="mdlExtendTerm" tabindex="-1" role="dialog" aria-labelledby="extermModal" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content border border-primary">
+			<div class="modal-header border border-primary bg-primary text-white">
+				REGISTRAR AMPLIACIÓN DE PLAZO
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form action="frmExtendTerm" enctype="multipart/form-data">
+					{{ csrf_field() }}
+					<div class="form-group row">
+						<label class="col-md-4 font-weight-bold">Valorización implicada</label>
+						<div class="col-md-8">
+							<select class="form-control form-control-sm" name="nampPrgfisica">
+								@foreach($cronograma as $val)
+									@if(!$val->prgClosed && $val->prgNumberVal != null)
+									<option value="{{ $val->prgId }}">
+										{{ $val->prgNumberVal . ': ' . strftime("%B",strtotime($val->prgPeriodo))  }}
+									</option>
+									@endif
+								@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-md-4 font-weight-bold">Motivo (Art.140)</label>
+						<div class="col-md-8">
+							<select class="form-control form-control-sm" name="nampCaso">
+								@foreach($casos as $caso)
+								<option value="{{ $caso->camId }}">{{ $caso->camShortDesc }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-md-4 font-weight-bold">Nota/Detalle</label>
+						<div class="col-md-8">
+							<textarea class="form-control form-control-sm" name="nampNote"></textarea>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-md-4 font-weight-bold">Desde (fecha):</label>
+						<div class="col-md-8">
+							<input class="form-control form-control-sm" type="date" name="nampStart">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-md-4 font-weight-bold">Hasta (fecha):</label>
+						<div class="col-md-8">
+							<input class="form-control form-control-sm" type="date" name="nampEnd">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-md-4 font-weight-bold">Ampliación (días):</label>
+						<div class="col-md-8">
+							<input class="form-control form-control-sm" type="text" name="nampDays">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-md-4 font-weight-bold">Nueva fecha final de obra:</label>
+						<div class="col-md-8">
+							<input class="form-control form-control-sm" type="date" name="nampEndexec">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-md-4 font-weight-bold">Doc. Sustentatorio:</label>
+						<div class="col-md-8">
+							<input class="form-control form-control-file form-control-sm" type="file" name="nampFile">
+							<progress class="form-control" value="0"></progress>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="registrar_ampliacion($('#frmExtendTerm')[0])">Registrar Ampliación</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
 			</div>
 		</div>
 	</div>

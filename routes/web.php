@@ -53,6 +53,7 @@ Route::get('curvas','Gco\ProgramaFisicoController@indexCurva')->middleware('auth
 Route::get('curvas/desplegar/{curva}','Gco\ProgramaFisicoController@show');
 Route::get('export/sheet','Gco\ProgramaFisicoController@generateSheet');
 Route::post('documento/programacion','Gco\ProgramaFisicoController@uploadFileProgramacion');
+Route::post('ampliacion/programacion','Gco\ProgramaFisicoController@storeTermExtension');
 
 Route::get('presupuesto/avance','Gco\AvanceController@index')->middleware('auth');
 Route::get('avance/nuevo','Gco\AvanceController@create');

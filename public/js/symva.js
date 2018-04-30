@@ -688,6 +688,7 @@ function editar_cronograma(btn, form)
 		btn.attr('class', 'btn btn-sm btn-warning btn-block');
 		$('#btnEditSchedule').show();
 		$('#btnAddPeriod').show();
+		$('#btnExtendTerm').show();
 	}
 	else if(action == 'cancelar'){
 		mostrar_cronograma(form.find('#pyId').val(),form.find('#ptId').val(),'../ver/programacion/0');
@@ -783,4 +784,39 @@ function resumen_sosem(id)
 	$.get('sosem/pry',{pyId:id},function(data){
 		$('#container-main').html(data);
 	});
+}
+
+function registrar_ampliacion(form)
+{
+	var frmData = new FormData(form);
+
+	$.ajax({
+        type: 'post',
+        url: '../ampliacion/programacion',
+        data: frmData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(response){
+            alert(response.msg);
+            $('#mdlAttachFile').modal('hide');
+            if(response.msgId == 200){
+				mostrar_cronograma(response.pyId, response.ptId, response.url);
+            }
+        },
+        xhr: function(){
+            var myXhr = $.ajaxSettings.xhr();
+            if(myXhr.upload){
+                myXhr.upload.addEventListener('progress', function(ev){
+                    if(ev.lengthComputable){
+                        $('progress').attr({
+                            value: ev.loaded,
+                            max: ev.total,
+                        });
+                    }
+                }, false);
+            }
+            return myXhr;
+        },
+    });
 }

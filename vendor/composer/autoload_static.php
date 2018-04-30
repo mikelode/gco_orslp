@@ -420,6 +420,7 @@ class ComposerStaticInite68d400fe827c65b20ed65c34773c3da
         'Carbon\\Carbon' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Carbon.php',
         'Carbon\\CarbonInterval' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonInterval.php',
         'Carbon\\Exceptions\\InvalidDateException' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Exceptions/InvalidDateException.php',
+        'CasoampliacionTableSeeder' => __DIR__ . '/../..' . '/database/seeds/CasoampliacionTableSeeder.php',
         'CondicionTableSeeder' => __DIR__ . '/../..' . '/database/seeds/CondicionTableSeeder.php',
         'Cron\\AbstractField' => __DIR__ . '/..' . '/mtdowling/cron-expression/src/Cron/AbstractField.php',
         'Cron\\CronExpression' => __DIR__ . '/..' . '/mtdowling/cron-expression/src/Cron/CronExpression.php',
