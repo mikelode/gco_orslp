@@ -273,9 +273,13 @@ class ProgramaFisicoController extends Controller
                 //$resumen = Presupuesto::where('preId',$prId)->where('preProject',$pyId)->get();
                 $resumen = Itempresupuesto::where('iprBudget',$prId)->get();
                 $eje = Proyecto::find($pyId)->ejecutor()->get();
-                
+                $amp = Amplazo::select('*')
+                            ->join('gcocasoampliacion','camId','=','ampCaso')
+                            ->where('ampProject',$pyId)
+                            ->where('ampBudget',$prId)
+                            ->get();
 
-                $view = view('formularios.editar_programacion', compact('cronograma','pry','eje','resumen','casos'));
+                $view = view('formularios.editar_programacion', compact('cronograma','pry','eje','resumen','casos','amp'));
 
             }
         }
@@ -800,12 +804,14 @@ class ProgramaFisicoController extends Controller
         header('Content-Disposition: attachment; filename="avance-fisico.xlsx"');
         $writer->save('php://output');
     }
-
+    /*
+     * Función para adjuntar archivo a la ampliación de plazo registrada
+     */
     public function uploadFileProgramacion(Request $request)
     {
         try{
             $pyId = $request->hnatchPry;
-            $pgId = $request->hnatchPrg;
+            $apId = $request->hnatchAmp;
             $url = url('ver/programacion/0');
 
             if($request->hasFile('natchFile')){
@@ -815,17 +821,17 @@ class ProgramaFisicoController extends Controller
                 $filename = $path_parts['filename'];
                 $fileext = $path_parts['extension'];
 
-                $path_saved = $file->storeAs('docsprogramacion/' . $pgId, $filename . '_' . time() . '.' . $fileext);
+                $path_saved = $file->storeAs('docsprogramacion/' . $apId, $filename . '_' . time() . '.' . $fileext);
 
                 if(Storage::disk('public')->exists($path_saved)){
-                    $programacion = Progfisica::find($pgId);
-                    $programacion->prgPathFile = $path_saved;
-                    $programacion->save();
+                    $ampliacion = Amplazo::find($apId);
+                    $ampliacion->ampPathFile = $path_saved;
+                    //$ampliacion->save();
 
-                    if($programacion->save()){
+                    if($ampliacion->save()){
                         $msg = 'Archivo adjunto subido y registrado correctamente.';
                         $msgId = 200;
-                        $ptId = $programacion->prgBudget;
+                        $ptId = $ampliacion->ampBudget;
                     }
                     else{
                         throw new Exception("Error al registrar la ruta del archivo en la base de datos. Revise su conexión.");
@@ -890,9 +896,8 @@ class ProgramaFisicoController extends Controller
     }
 
     public function storeTermExtension(Request $request)
-    {/* FALTA ACOMODAR LA REPROGRAMACION AUTOMATICA DEL CRONOGRAMA */
+    {
         try{
-
             $prg = Progfisica::find($request->nampPrgfisica);
             $pyId = $prg->prgProject;
             $ptId = $prg->prgBudget;
@@ -905,8 +910,8 @@ class ProgramaFisicoController extends Controller
                 $amp->ampSchedulePeriod = $prg->prgId;
                 $amp->ampCaso = $request->nampCaso;
                 $amp->ampNote = $request->nampNote;
-                $amp->ampStartExterm = $request->nampStart;
-                $amp->ampEndExterm = $request->nampEnd;
+                $amp->ampStartStay = $request->nampStart;
+                $amp->ampEndStay = $request->nampEnd;
                 $amp->ampDaysTerm = $request->nampDays;
                 $amp->ampEndExe = $request->nampEndexec;
 
@@ -928,10 +933,65 @@ class ProgramaFisicoController extends Controller
                 }
 
                 $amp->save();
+
+                /* Modificando el cronograma actual existente */
+                
+                $currLastVal = DB::table('gcoprogfisica as a')
+                                ->select('a.*')
+                                ->leftJoin(
+                                    DB::raw('gcoprogfisica as b'), function($join){
+                                        $join->on('a.prgProject','=','b.prgProject');
+                                        $join->on('a.prgBudget','=','b.prgBudget');
+                                        $join->on('a.prgId','<','b.prgId');
+                                    }
+                                )
+                                ->where('b.prgId',null)
+                                ->where('a.prgProject',$prg->prgProject)
+                                ->where('a.prgBudget',$prg->prgBudget)
+                                ->first();
+                
+                $currEndate = Carbon::parse($currLastVal->prgEndPeriod);
+                $newEndate = Carbon::parse($amp->ampEndExe);
+                
+                $diffInMonths = $newEndate->month - $currEndate->month;
+                
+                if($diffInMonths == 0){
+                    $currLastVal->prgEndPeriod = $amp->ampEndExe;
+                    $currLastVal->save();
+                }
+                else{
+                    for($i = 0; $i <= $diffInMonths; $i++){
+                        if($i == 0){
+                            $lastCrono = Progfisica::find($currLastVal->prgId);
+                            $lastCrono->prgEndPeriod = $currEndate->endOfMonth();
+                            $lastCrono->save();
+                        }
+                        else{
+                            $crono = new Progfisica();
+                            $crono->prgProject = $currLastVal->prgProject;
+                            $crono->prgBudget = $currLastVal->prgBudget;
+                            $crono->prgExecutor = $currLastVal->prgExecutor;
+                            $crono->prgNumberVal = $currLastVal->prgNumberVal + $i;
+                            $crono->prgStartPeriod = $currEndate->copy()->addMonth($i)->startOfMonth();
+
+                            if(($currEndate->month + $i) == $newEndate->month){
+                                $crono->prgEndPeriod = $newEndate;
+                                $crono->prgPeriodo = $newEndate->toDateString();
+                            }
+                            else{
+                                $crono->prgEndPeriod = $currEndate->copy()->addMonth($i)->endOfMonth();
+                                $crono->prgPeriodo = $currEndate->copy()->addMonth($i)->endOfMonth()->toDateString();
+                            }
+
+                            $crono->prgEditNote = 'Ampliación de plazo registrada';
+                            $crono->save();
+                        }
+                    }
+                }
             });
 
             if(is_null($exception)){
-                $msg = 'Cronograma calendarizado actualizado correctamente';
+                $msg = 'Ampliación de plazo registrada correctamente \nCronograma calendarizado actualizado correctamente, ajuste los montos de la nueva programación.';
                 $msgId = 200;
                 $url = url('ver/programacion/0');
             }

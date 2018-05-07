@@ -344,7 +344,7 @@ function cargar_presupuesto1(id)
 	return partidas;
 }
 
-function adjuntar_archivo_prg(form)
+function adjuntar_archivo_amp(form)
 {
 	var frmData = new FormData(form);
 
@@ -799,7 +799,7 @@ function registrar_ampliacion(form)
         processData: false,
         success: function(response){
             alert(response.msg);
-            $('#mdlAttachFile').modal('hide');
+            $('#mdlExtendTerm').modal('hide');
             if(response.msgId == 200){
 				mostrar_cronograma(response.pyId, response.ptId, response.url);
             }

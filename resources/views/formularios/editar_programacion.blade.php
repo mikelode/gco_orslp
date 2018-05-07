@@ -12,40 +12,80 @@
 										<button type="button" data-toggle="modal" data-target="#mdlExtendTerm" class="btn btn-primary btn-sm" id="btnExtendTerm" style="display: none;">Ampliar de Plazo</button>
 									</div>
 								</div>
-								<div class="card-body py-0">
+								<div class="card-body p-0">
 									<div class="row">
 										<div class="col-md-12">
-											<table class="table">
+											<table class="table table-bordered table-sm action-table">
 												<thead>
 													<tr>
-														<th>Nro</th>
+														<th>Plazo</th>
 														<th>Meses</th>
 														<th>Días</th>
+														<th>Motivo</th>
+														<th>Duración</th>
 														<th>Inicio de Obra</th>
-														<th>Final Contractual</th>
+														<th>Fecha final de obra</th>
+														<th><img src="{{ asset('/img/fileattach_24.png') }}"></th>
 													</tr>
 												</thead>
 												<tbody>
 													<tr>
 														<td>Contractual</td>
 														<td>
-															<input type="text" class="form-control-plaintext" id="pyMesesPlazo" name="npyMesesPlazo" value="{{ $eje[0]->ejeMonthTerm }} meses" readonly>
+															{{ $eje[0]->ejeMonthTerm }}
 														</td>
 														<td>
-															<input type="text" class="form-control-plaintext" id="pyDiasPlazo" name="npyDiasPlazo" value="{{ $eje[0]->ejeDaysTerm }} días" readonly>
+															{{ $eje[0]->ejeDaysTerm }}
+														</td>
+														<td>-</td>
+														<td>-</td>
+														<td>
+															{{ is_null($eje[0]->ejeStartDate) ? null : Carbon\Carbon::parse($eje[0]->ejeStartDate)->format('Y-m-d') }}
 														</td>
 														<td>
-															<input type="date" class="form-control-plaintext" id="pyFechaInicio" name="npyFechaInicio" value="{{ is_null($eje[0]->ejeStartDate) ? null : Carbon\Carbon::parse($eje[0]->ejeStartDate)->format('Y-m-d') }}" readonly>
+															{{ is_null($eje[0]->ejeEndDate) ? null : Carbon\Carbon::parse($eje[0]->ejeEndDate)->format('Y-m-d') }}
 														</td>
+														<td>-</td>
+													</tr>
+													@foreach($amp as $item)
+													<tr data-key="{{ $item->ampId }}">
+														<input type="hidden" class="hampNote" value="{{ $item->ampNote }}">
+														<td>Ampliación</td>
+														<td>{{ intval($item->ampDaysTerm / 30) }}</td>
+														<td>{{ $item->ampDaysTerm }}</td>
+														<td>{{ $item->camDescription }}</td>
 														<td>
-															<input type="date" class="form-control-plaintext" id="pyFechaFinal" name="npyFechaFinal" value="{{ is_null($eje[0]->ejeEndDate) ? null : Carbon\Carbon::parse($eje[0]->ejeEndDate)->format('Y-m-d') }}" readonly>
+															{{ $item->ampCaso == 2 ? $item->ampStartStay . ' a ' . $item->ampEndStay : '-' }}<br>
+															{{ $item->ampNote }}
+														</td>
+														<td>{{ is_null($eje[0]->ejeStartDate) ? null : Carbon\Carbon::parse($eje[0]->ejeStartDate)->format('Y-m-d') }}</td>
+														<td>{{ $item->ampEndExe }}</td>
+														<td>
+															@if(\Storage::disk('public')->exists($item->ampPathFile))
+															<a href="{{ url('/storage/' . $item->ampPathFile) }}" target="_blank" title="Ver archivo">
+																<img src="{{ asset('/img/pdf-file_16.png') }}">
+															</a>
+																@if(Auth::user()->hasPermission(23))
+																<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Cambiar archivo">
+																	<img src="{{ asset('/img/refresh_16.png') }}">
+																</a>
+																@endif
+															@else
+																@if(Auth::user()->hasPermission(23))
+																<a href="#" data-toggle="modal" data-target="#mdlAttachFile" class="btnAttachFile" title="Adjuntar archivo">
+																	<img src="{{ asset('/img/upload_file_20.png') }}">
+																</a>
+																@endif
+															@endif
 														</td>
 													</tr>
+													@endforeach
 												</tbody>
 											</table>
 										</div>
 									</div>
 									<div class="form-group row">
+										<div class="col-sm-2"></div>
 										<label class="col-sm-2 col-form-label">Monto Base</label>
 										<div class="col-sm-3">
 											<select class="form-control form-control-sm" id="pyResumenPto">
@@ -87,7 +127,7 @@
 						<div class="col-md-12">
 							<div class="card mt-3">
 								<div class="card-header">
-									<p style="display: inline;"><i class="fas fa-calendar-alt"></i> Datos del Cronograma Calendarizado</p>
+									<p style="display: inline;"><i class="fas fa-calendar-alt"></i> Control de Valorizaciones</p>
 									<div class="float-right">
 										<button type="button" class="btn btn-secondary btn-sm" id="btnAddPeriod" style="display: none;" onclick="agregar_periodo($('#tblSchedule'))">Agregar Periodo</button>
 										<button type="button" class="btn btn-info btn-sm" id="btnEditSchedule" style="display: none;" onclick="actualizar_cronograma($('#frmUpdateSchedule'))">Guardar
@@ -102,19 +142,18 @@
 										<table class="table table-bordered table-sm action-table" id="tblSchedule">
 											<thead>
 												<tr>
-													<th width="5%" rowspan="2">Nro</th>
-													<th colspan="3">Periodo</th>
+													<th width="5%" rowspan="2">Val.</th>
+													<th rowspan="2">Desde</th>
+													<th rowspan="2">Hasta</th>
+													<th rowspan="2">Periodo</th>
 													<th width="7%" rowspan="2">Monto</th>
 													<th width="5%" rowspan="2">% Avance</th>
 													<th width="5%" rowspan="2">% Acum</th>
 													<th rowspan="2">Nota</th>
-													<th rowspan="2"><img src="{{ asset('/img/fileattach_24.png') }}"></th>
+													<th rowspan="2">{{-- <img src="{{ asset('/img/fileattach_24.png') }}"> --}}</th>
 													<th colspan="3">Estado de Obra</th>
 												</tr>
 												<tr>
-													<th>Inicial</th>
-													<th>Final</th>
-													<th>Mes</th>
 													<th>Valoriz</th>
 													<th>Ejecución</th>
 													<th>Pago</th>
@@ -153,7 +192,7 @@
 															<textarea name="nvalNote[]" readonly="readonly" class="textarea-cell {{ $item->prgClosed ? '' : 'cronoedit' }}" rows="1" cols="10">{{ $item->prgEditNote }}</textarea>
 														</td>
 														<td>
-															@if(\Storage::disk('public')->exists($item->prgPathFile))
+															{{-- @if(\Storage::disk('public')->exists($item->prgPathFile))
 															<a href="{{ url('/storage/' . $item->prgPathFile) }}" target="_blank" title="Ver archivo">
 																<img src="{{ asset('/img/pdf-file_16.png') }}">
 															</a>
@@ -168,7 +207,7 @@
 																	<img src="{{ asset('/img/upload_file_20.png') }}">
 																</a>
 																@endif
-															@endif
+															@endif --}}
 														</td>
 														<td>
 															@if($item->prgClosed)
@@ -274,9 +313,9 @@
 						<input type="hidden" id="hatchPry" name="hnatchPry">
 					</div>
 					<div class="form-group">
-						<label>Periodo: </label>
-						<input type="text" readonly class="form-control form-control-sm" id="atchPrg" name="natchPrg">
-						<input type="hidden" id="hatchPrg" name="hnatchPrg">
+						<label>Ampliación: </label>
+						<input type="text" readonly class="form-control form-control-sm" id="atchAmp" name="natchAmp">
+						<input type="hidden" id="hatchAmp" name="hnatchAmp">
 					</div>
 					<div class="form-group">
 						<label>Seleccionar Archivo</label>
@@ -286,7 +325,7 @@
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" onclick="adjuntar_archivo_prg($('#frmAttachFile')[0])">Subir documento</button>
+				<button type="button" class="btn btn-primary" onclick="adjuntar_archivo_amp($('#frmAttachFile')[0])">Subir documento</button>
         		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
 			</div>
 		</div>
@@ -302,7 +341,7 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<form action="frmExtendTerm" enctype="multipart/form-data">
+				<form id="frmExtendTerm" enctype="multipart/form-data">
 					{{ csrf_field() }}
 					<div class="form-group row">
 						<label class="col-md-4 font-weight-bold">Valorización implicada</label>
@@ -321,7 +360,8 @@
 					<div class="form-group row">
 						<label class="col-md-4 font-weight-bold">Motivo (Art.140)</label>
 						<div class="col-md-8">
-							<select class="form-control form-control-sm" name="nampCaso">
+							<select class="form-control form-control-sm" name="nampCaso" id="ampCaso">
+								<option value="NA">-- Seleccione el motivo --</option>
 								@foreach($casos as $caso)
 								<option value="{{ $caso->camId }}">{{ $caso->camShortDesc }}</option>
 								@endforeach
@@ -337,13 +377,13 @@
 					<div class="form-group row">
 						<label class="col-md-4 font-weight-bold">Desde (fecha):</label>
 						<div class="col-md-8">
-							<input class="form-control form-control-sm" type="date" name="nampStart">
+							<input class="form-control form-control-sm ampSuspension" type="date" name="nampStart">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label class="col-md-4 font-weight-bold">Hasta (fecha):</label>
 						<div class="col-md-8">
-							<input class="form-control form-control-sm" type="date" name="nampEnd">
+							<input class="form-control form-control-sm ampSuspension" type="date" name="nampEnd">
 						</div>
 					</div>
 					<div class="form-group row">
@@ -380,8 +420,8 @@
 	$('#mdlAttachFile').on('show.bs.modal', function(event) {
 		var button = $(event.relatedTarget);
 		var action = button.data('action');
-		var prId = button.closest('tr').attr('data-key');
-		var prNro = button.closest('tr').attr('id');
+		var ampId = button.closest('tr').attr('data-key');
+		var ampNro = button.closest('tr').find('input.hampNote').val();
 		var dataSelect = $('#pyName').select2('data');
 		var pryText = dataSelect[0].text;
 		var pryId = dataSelect[0].id;
@@ -389,8 +429,8 @@
 
 		modal.find('.modal-body #atchPry').val(pryText);
 		modal.find('.modal-body #hatchPry').val(pryId);
-		modal.find('.modal-body #atchPrg').val('Número - ' + prNro.split('-')[1]);
-		modal.find('.modal-body #hatchPrg').val(prId);
+		modal.find('.modal-body #atchAmp').val(ampNro);
+		modal.find('.modal-body #hatchAmp').val(ampId);
 	});
 
 	$('#tblSchedule').on('focusin', '.valMount', function() {
@@ -501,6 +541,15 @@
 			{value: 'Adelantado', text: 'Adelantado'},
 			{value: 'Atrazado', text: 'Atrazado'}
 		],
+	});
+
+	$('#ampCaso').change(function(){
+		if(this.value == 1){
+			$('.ampSuspension').prop('readonly',true);
+		}
+		else{
+			$('.ampSuspension').prop('readonly',false);
+		}
 	});
 
 </script>

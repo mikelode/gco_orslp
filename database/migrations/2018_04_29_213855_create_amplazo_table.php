@@ -28,8 +28,8 @@ class CreateAmplazoTable extends Migration
                     ->on('gcocasoampliacion');
 
             $table->string('ampNote')->nullable();
-            $table->date('ampStartExterm');
-            $table->date('ampEndExterm');
+            $table->date('ampStartStay')->nullable();
+            $table->date('ampEndStay')->nullable();
             $table->integer('ampDaysTerm');
             $table->date('ampEndExe');
             $table->string('ampPathFile',500)->nullable();
