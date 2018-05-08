@@ -348,7 +348,7 @@
 						<div class="col-md-8">
 							<select class="form-control form-control-sm" name="nampPrgfisica">
 								@foreach($cronograma as $val)
-									@if(!$val->prgClosed && $val->prgNumberVal != null)
+									@if(/* !$val->prgClosed && */ $val->prgNumberVal != null)
 									<option value="{{ $val->prgId }}">
 										{{ $val->prgNumberVal . ': ' . strftime("%B",strtotime($val->prgPeriodo))  }}
 									</option>
