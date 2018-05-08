@@ -956,8 +956,9 @@ class ProgramaFisicoController extends Controller
                 $diffInMonths = $newEndate->month - $currEndate->month;
                 
                 if($diffInMonths == 0){
-                    $currLastVal->prgEndPeriod = $amp->ampEndExe;
-                    $currLastVal->save();
+                    $lastCrono = Progfisica::find($currLastVal->prgId);
+                    $lastCrono->prgEndPeriod = $amp->ampEndExe;
+                    $lastCrono->save();
                 }
                 else{
                     for($i = 0; $i <= $diffInMonths; $i++){
