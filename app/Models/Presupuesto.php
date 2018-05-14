@@ -19,4 +19,9 @@ class Presupuesto extends Model
     {
         return $this->hasMany('App\Models\Progfisica','prgBudget','preId');
     }
+
+    public function ampliaciones()
+    {
+        return $this->hasMany('App\Models\Amplazo','ampBudget','preId');
+    }
 }

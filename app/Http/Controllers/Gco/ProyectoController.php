@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Gco;
 
+use App\Models\Amplazo;
 use App\Models\Proyecto;
 use App\Models\Presupuesto;
 use App\Models\Progfisica;
@@ -407,8 +408,11 @@ class ProyectoController extends Controller
                 ->join('gcotpresupuesto','tprId','preType')
                 ->where('preProject',$pyId)
                 ->get();
+        $amp = Amplazo::where('ampProject',$pyId)
+                ->join('gcocasoampliacion','ampCaso','=','camId')
+                ->get();
 
-        $view = view('presentacion.slide_sosem',compact('pry','psl','pst','eje','eqp','pto'));
+        $view = view('presentacion.slide_sosem',compact('pry','psl','pst','eje','eqp','pto','amp'));
 
         return $view;
     }

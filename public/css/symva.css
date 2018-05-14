@@ -407,7 +407,7 @@ input.editor-checkbox {
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
-.table-slide tbody td:nth-child(1){
+.table-slide tbody td,th:nth-child(1){
   padding-left: 30px;
   color: #74777c;
   font-weight: bold;

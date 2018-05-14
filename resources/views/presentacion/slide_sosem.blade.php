@@ -171,8 +171,8 @@
                             <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseDocs" aria-expanded="false" aria-controls="collapseDocs">A.4. DOCUMENTACIÓN ADMINISTRATIVA</button>
                         </div>
                         <div id="collapseDocs" class="collapse" aria-labelledby="headDocs" data-parent="#accordion">
-                            <table class="table table-sm">
-                                <thead>
+                            <table class="table table-sm table-slide">
+                                <thead class="thead-light"
                                     <tr>
                                         <th>DESCRIPCIÓN</th>
                                         <th>DOCUMENTO</th>
@@ -222,18 +222,18 @@
                                 <div class="col-md-12">
                                     @foreach($pto as $p)
                                         @if($p->preType == 1)
-                                            <table class="table table-sm">
-                                                <thead>
+                                            <table class="table table-sm table-slide">
+                                                <thead class="thead-light">
                                                     <tr>
-                                                        <th colspan="3">VALORIZACIONES</th>
+                                                        <th colspan="3" class="text-center">VALORIZACIONES</th>
                                                         <th rowspan="2">% AVANCE FÍSICO</th>
                                                         <th rowspan="2">NETO A PAGAR</th>
                                                         <th rowspan="2">SALDO FINANCIERO</th>
                                                     </tr>
                                                     <tr>
                                                         <th>Nro</th>
-                                                        <th>Correspondiente al mes</th>
-                                                        <th>Monto valorizado S/.</th>
+                                                        <th class="text-center">Correspondiente al mes</th>
+                                                        <th class="text-center">Monto valorizado S/.</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -260,7 +260,7 @@
                                             </table>
                                         @endif
                                         @if($p->preType == 2)
-                                            <table class="table table-sm">
+                                            <table class="table table-sm table-slide">
                                                 <thead>
                                                     <tr>
                                                         <th>Nro</th>
@@ -305,8 +305,8 @@
                             <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapsePpto" aria-expanded="false" aria-controls="collapsePpto">A.6. MODIFICACIONES PRESUPUESTALES: (Aprobada(s) mediante resolución(es)</button>
                         </div>
                         <div id="collapsePpto" class="collapse" aria-labelledby="headPpto" data-parent="#accordion">
-                            <table class="table table-sm">
-                                <thead>
+                            <table class="table table-sm table-slide">
+                                <thead class="thead-light">
                                     <tr>
                                         <th>Monto del Contrato</th>
                                         <th>Ad. Mayores Metrados</th>
@@ -335,13 +335,14 @@
                             <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapsePlazo" aria-expanded="false" aria-controls="collapsePlazo">A.7. PLAZO DE EJECUCIÓN SEGÚN CONTRATO</button>
                         </div>
                         <div id="collapsePlazo" class="collapse" aria-labelledby="headPlazo" data-parent="#accordion">
-                            <table class="table table-sm">
-                                <thead>
+                            <table class="table table-sm table-slide">
+                                <thead class="thead-light">
                                     <tr>
+                                        <th>Tipo de plazo</th>
                                         <th>Días</th>
-                                        <th>Fecha inicio</th>
-                                        <th>Inicio plazo contractul</th>
-                                        <th>Fecha conclusión</th>
+                                        <th>Inicio de plazo</th>
+                                        <th>Fin de plazo</th>
+                                        <th>Fecha de conclusión contractual</th>
                                         <th>EJECUTADO</th>
                                         <th>PARALIZADO</th>
                                         <th>AMPLIACIÓN</th>
@@ -350,15 +351,29 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>Contractual</td>
+                                        <td>{{ $eje[0]->ejeDaysTerm }}</td>
+                                        <td>{{ $eje[0]->ejeStartDate }}</td>
+                                        <td>{{ $eje[0]->ejeEndDate }}</td>
+                                        <td>{{ $eje[0]->ejeEndDate }}</td>
+                                        <td>{{ Carbon\Carbon::today()->diffInDays(Carbon\Carbon::parse($eje[0]->ejeEndDate)) }}</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                    @foreach($amp as $i=>$a)
+                                    <tr>
+                                        <td>{{ $a->ampNote . ' - ' . $a->camShortDesc }}</td>
+                                        <td>{{ $a->ampDaysTerm }}</td>
+                                        <td>{{ $a->ampStartStay }}</td>
+                                        <td>{{ $a->ampEndStay }}</td>
+                                        <td>{{ $a->ampEndExe }}</td>
+                                        <td></td>
+                                        <td>{{ Carbon\Carbon::parse($a->ampStartStay)->diffInDays(Carbon\Carbon::parse($a->ampEndStay)) }}</td>
+                                        <td>{{ $a->ampDaysTerm }}</td>
+                                        <td></td>
+                                    </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
