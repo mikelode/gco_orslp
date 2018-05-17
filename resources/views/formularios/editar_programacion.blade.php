@@ -358,10 +358,10 @@
 						</div>
 					</div>
 					<div class="form-group row">
-						<label class="col-md-4 font-weight-bold">Motivo (Art.140)</label>
+						<label class="col-md-4 font-weight-bold">Causal (Art.140, 169)</label>
 						<div class="col-md-8">
 							<select class="form-control form-control-sm" name="nampCaso" id="ampCaso">
-								<option value="NA">-- Seleccione el motivo --</option>
+								<option value="NA">-- Seleccione causal --</option>
 								@foreach($casos as $caso)
 								<option value="{{ $caso->camId }}">{{ $caso->camShortDesc }}</option>
 								@endforeach
@@ -369,19 +369,19 @@
 						</div>
 					</div>
 					<div class="form-group row">
-						<label class="col-md-4 font-weight-bold">Nota/Detalle</label>
+						<label class="col-md-4 font-weight-bold">Nombre y/o nota</label>
 						<div class="col-md-8">
 							<textarea class="form-control form-control-sm" name="nampNote"></textarea>
 						</div>
 					</div>
 					<div class="form-group row">
-						<label class="col-md-4 font-weight-bold">Desde (fecha):</label>
+						<label class="col-md-4 font-weight-bold">Susp. desde:</label>
 						<div class="col-md-8">
 							<input class="form-control form-control-sm ampSuspension" type="date" name="nampStart">
 						</div>
 					</div>
 					<div class="form-group row">
-						<label class="col-md-4 font-weight-bold">Hasta (fecha):</label>
+						<label class="col-md-4 font-weight-bold">Susp. hasta:</label>
 						<div class="col-md-8">
 							<input class="form-control form-control-sm ampSuspension" type="date" name="nampEnd">
 						</div>
