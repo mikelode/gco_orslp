@@ -404,11 +404,14 @@ input.editor-checkbox {
 }
 
 .table-slide{
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  /*font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;*/
+  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-size: x-small;
 }
 
 .table-slide tbody td,th:nth-child(1){
   padding-left: 30px;
   color: #74777c;
-  font-weight: bold;
+  /* font-weight: bold; */
 }

@@ -241,8 +241,8 @@
                                                     <tr>
                                                         <td>{{ $prg->prgNumberVal }}</td>
                                                         <td>{{ $prg->prgStartPeriod . ' - ' . $prg->prgEndPeriod }}</td>
-                                                        <td>{{ $prg->prgMountExec }}</td>
-                                                        <td>{{ $prg->prgAggregateExec }}</td>
+                                                        <td>{{ is_null($prg->prgMountExec) ? '' : number_format($prg->prgMountExec,2,'.',',') }}</td>
+                                                        <td>{{ is_null($prg->prgAggregateExec) ? '' : $prg->prgAggregateExec * 100 }}</td>
                                                         <td></td>
                                                         <td></td>
                                                     </tr>
@@ -276,8 +276,8 @@
                                                     <tr>
                                                         <td>{{ $prg->prgNumberVal }}</td>
                                                         <td>{{ $prg->prgStartPeriod . ' - ' . $prgEndPeriod }}</td>
-                                                        <td>{{ $prg->prgMountExec }}</td>
-                                                        <td>{{ $prg->prgAggregateExec }}</td>
+                                                        <td>{{ number_format($prg->prgMountExec,2,'.',',') }}</td>
+                                                        <td>{{ $prg->prgAggregateExec * 100 }}</td>
                                                         <td></td>
                                                         <td></td>
                                                     </tr>
@@ -356,7 +356,7 @@
                                         <td>{{ $eje[0]->ejeStartDate }}</td>
                                         <td>{{ $eje[0]->ejeEndDate }}</td>
                                         <td>{{ $eje[0]->ejeEndDate }}</td>
-                                        <td>{{ Carbon\Carbon::today()->diffInDays(Carbon\Carbon::parse($eje[0]->ejeEndDate)) }}</td>
+                                        <td>{{ Carbon\Carbon::today()->diffInDays(Carbon\Carbon::parse($eje[0]->ejeStartDate)) }}</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
