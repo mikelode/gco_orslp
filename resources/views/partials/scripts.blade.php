@@ -41,8 +41,8 @@
 <script src="{{ asset('/plugins/DataTables/buttons.html5.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/plugins/DataTables/buttons.print.min.js') }}" type="text/javascript"></script>
 
-<script src="{{  asset('/plugins/morris/raphael.min.js') }}" type="text/javascript"></script>
-<script src="{{  asset('/plugins/morris/morris.min.js') }}" type="text/javascript"></script>
+{{-- <script src="{{  asset('/plugins/morris/raphael.min.js') }}" type="text/javascript"></script>
+<script src="{{  asset('/plugins/morris/morris.min.js') }}" type="text/javascript"></script> --}}
 
 <script type="text/javascript" src="{{ asset('/js/symva.js') }}"></script>
 
@@ -60,6 +60,4 @@
 				screen.fadeOut();
 			});
 	}
-
-   //document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
 </script>

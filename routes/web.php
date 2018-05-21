@@ -22,6 +22,7 @@ Route::get('editar/pry','Gco\ProyectoController@edit');
 Route::post('editar/pry','Gco\ProyectoController@update');
 Route::post('eliminar/pry','Gco\ProyectoController@destroy');
 Route::get('sosem/pry','Gco\ProyectoController@buildSosem');
+Route::get('sosem/export','Gco\ProyectoController@exportSosem');
 
 Route::post('nuevo/prc','Gco\SeleccionController@store');
 Route::post('editar/prc','Gco\SeleccionController@update');
@@ -38,6 +39,7 @@ Route::get('create/prestacion','Gco\PresupuestoController@createPrestacion');
 Route::post('store/prestacion','Gco\PresupuestoController@storePrestacion');
 Route::get('list/presupuesto','Gco\PresupuestoController@list');
 Route::post('documento/prestacion','Gco\PresupuestoController@uploadFilePrestacion');
+Route::get('export/presupuesto','Gco\PresupuestoController@exportPresupuesto');
 
 Route::post('importar/partidas','Gco\PartidaController@importExcel');
 Route::get('list/partidas','Gco\PartidaController@list');

@@ -6,7 +6,7 @@
 		<div class="card-body">
 			<form id="frmUpdateBudget" action="{{ url('actualizar/presupuesto') }}">
 				{{ csrf_field() }}
-				<input type="hidden" name="hnpyId" value="{{ $pry->pryId }}">
+				<input type="hidden" id="pyId" name="hnpyId" value="{{ $pry->pryId }}">
 				<div class="table-responsive">
 					<table class="table table-sm" id="tblSummaryBudget">
 						<thead class="thead-dark">
@@ -108,12 +108,17 @@
 				<div class="col-md-4">
 					<div class="form-group row mb-0">
 						<label class="col-form-label col-md-4">Presupuesto:</label>
-						<div class="col-md-8">
+						<div class="col-md-6">
 							<select class="form-control form-control-sm" id="slcPartidasPto">
 								@foreach($pto as $p)
 								<option value="{{ $p->preId }}">{{ $p->itemDsc . ' - ' . $p->preName }}</option>
 								@endforeach
 							</select>
+						</div>
+						<div class="col-md-2">
+							<a id="btnExportPpto" data-base="{{ url('export/presupuesto'). '?pry=' . $pry->pryId }}" href="{{ url('export/presupuesto') . '?pry=' . $pry->pryId . '&pto=' . $pto[0]->preId }}">
+								<img src="{{ asset('/img/xls_32.png') }}">
+							</a>
 						</div>
 					</div>
 				</div>
@@ -298,6 +303,9 @@
 	});
 
 	$('#slcPartidasPto').change(function(event) {
+
+		var base = $('#btnExportPpto').data('base');
+		$('#btnExportPpto').attr('href',base + '&pto=' + this.value);
 		
 		cargar_presupuesto({{ $pto[0]->preProject }}, this.value, function(data){
 
@@ -330,18 +338,18 @@
 
 			grid = new Slick.Grid("#myGrid", ptdData, columns, options);
 
-				grid.onCellChange.subscribe(function(e,args){
-									
-					$.get('actualizar/partida', args.item, function(response) {
-						if(response.msgId == '500'){
-							alert(response.msg);
-						}
-					});
-
-					grid.invalidateRow(args.row);
-					grid.render();
-
+			grid.onCellChange.subscribe(function(e,args){
+								
+				$.get('actualizar/partida', args.item, function(response) {
+					if(response.msgId == '500'){
+						alert(response.msg);
+					}
 				});
+
+				grid.invalidateRow(args.row);
+				grid.render();
+
+			});
 		});
 
 	});

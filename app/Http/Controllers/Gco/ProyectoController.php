@@ -17,6 +17,20 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Exception;
+use Excel;
+use File;
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx as ReadXlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx as WriteXlsx;
+
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Protection;
 
 class ProyectoController extends Controller
 {   
@@ -415,5 +429,66 @@ class ProyectoController extends Controller
         $view = view('presentacion.slide_sosem',compact('pry','psl','pst','eje','eqp','pto','amp'));
 
         return $view;
+    }
+
+    public function exportSosem(Request $request)
+    {
+        $extFile = $request->type;
+
+        $pyId = $request->pry;
+
+        $pry = Proyecto::find($pyId);
+        $psl = Seleccion::where('pslProject',$pyId)->get();
+        $pst = Postor::with('individualData')->where('pstSelectionProc',$psl[0]->pslId)->where('pstCondition',1)->get();
+        $eje = Uejecutora::where('ejeProject',$pyId)->get();
+        $eqp = Equiprof::with('individualData')->where('prfUejecutora',$eje[0]->ejeId)->get();
+        $pto = Presupuesto::select('*')
+                ->with('items')
+                ->with('programacion')
+                ->join('gcotpresupuesto','tprId','preType')
+                ->where('preProject',$pyId)
+                ->get();
+        $amp = Amplazo::where('ampProject',$pyId)
+                ->join('gcocasoampliacion','ampCaso','=','camId')
+                ->get();
+
+        if($extFile == 'xls'){
+
+            $reader = new ReadXlsx();
+            $reader->setLoadSheetsOnly(['sosem']);
+            $spreadsheet = $reader->load(storage_path('app/public/formatos') . '/sosem.xlsx');
+            
+            $spreadsheet->getProperties()
+               ->setCreator('Symva')
+               ->setTitle('Ficha SOSEM - Oficina Regional de Supervisión y Liquidación de Proyectos')
+               ->setLastModifiedBy('Symva')
+               ->setDescription('Ficha técnica de información de obra')
+               ->setSubject('Información de obra')
+               ->setCategory('SIGCO');
+    
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $hoy = Carbon::today();
+
+            $sheet->setCellValue('F2', $pry->pryDenomination);
+            $sheet->setCellValue('K4', 'Informado al: ' . $hoy->day . '/' . $hoy->month . '/' . $hoy->year);
+            $sheet->setCellValue('F7', $eje[0]->ejeSisContract);
+            $sheet->setCellValue('F8', $psl[0]->pslNomenclatura);
+            $sheet->setCellValue('F9', $pst[0]->individualData->prjBusiName . ' (' . $pst[0]->individualData->prjRegistNumber . ')');
+            $sheet->setCellValue('F10', $pst[0]->individualData->prjLegalRepName . ' ' . $pst[0]->individualData->prjLegalRepPaterno . ' ' . $pst[0]->individualData->prjLegalRepMaterno . ' (' . $pst[0]->individualData->prjLegalRepDni . ')');
+            $sheet->setCellValue('F11',$eje[0]->ejeMountContract);
+
+            $rowEqp = 17;
+            foreach($eqp as $i => $prf){
+                $sheet->setCellValue('C'.($rowEqp + $i), $prf->prfJob . ':');
+                $sheet->setCellValue('E'.($rowEqp + $i), $prf->individualData->perFullName);
+            }
+            
+            $writer = new WriteXlsx($spreadsheet);
+            header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="sosem.xlsx"');
+            $writer->save('php://output');
+            
+        }
     }
 }

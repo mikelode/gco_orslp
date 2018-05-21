@@ -17,6 +17,17 @@ use Exception;
 use Excel;
 use File;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Protection;
+
 class PresupuestoController extends Controller
 {
     /**
@@ -419,5 +430,47 @@ class PresupuestoController extends Controller
         }
 
         return response()->json(compact('msg','msgId','url','pyId'));
+    }
+
+    public function exportPresupuesto(Request $request)
+    {
+        $spreadsheet = new SpreadSheet();
+
+        $spreadsheet->getProperties()
+           ->setCreator('Symva')
+           ->setTitle('Presupuesto - Oficina Regional de Supervisión y Liquidación de Proyectos')
+           ->setLastModifiedBy('Symva')
+           ->setDescription('Archivo excel del presupuesto de obra')
+           ->setSubject('Partidas presupuestarias')
+           ->setCategory('SIGCO');
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Presupuesto');
+
+        $pyId = $request->pry;
+        $prId = $request->pto;
+
+        $ptd = Partida::where('parProject',$pyId)->where('parBudget',$prId)->get();
+
+        foreach($ptd as $i => $par){
+            $sheet->setCellValue('A'.($i+5),$i+1);
+            $sheet->setCellValue('B'.($i+5),$par->parItem);
+            $sheet->setCellValue('C'.($i+5),$par->parDescription);
+            $sheet->setCellValue('D'.($i+5),$par->parMetered);
+            $sheet->setCellValue('E'.($i+5),$par->parUnit);
+            $sheet->setCellValue('F'.($i+5),$par->parPrice);
+            $sheet->setCellValue('G'.($i+5),$par->parPartial);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="presupuesto.xlsx"');
+        $writer->save('php://output');
+        //$writer->save('presupuesto.xlsx');
+
+        /* $data = array('success' => true, 'url' => url('presupuesto') . '.xlsx');
+
+        return response()->json(compact('data')); */
+
     }
 }

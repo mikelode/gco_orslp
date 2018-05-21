@@ -1,8 +1,16 @@
 <div class="card">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
                 <h4 class="text-center"><span class="border border-secondary px-2">FICHA TÉCNICA DEL PROYECTO DE INVERSIÓN PÚBLICA</span></h4>
+            </div>
+            <div class="col-md-2">
+                <a id="btnExportSosem" href="{{ url('sosem/export') . '?type=xls&pry=' . $pry->pryId }}">
+                    <img src="{{ asset('/img/xls_32.png') }}">
+                </a>
+                <img src="{{ asset('/img/pdf_32.png') }}">
+                <img src="{{ asset('/img/doc_32.png') }}">
             </div>
         </div>
         <div class="row">
