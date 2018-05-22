@@ -35,7 +35,7 @@
                                 <tbody>
                                     <tr>
                                         <td>Sistema de Contratación</td>
-                                        <td>{{ $eje[0]->ejeSisContract }}</td>
+                                        <td>{{ $eje[0]->ejeSisContract == 'PU' ? 'PRECIOS UNITARIOS' : 'SUMA ALZADA' }}</td>
                                     </tr>
                                     <tr>
                                         <td>Tipo de Selección</td>

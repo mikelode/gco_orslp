@@ -472,7 +472,7 @@ class ProyectoController extends Controller
 
             $sheet->setCellValue('F2', $pry->pryDenomination);
             $sheet->setCellValue('K4', 'Informado al: ' . $hoy->day . '/' . $hoy->month . '/' . $hoy->year);
-            $sheet->setCellValue('F7', $eje[0]->ejeSisContract);
+            $sheet->setCellValue('F7', $eje[0]->ejeSisContract == 'PU' ? 'PRECIOS UNITARIOS' : 'SUMA ALZADA');
             $sheet->setCellValue('F8', $psl[0]->pslNomenclatura);
             $sheet->setCellValue('F9', $pst[0]->individualData->prjBusiName . ' (' . $pst[0]->individualData->prjRegistNumber . ')');
             $sheet->setCellValue('F10', $pst[0]->individualData->prjLegalRepName . ' ' . $pst[0]->individualData->prjLegalRepPaterno . ' ' . $pst[0]->individualData->prjLegalRepMaterno . ' (' . $pst[0]->individualData->prjLegalRepDni . ')');
@@ -483,6 +483,50 @@ class ProyectoController extends Controller
                 $sheet->setCellValue('C'.($rowEqp + $i), $prf->prfJob . ':');
                 $sheet->setCellValue('E'.($rowEqp + $i), $prf->individualData->perFullName);
             }
+
+            $sheet->setCellValue('F22', $pry->prySnip);
+            $sheet->setCellValue('F24', $pry->pryDenomination);
+
+            \PhpOffice\PhpSpreadsheet\Cell\Cell::setValueBinder( new \PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder() );
+            $rowPrg = 51;
+            foreach($pto as $p){
+                if($p->preType == 1){
+                    foreach($p->programacion as $i=>$prg){
+                        if($i == 0){
+                            $sheet->setCellValue('C50', $prg->prgNumberVal);
+                            $sheet->setCellValue('D50', $prg->prgEndPeriod);
+                            $sheet->getStyle('D50')
+                                    ->getNumberFormat()
+                                    ->setFormatCode('mmmm-yy');
+
+                            $sheet->setCellValue('G50', is_null($prg->prgMountExec) ? '' : $prg->prgMountExec);
+                            $sheet->getStyle('G50')->getNumberFormat()
+                                    ->setFormatCode('#,##0.00');
+
+                            $sheet->setCellValue('H50', is_null($prg->prgAggregateExec) ? '' : $prg->prgAggregateExec);
+                        }
+                        else{
+                            $sheet->insertNewRowBefore($rowPrg,1);
+                            $sheet->setCellValue('C'.$rowPrg, $prg->prgNumberVal);
+                            $sheet->setCellValue('D'.$rowPrg, $prg->prgEndPeriod);
+                            $sheet->getStyle('D'.$rowPrg)
+                                    ->getNumberFormat()
+                                    ->setFormatCode('mmmm-yy');
+
+                            $sheet->setCellValue('G'.$rowPrg, is_null($prg->prgMountExec) ? '' : $prg->prgMountExec);
+                            $sheet->getStyle('G50')->getNumberFormat()
+                                    ->setFormatCode('#,##0.00');
+
+                            $sheet->setCellValue('H'.$rowPrg, is_null($prg->prgAggregateExec) ? '' : $prg->prgAggregateExec);
+                            $rowPrg++;
+                        }
+                    }
+                }
+                else if($p->preType == 1){
+                    
+                }
+            }
+
             
             $writer = new WriteXlsx($spreadsheet);
             header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
