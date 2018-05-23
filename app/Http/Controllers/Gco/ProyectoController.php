@@ -507,17 +507,17 @@ class ProyectoController extends Controller
                         }
                         else{
                             $sheet->insertNewRowBefore($rowPrg,1);
-                            $sheet->setCellValue('C'.$rowPrg, $prg->prgNumberVal);
-                            $sheet->setCellValue('D'.$rowPrg, $prg->prgEndPeriod);
-                            $sheet->getStyle('D'.$rowPrg)
+                            $sheet->setCellValue('C'.($rowPrg), $prg->prgNumberVal);
+                            $sheet->setCellValue('D'.($rowPrg), $prg->prgEndPeriod);
+                            $sheet->getStyle('D'.($rowPrg))
                                     ->getNumberFormat()
                                     ->setFormatCode('mmmm-yy');
 
-                            $sheet->setCellValue('G'.$rowPrg, is_null($prg->prgMountExec) ? '' : $prg->prgMountExec);
+                            $sheet->setCellValue('G'.($rowPrg), is_null($prg->prgMountExec) ? '' : $prg->prgMountExec);
                             $sheet->getStyle('G50')->getNumberFormat()
                                     ->setFormatCode('#,##0.00');
 
-                            $sheet->setCellValue('H'.$rowPrg, is_null($prg->prgAggregateExec) ? '' : $prg->prgAggregateExec);
+                            $sheet->setCellValue('H'.($rowPrg), is_null($prg->prgAggregateExec) ? '' : $prg->prgAggregateExec);
                             $rowPrg++;
                         }
                     }
@@ -525,6 +525,29 @@ class ProyectoController extends Controller
                 else if($p->preType == 1){
                     
                 }
+            }
+
+            $rowTerm = $rowPrg + 19;
+
+            $sheet->setCellValue('C'.($rowTerm - 4), $eje[0]->ejeDaysTerm);
+            $sheet->setCellValue('D'.($rowTerm - 4), $eje[0]->ejeStartDate);
+            $sheet->setCellValue('E'.($rowTerm - 4), $eje[0]->ejeStartDate);
+            $sheet->setCellValue('F'.($rowTerm - 4), $eje[0]->ejeEndDate);
+
+            $sheet->setCellValue('C'.$rowTerm, 'Contractual');
+            $sheet->setCellValue('E'.$rowTerm, '');
+            $sheet->setCellValue('H'.$rowTerm, '');
+            $sheet->setCellValue('I'.$rowTerm, '');
+            $sheet->setCellValue('J'.$rowTerm, $eje[0]->ejeEndDate);
+
+            foreach($amp as $i => $a){
+                $rowTerm++;
+                $sheet->insertNewRowBefore($rowTerm,1);
+                $sheet->setCellValue('C'.($rowTerm), $a->ampNote . ' - ' . $a->camShortDesc);
+                $sheet->setCellValue('E'.($rowTerm), $a->camDescription);
+                $sheet->setCellValue('H'.($rowTerm), Carbon::parse($a->ampStartStay)->diffInDays(Carbon::parse($a->ampEndStay)));
+                $sheet->setCellValue('I'.($rowTerm), $a->ampDaysTerm);
+                $sheet->setCellValue('J'.($rowTerm), $a->ampEndExe);
             }
 
             
